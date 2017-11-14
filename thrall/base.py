@@ -74,7 +74,7 @@ class BaseData(object):
 
     def _decode(self, p):
         r = self.decode_param(p, self._data)
-        return r or self._data.get(p)
+        return r if r is not None else self._data.get(p)
 
     def decode_param(self, p, data):
         """ Decode data param.
@@ -119,18 +119,26 @@ class BaseAdapterMixin(object):
             return self._registered_coders[func]
 
     def registry(self, func, coder):
-        if is_func_bound(func, self):
-            self._registered_coders[func.func_name] = coder
-        else:
-            raise RuntimeError('un-support registry function {}'.format(func))
+        try:
+            if is_func_bound(func, self):
+                self._registered_coders[func.func_name] = coder
+            else:
+                raise KeyError
+        except Exception:
+            raise AttributeError(
+                'un-support registry function {}'.format(func))
 
     def un_registry(self, func):
-        if isinstance(func, (str, unicode)):
-            self._registered_coders.pop(func)
-        elif is_func_bound(func, self):
-            self._registered_coders.pop(func.func_name)
-        else:
-            raise RuntimeError("can't un-registry function {}".format(func))
+        try:
+            if isinstance(func, (str, unicode)):
+                self._registered_coders.pop(func)
+            elif is_func_bound(func, self):
+                self._registered_coders.pop(func.func_name)
+            else:
+                raise KeyError
+        except Exception:
+            raise AttributeError(
+                "can't un-registry function {}".format(func))
 
 
 class BaseAdapter(BaseAdapterMixin):

@@ -31,7 +31,7 @@ class TestSearchTextRequestParams(object):
 
         p = model.prepare()
 
-        assert isinstance(p, _search_model.PreparedSearchRequestParams)
+        assert isinstance(p, _search_model.PreparedSearchTextRequestParams)
 
         assert p.keywords == [u'xxx', u'中国']
         assert p.key == 'xx'
@@ -42,7 +42,7 @@ class TestSearchTextRequestParams(object):
 
         p = model.prepare()
 
-        assert isinstance(p, _search_model.PreparedSearchRequestParams)
+        assert isinstance(p, _search_model.PreparedSearchTextRequestParams)
 
         assert p.types == [u'xxx', u'中国', u'001']
         assert p.key == 'xx'
@@ -59,14 +59,14 @@ class TestSearchTextRequestParams(object):
         assert 'keywords and types' in err.value.message
 
 
-class TestPreparedSearchRequestParams(object):
+class TestPreparedSearchTextRequestParams(object):
     def test_init_ok(self):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         assert model.key is None
 
     def test_prepare_ok(self, mocker):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         model.prepare_keywords = lambda x: 'keywords'
         model.prepare_types = lambda x: 'types'
@@ -100,7 +100,7 @@ class TestPreparedSearchRequestParams(object):
         model.prepare_extension.assert_called_once_with(True)
 
     def test_prepare_keywords(self, mocker):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         mocker.spy(_search_model, 'prepare_multi_address')
         mocker.spy(_search_model, 'merge_multi_address')
@@ -115,7 +115,7 @@ class TestPreparedSearchRequestParams(object):
             ['aaa', u'你'])
 
     def test_prepare_none_keywods(self, mocker):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         mocker.spy(_search_model, 'prepare_multi_address')
         mocker.spy(_search_model, 'merge_multi_address')
@@ -129,7 +129,7 @@ class TestPreparedSearchRequestParams(object):
         assert _search_model.merge_multi_address.call_count == 0
 
     def test_prepare_types(self, mocker):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         mocker.spy(_search_model, 'prepare_multi_pois')
         mocker.spy(_search_model, 'merge_multi_poi')
@@ -143,7 +143,7 @@ class TestPreparedSearchRequestParams(object):
         _search_model.merge_multi_poi.assert_called_once_with(['aaa', u'你'])
 
     def test_prepare_none_types(self, mocker):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         mocker.spy(_search_model, 'prepare_multi_pois')
         mocker.spy(_search_model, 'merge_multi_poi')
@@ -161,7 +161,7 @@ class TestPreparedSearchRequestParams(object):
         ('', u'')
     ])
     def test_prepare_city(self, input, output):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         model.prepare_city(input)
 
@@ -182,7 +182,7 @@ class TestPreparedSearchRequestParams(object):
          'false'),
     ])
     def test_prepare_city_limit(self, input, output, p_output):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         model.prepare_city_limit(input)
 
@@ -199,7 +199,7 @@ class TestPreparedSearchRequestParams(object):
         (None, None, None)
     ])
     def test_prepare_children(self, input, output, p_output):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         model.prepare_children(input)
 
@@ -208,7 +208,7 @@ class TestPreparedSearchRequestParams(object):
 
     @pytest.mark.parametrize('data', [0, 1, 10, 25])
     def test_offset(self, data):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         model.prepare_offset(data)
 
@@ -217,7 +217,7 @@ class TestPreparedSearchRequestParams(object):
 
     @pytest.mark.parametrize('data', [-1, 26, 100, -10])
     def test_offset_out_of_range(self, data):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         with pytest.raises(VendorParamError) as err:
             model.prepare_offset(data)
@@ -227,7 +227,7 @@ class TestPreparedSearchRequestParams(object):
 
     @pytest.mark.parametrize('data', [0, 1, 10, 50, 100])
     def test_page(self, data):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         model.prepare_page(data)
 
@@ -236,7 +236,7 @@ class TestPreparedSearchRequestParams(object):
 
     @pytest.mark.parametrize('data', [-1, 101, 1000, -10])
     def test_page_out_of_range(self, data):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         with pytest.raises(VendorParamError) as err:
             model.prepare_page(data)
@@ -254,7 +254,7 @@ class TestPreparedSearchRequestParams(object):
          _search_model.EXTENSION_ALL),
     ])
     def test_prepare_extensions(self, input, output, p_output):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         model.prepare_extension(input)
 
@@ -262,7 +262,7 @@ class TestPreparedSearchRequestParams(object):
         assert model.prepared_extension == p_output
 
     def test_prepare_others(self):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
 
         model.prepare_building('building')
         model.prepare_floor('floor')
@@ -289,10 +289,84 @@ class TestPreparedSearchRequestParams(object):
          {'key': 'xxx'}),
     ])
     def test_generate_params(self, input, output):
-        model = _search_model.PreparedSearchRequestParams()
+        model = _search_model.PreparedSearchTextRequestParams()
         model.prepare(**input)
 
         for k, v in iteritems(output):
             assert model.params[k] == v
 
 
+class TestSearchResponseData(object):
+    RAW_DATA = '''
+            {
+                "status": "1",
+                "count": "100",
+                "info": "OK",
+                "infocode": "10000",
+                "suggestion": {
+                    "keywords": [],
+                    "cities": [
+                        {
+                            "name": "南阳市",
+                            "num": "4678",
+                            "citycode": "0377",
+                            "adcode": "411300"
+                        }
+                    ]
+                },
+                "pois": []
+            }'''
+
+    def test_get_suggestion(self, mocker):
+        model = _search_model.SearchResponseData(self.RAW_DATA)
+
+        mocker.spy(model, 'get_suggestions')
+        data = model.suggestions
+
+        assert isinstance(data, _search_model.SearchSuggestion)
+        model.get_suggestions.assert_called_once_with(model._raw_data)
+
+    def test_get_data(self, mocker):
+        model = _search_model.SearchResponseData(self.RAW_DATA)
+
+        mocker.spy(model, 'get_data')
+        data = model.data
+
+        for i in data:
+            assert isinstance(i, _search_model.SearchData)
+
+        model.get_data.assert_called_once_with(model._raw_data)
+
+
+class TestSearchSuggestion(object):
+    def test_init(self):
+        model = _search_model.SearchSuggestion({})
+
+        assert model.keywords is None
+        assert isinstance(model.cities, list)
+        assert not model.cities
+
+    def test_decode_cities(self):
+        raw_data = {'cities': [{}, {}, {}]}
+        model = _search_model.SearchSuggestion(raw_data)
+
+        assert model.keywords is None
+        assert isinstance(model.cities, list)
+        assert len(model.cities) == 3
+
+
+class TestSearchData(object):
+    def test_init(self):
+        model = _search_model.SearchData({})
+
+        for m in model._properties:
+            o = getattr(model, m)
+            if m == 'photos':
+                assert isinstance(o, list)
+                assert not o
+            elif m == 'indoor_data':
+                assert isinstance(o, _search_model.IndoorData)
+            elif m == 'biz_ext':
+                assert isinstance(o, _search_model.BizExt)
+            else:
+                assert o is None

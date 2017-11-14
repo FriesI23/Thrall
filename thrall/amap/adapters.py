@@ -9,7 +9,9 @@ from .models import (
     GeoCodeRequestParams,
     GeoCodeResponseData,
     ReGeoCodeRequestParams,
-    ReGeoCodeResponseData
+    ReGeoCodeResponseData,
+    SearchTextRequestParams,
+    SearchResponseData,
 )
 
 
@@ -24,6 +26,7 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
     def registry_encoders(self):
         self.registry(self.encode_geo_code, GeoCodeRequestParams)
         self.registry(self.encode_regeo_code, ReGeoCodeRequestParams)
+        self.registry(self.encode_search_text, SearchTextRequestParams)
 
     @check_params_type(coder=(type,))
     def registry(self, func, coder):
@@ -35,6 +38,11 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
 
     def encode_regeo_code(self, *args, **kwargs):
         with self.encoder_context('encode_regeo_code', *args, **kwargs) as p:
+            return p
+
+    def encode_search_text(self, *args, **kwargs):
+        with self.encoder_context('encode_search_text',
+                                  *args, **kwargs) as p:
             return p
 
 
@@ -49,6 +57,7 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
     def registry_decoders(self):
         self.registry(self.decode_geo_code, GeoCodeResponseData)
         self.registry(self.decode_regeo_code, ReGeoCodeResponseData)
+        self.registry(self.decode_search, SearchResponseData)
 
     @check_params_type(coder=(type,))
     def registry(self, func, coder):
@@ -60,4 +69,8 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
 
     def decode_regeo_code(self, *args, **kwargs):
         with self.decoder_context('decode_regeo_code', *args, **kwargs) as p:
+            return p
+
+    def decode_search(self, *args, **kwargs):
+        with self.decoder_context('decode_search', *args, **kwargs) as p:
             return p

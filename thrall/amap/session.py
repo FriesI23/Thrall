@@ -1,13 +1,24 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from ..base import BaseDecoderAdapter, BaseEncoderAdapter, BaseRequest
+from ..base import (
+    BaseDecoderAdapter,
+    BaseEncoderAdapter,
+    BaseRequest
+)
 from ..hooks import SetDefault
 from ..settings import GLOBAL_CONFIG
 from ..utils import check_params_type
-from .adapters import AMapEncodeAdapter, AMapJsonDecoderAdapter
+from .adapters import (
+    AMapEncodeAdapter,
+    AMapJsonDecoderAdapter
+)
 from .request import AMapRequest
-from .urls import GEO_CODING_URL, REGEO_CODING_URL
+from .urls import (
+    GEO_CODING_URL,
+    REGEO_CODING_URL,
+    POI_SEARCH_TEXT_URL,
+)
 
 _set_default = SetDefault()
 
@@ -77,6 +88,27 @@ class AMapSession(object):
         d = self.decoder.decode_regeo_code(raw_data=r.content,
                                            version=REGEO_CODING_URL.version)
 
+        return d
+
+    @_set_default
+    def search_text(self, keywords=None, types=None, city=None,
+                    city_limit=None, children=None, offset=None, page=None,
+                    building=None, floor=None, extensions=None, **kwargs):
+        p = self.encoder.encode_search_text(keywords=keywords,
+                                            types=types,
+                                            city=city,
+                                            city_limit=city_limit,
+                                            children=children,
+                                            offset=offset,
+                                            page=page,
+                                            building=building,
+                                            floor=floor,
+                                            extensions=extensions,
+                                            **kwargs)
+        r = self.request.get(POI_SEARCH_TEXT_URL.url, params=p.params)
+
+        d = self.decoder.decode_search(raw_data=r.content,
+                                       version=POI_SEARCH_TEXT_URL.version)
         return d
 
 

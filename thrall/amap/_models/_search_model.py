@@ -58,7 +58,7 @@ class SearchTextRequestParams(BaseRequestParams):
             raise amap_params_exception(
                 'keywords and types must be required one at least.')
 
-        _p = PreparedSearchRequestParams()
+        _p = PreparedSearchTextRequestParams()
 
         with self.prepare_basic(_p) as p:
             p.prepare(
@@ -78,9 +78,9 @@ class SearchTextRequestParams(BaseRequestParams):
         return p
 
 
-class PreparedSearchRequestParams(BasePreparedRequestParams):
+class PreparedSearchTextRequestParams(BasePreparedRequestParams):
     def __init__(self):
-        super(PreparedSearchRequestParams, self).__init__()
+        super(PreparedSearchTextRequestParams, self).__init__()
         self.keywords = None
         self.types = None
         self.city = None
@@ -242,11 +242,11 @@ class SearchResponseData(BaseResponseData):
     def suggestions(self):
         return self.get_suggestions(self._raw_data)
 
-    def get_suggestions(self, raw_data):
-        return SearchSuggestion(raw_data.get(self._SUGGESTION_ROUTE))
+    def get_suggestions(self, data):
+        return SearchSuggestion(data.get(self._SUGGESTION_ROUTE))
 
-    def get_data(self, raw_data):
-        datas = raw_data.get(self._POIS_ROUTE)
+    def get_data(self, data):
+        datas = data.get(self._POIS_ROUTE)
         return [SearchData(d) for d in datas] if datas else []
 
 

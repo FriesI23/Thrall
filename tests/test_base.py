@@ -120,12 +120,12 @@ class TestBaseAdapterMixin(object):
 
     def test_registry_unbound(self):
         mock_adapter = self.MockAdapter()
-        with pytest.raises(RuntimeError):
+        with pytest.raises(AttributeError):
             mock_adapter.registry(self.mock_coder, 'mock')
 
     def test_registry_not_fn(self):
         mock_adapter = self.MockAdapter()
-        with pytest.raises(RuntimeError):
+        with pytest.raises(AttributeError):
             mock_adapter.registry('mock_coder', 'mock')
 
     def test_un_registry(self):
@@ -148,20 +148,20 @@ class TestBaseAdapterMixin(object):
         mock_adapter = self.MockAdapter()
         mock_adapter.registry(mock_adapter.mock_coder, 'mock')
 
-        with pytest.raises(RuntimeError):
+        with pytest.raises(AttributeError):
             mock_adapter.un_registry(self.mock_coder)
 
     def test_un_registry_not_register(self):
         mock_adapter = self.MockAdapter()
 
-        with pytest.raises(KeyError):
+        with pytest.raises(AttributeError):
             mock_adapter.un_registry(mock_adapter.mock_coder)
 
     def test_un_registry_unknown_str(self):
         mock_adapter = self.MockAdapter()
         mock_adapter.registry(mock_adapter.mock_coder, 'mock')
 
-        with pytest.raises(KeyError):
+        with pytest.raises(AttributeError):
             mock_adapter.un_registry('mock_coderss')
 
     def test_query_ok(self):
