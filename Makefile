@@ -1,12 +1,23 @@
 export PYTHONPATH ?= .
 
-.PHONY: test
+.PHONY: init test ci cov clean build
+
+init:
+	pip install pipenv --upgrade
+	pipenv install --dev --skip-lock
 
 test:
-	py.test --doctest-modules
+	pipenv run tox
 
 ci:
-	flake8 thrall -v
+	pipenv run flake8 thrall --verbose
 
-coverage:
-	py.test --cov-config .coveragerc --verbose --cov=thrall tests
+cov:
+	pipenv run py.test --doctest-module --cov-config .coveragerc --verbose --cov=thrall
+
+
+clean:
+	rm -rf dist build
+
+build: test clean
+	python setup.py sdist bdist_wheel

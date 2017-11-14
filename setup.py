@@ -10,7 +10,9 @@ test_requirements = ['responses',
                      'pytest-mock',
                      'pytest>=2.8.0', ]
 
-install_requires = ['six', 'requests']
+install_requires = ['six',
+                    'requests<3.0.0',
+                    'future']
 
 if sys.version_info == (2, 7):
     install_requires.append('functools32')
@@ -23,5 +25,5 @@ setup(
     author_email='qinzezzhen@outlook.com',
     packages=find_packages(),
     tests_require=test_requirements,
-    install_requires=['six', 'functools32', 'requests'],
+    install_requires=install_requires,
 )
