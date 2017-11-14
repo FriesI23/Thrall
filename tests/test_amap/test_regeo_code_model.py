@@ -113,7 +113,7 @@ class TestPreparedReGeoCodeRequestParams(object):
         with pytest.raises(VendorParamError) as e:
             model.prepare_radius(data)
 
-        assert 'in 0~3000m' in e.value.message
+        assert 'in 0~3000m' in str(e.value)
 
     @pytest.mark.parametrize('data, result, p_result', [
         (True, BatchFlag.ON, 'true'),

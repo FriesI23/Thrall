@@ -71,7 +71,7 @@ class TestBaseModel(object):
             model.prepare()
 
         assert isinstance(err.value.data, model.__class__)
-        assert '123' in err.value.message
+        assert '123' in str(err.value)
 
 
 class TestBasePrepareModelNoEmplement(object):

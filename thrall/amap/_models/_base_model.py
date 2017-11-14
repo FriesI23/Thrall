@@ -69,7 +69,10 @@ class Sig(object):
 
     @property
     def hashed_sig(self):
-        return self.hash_func(self.unhash_sig).digest()
+        sig = (self.unhash_sig.encode('utf-8')
+               if isinstance(self.unhash_sig, unicode) else self.unhash_sig)
+
+        return self.hash_func(sig).digest()
 
     @property
     def unhash_sig(self):

@@ -1,6 +1,7 @@
 # coding: utf-8
 from __future__ import absolute_import
 from six import iteritems
+from thrall.utils import unicode
 
 import pytest
 
@@ -56,7 +57,7 @@ class TestSearchTextRequestParams(object):
         assert isinstance(err.value.data,
                           _search_model.SearchTextRequestParams)
 
-        assert 'keywords and types' in err.value.message
+        assert 'keywords and types' in str(err.value)
 
 
 class TestPreparedSearchTextRequestParams(object):
@@ -222,7 +223,7 @@ class TestPreparedSearchTextRequestParams(object):
         with pytest.raises(VendorParamError) as err:
             model.prepare_offset(data)
 
-        assert 'offset must in range 0 - 25.' in err.value.message
+        assert 'offset must in range 0 - 25.' in str(err.value)
         assert model.prepared_offset is None
 
     @pytest.mark.parametrize('data', [0, 1, 10, 50, 100])
@@ -241,7 +242,7 @@ class TestPreparedSearchTextRequestParams(object):
         with pytest.raises(VendorParamError) as err:
             model.prepare_page(data)
 
-        assert 'page must in range 0 - 100.' in err.value.message
+        assert 'page must in range 0 - 100.' in str(err.value)
         assert model.prepared_page is None
 
     @pytest.mark.parametrize('input, output, p_output', [

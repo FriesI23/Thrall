@@ -1,6 +1,7 @@
 # coding: utf-8
 # coding: utf-8
 from __future__ import absolute_import
+from thrall.compat import unicode
 
 from requests.adapters import HTTPAdapter
 from requests.sessions import Session
@@ -114,14 +115,14 @@ class BaseAdapterMixin(object):
 
     def _query(self, func):
         if is_func_bound(func, self):
-            return self._registered_coders[func.func_name]
+            return self._registered_coders[func.__name__]
         else:
             return self._registered_coders[func]
 
     def registry(self, func, coder):
         try:
             if is_func_bound(func, self):
-                self._registered_coders[func.func_name] = coder
+                self._registered_coders[func.__name__] = coder
             else:
                 raise KeyError
         except Exception:
@@ -133,7 +134,7 @@ class BaseAdapterMixin(object):
             if isinstance(func, (str, unicode)):
                 self._registered_coders.pop(func)
             elif is_func_bound(func, self):
-                self._registered_coders.pop(func.func_name)
+                self._registered_coders.pop(func.__name__)
             else:
                 raise KeyError
         except Exception:
