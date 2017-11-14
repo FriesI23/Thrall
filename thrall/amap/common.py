@@ -10,12 +10,10 @@ from thrall.utils import camelcase_to_snakecase, is_list_empty
 def parse_multi_address(mixed_addresses):
     u""" split amap multi address by '|'
 
-    >>> parse_multi_address('aaa|bbb')
-    [u'aaa', u'bbb']
-    >>> parse_multi_address('aaa')
-    [u'aaa']
-    >>> parse_multi_address(u'中国|美国')
-    [u'\\u4e2d\\u56fd', u'\\u7f8e\\u56fd']
+    >>> assert parse_multi_address('aaa|bbb') == [u'aaa', u'bbb']
+    >>> assert parse_multi_address('aaa') == [u'aaa']
+    >>> assert parse_multi_address(u'中国|美国') == \
+    [u'\u4e2d\u56fd', u'\u7f8e\u56fd']
     """
     return mixed_addresses.split(u'|')
 
@@ -23,14 +21,11 @@ def parse_multi_address(mixed_addresses):
 def merge_multi_address(addresses):
     u"""merge amap multi addresses into single
 
-    >>> merge_multi_address(['aaa', 'bbb'])
-    u'aaa|bbb'
-    >>> merge_multi_address([u'aaaa'])
-    u'aaaa'
-    >>> merge_multi_address([u'中国', 'bbb'])
-    u'\\u4e2d\\u56fd|bbb'
-    >>> merge_multi_address([u'中国', u'美国', u'新加波'])
-    u'\\u4e2d\\u56fd|\\u7f8e\\u56fd|\\u65b0\\u52a0\\u6ce2'
+    >>> assert merge_multi_address(['aaa', 'bbb']) == u'aaa|bbb'
+    >>> assert merge_multi_address([u'aaaa']) == u'aaaa'
+    >>> assert merge_multi_address([u'中国', 'bbb']) == u'\u4e2d\u56fd|bbb'
+    >>> assert merge_multi_address([u'中国', u'美国', u'新加波']) == \
+    u'\u4e2d\u56fd|\u7f8e\u56fd|\u65b0\u52a0\u6ce2'
     """
     return u'|'.join(addresses)
 
@@ -59,10 +54,10 @@ def parse_location(location):
 def merge_location(lng, lat):
     """ merge location to amap str
 
-    >>> merge_location(111.1, 22.22)
-    u'111.100000,22.220000'
-    >>> merge_location(111.1111112324234234, 22.222222123141251351)
-    u'111.111111,22.222222'
+    >>> merge_location(111.1, 22.22) == u'111.100000,22.220000'
+    True
+    >>> merge_location(111.11111123242, 22.22222212) == u'111.111111,22.222222'
+    True
 
     :param lng: longitude,
     :param lat: latitude
@@ -158,13 +153,18 @@ def json_load_and_fix_amap_empty(raw_data):
         before: xxx: []
         after: xxx: <`fixed_empty_value`> --> default: None
 
-    >>> json_load_and_fix_amap_empty('{"a": "b", "c": []}')
-    {u'a': u'b', u'c': None}
+    >>> x = json_load_and_fix_amap_empty('{"a": "b", "c": []}')
+    >>> x['a'] == 'b' and x['c'] is None
+    True
     >>> data = '{"a": {"b": [], "c": {"d": [1], "e": [], "f": {}}}}'
-    >>> json_load_and_fix_amap_empty(data)
-    {u'a': {u'c': {u'e': None, u'd': [1], u'f': {}}, u'b': None}}
-    >>> json_load_and_fix_amap_empty('{"a": "b", "CdE": []}')
-    {u'a': u'b', u'cd_e': None}
+    >>> x = json_load_and_fix_amap_empty(data)
+    >>> x['a'] is not None and x['a']['b'] is None and x['a']['c'] is not None\
+    and x['a']['c']['d'] == [1] and x['a']['c']['e'] is None and \
+    x['a']['c']['f'] == {}
+    True
+    >>> x = json_load_and_fix_amap_empty('{"a": "b", "CdE": []}')
+    >>> x['a'] == 'b' and x['cd_e'] is None
+    True
     """
 
     def _json_load_hook(obj):

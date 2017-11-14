@@ -6,6 +6,7 @@ from operator import itemgetter
 from six import iteritems
 
 from thrall.compat import __builtin__, unicode
+from future.utils import python_2_unicode_compatible
 
 builtin_names = frozenset(
     name for name in dir(__builtin__)
@@ -93,6 +94,7 @@ def check_params_type(enforce=False, **types):
     return _check_params_type
 
 
+@python_2_unicode_compatible
 class NamedURL(tuple):
     """ Named url structure.
 
@@ -113,9 +115,6 @@ class NamedURL(tuple):
         return cls((name, url, version, desp))
 
     def __str__(self):
-        return unicode(getattr(self, 'url')).encode('ascii')
-
-    def __unicode__(self):
         return unicode(getattr(self, 'url'))
 
 
