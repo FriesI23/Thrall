@@ -7,7 +7,7 @@ init:
 	pipenv install --dev --skip-lock
 
 test:
-	pipenv run tox-epy27
+	pipenv run tox -epy27 -epy36
 
 ci:
 	pipenv run flake8 thrall --verbose
