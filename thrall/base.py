@@ -102,6 +102,10 @@ class BaseData(object):
         """
         pass
 
+    @property
+    def attrs(self):
+        return self._properties
+
 
 class BaseAdapterMixin(object):
     _TYPE_ENCODE = 'encode'
