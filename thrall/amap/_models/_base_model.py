@@ -77,9 +77,9 @@ class Sig(object):
     @property
     def unhash_sig(self):
         kw_pairs = sorted(iteritems(self.kw), key=lambda d: d[0])
-        prepared_sig = "{kw}{sig}".format(
+        prepared_sig = u"{kw}{sig}".format(
             sig=self.private_key,
-            kw="&".join(["{k}={v}".format(k=k, v=v) for k, v in kw_pairs])
+            kw=u"&".join([u"{k}={v}".format(k=k, v=v) for k, v in kw_pairs])
         )
         return prepared_sig
 
