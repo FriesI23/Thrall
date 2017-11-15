@@ -227,19 +227,19 @@ class ReGeoCodeResponseData(BaseResponseData):
     _ROUTE_SINGLE = 'regeocode'
     _ROUTE_MULTI = 'regeocodes'
 
-    def get_data(self, raw_data):
+    def get_data(self, raw_data, static=False):
         if self._ROUTE_SINGLE in raw_data:
-            return self._get_single_data(raw_data)
+            return self._get_single_data(raw_data, static)
         elif self._ROUTE_MULTI in raw_data:
-            return self._get_multi_data(raw_data)
+            return self._get_multi_data(raw_data, static)
 
-    def _get_single_data(self, raw_data):
+    def _get_single_data(self, raw_data, static):
         data = raw_data.get(self._ROUTE_SINGLE)
-        return [ReGeoCodeData(data)] if data else []
+        return [ReGeoCodeData(data, static)] if data else []
 
-    def _get_multi_data(self, raw_data):
+    def _get_multi_data(self, raw_data, static):
         data = raw_data.get(self._ROUTE_MULTI)
-        return [ReGeoCodeData(d) for d in data] if data else []
+        return [ReGeoCodeData(d, static) for d in data] if data else []
 
 
 class ReGeoCodeData(BaseData):
@@ -262,25 +262,28 @@ class ReGeoCodeData(BaseData):
         elif p == 'aois':
             return self.decode_aois(data)
 
-    @staticmethod
-    def decode_address_component(data):
+    def decode_address_component(self, data):
         address_component_data = data.get('address_component')
-        return ReGeoAddressComponent(address_component_data)
+        return ReGeoAddressComponent(address_component_data, self._static)
 
     def decode_pois(self, data):
-        return self._decode_to_list(data, 'pois', ReGeoPoi)
+        return self._decode_to_list(data, 'pois', ReGeoPoi,
+                                    static=self._static)
 
     def decode_roads(self, data):
-        return self._decode_to_list(data, 'roads', ReGeoRoad)
+        return self._decode_to_list(data, 'roads', ReGeoRoad,
+                                    static=self._static)
 
     def decode_road_inters(self, data):
-        return self._decode_to_list(data, 'roadinters', ReGeoRoadInter)
+        return self._decode_to_list(data, 'roadinters', ReGeoRoadInter,
+                                    static=self._static)
 
     def decode_aois(self, data):
-        return self._decode_to_list(data, 'aois', ReGeoAOI)
+        return self._decode_to_list(data, 'aois', ReGeoAOI,
+                                    static=self._static)
 
     @staticmethod
-    def _decode_to_list(data, route_key, package_class):
+    def _decode_to_list(data, route_key, package_class, **kwargs):
         """ decode list params
         >>> data = {'a':[1, 2, 3]}
         >>> route_key = 'a'
@@ -292,7 +295,7 @@ class ReGeoCodeData(BaseData):
         []
         """
         _data = data.get(route_key)
-        return [package_class(d) for d in _data] if _data else []
+        return [package_class(d, **kwargs) for d in _data] if _data else []
 
 
 class ReGeoAddressComponent(BaseData):
@@ -320,28 +323,25 @@ class ReGeoAddressComponent(BaseData):
         elif p == 'business_areas':
             return self.decode_business_areas(data)
 
-    @staticmethod
-    def decode_building_data(data):
+    def decode_building_data(self, data):
         building_data = data.get('building')
 
-        return Building(building_data)
+        return Building(building_data, self._static)
 
-    @staticmethod
-    def decode_neighborhood_data(data):
+    def decode_neighborhood_data(self, data):
         neighborhood_data = data.get('neighborhood')
 
-        return Neighborhood(neighborhood_data)
+        return Neighborhood(neighborhood_data, self._static)
 
-    @staticmethod
-    def decode_street_number(data):
+    def decode_street_number(self, data):
         street_number_data = data.get('street_number')
 
-        return StreetNumber(street_number_data)
+        return StreetNumber(street_number_data, self._static)
 
-    @staticmethod
-    def decode_business_areas(data):
+    def decode_business_areas(self, data):
         ba_datas = data.get('business_areas')
-        return [BusinessArea(d) for d in ba_datas] if ba_datas else []
+        return [BusinessArea(d, self._static)
+                for d in ba_datas] if ba_datas else []
 
 
 class ReGeoPoi(BaseData, LocationMixin):

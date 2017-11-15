@@ -116,9 +116,9 @@ class PreparedGeoCodeRequestParams(BasePreparedRequestParams):
 class GeoCodeResponseData(BaseResponseData):
     _ROUTE = 'geocodes'
 
-    def get_data(self, raw_data):
+    def get_data(self, raw_data, static=False):
         geo_data = raw_data.get(self._ROUTE)
-        return [GeoCodeData(d) for d in geo_data] if geo_data else []
+        return [GeoCodeData(d, static) for d in geo_data] if geo_data else []
 
 
 class GeoCodeData(BaseData, LocationMixin):
@@ -142,14 +142,12 @@ class GeoCodeData(BaseData, LocationMixin):
         elif p == 'neighborhood':
             return self.decode_neighborhood_data(data)
 
-    @staticmethod
-    def decode_building_data(data):
+    def decode_building_data(self, data):
         building_data = data.get('building')
 
-        return Building(building_data)
+        return Building(building_data, self._static)
 
-    @staticmethod
-    def decode_neighborhood_data(data):
+    def decode_neighborhood_data(self, data):
         neighborhood_data = data.get('neighborhood')
 
-        return Neighborhood(neighborhood_data)
+        return Neighborhood(neighborhood_data, self._static)

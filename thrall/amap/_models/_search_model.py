@@ -238,16 +238,25 @@ class SearchResponseData(BaseResponseData):
     _SUGGESTION_ROUTE = 'suggestion'
     _POIS_ROUTE = 'pois'
 
+    def __init__(self, raw_data, *args, **kwargs):
+        super(SearchResponseData, self).__init__(raw_data, *args, **kwargs)
+
+        self._suggestions = None
+        static = kwargs.get('static_mode')
+
+        if static:
+            self._suggestions = self.get_suggestions(self._raw_data)
+
     @property
     def suggestions(self):
-        return self.get_suggestions(self._raw_data)
+        return self._suggestions or self.get_suggestions(self._raw_data)
 
     def get_suggestions(self, data):
         return SearchSuggestion(data.get(self._SUGGESTION_ROUTE))
 
-    def get_data(self, data):
+    def get_data(self, data, static=False):
         datas = data.get(self._POIS_ROUTE)
-        return [SearchData(d) for d in datas] if datas else []
+        return [SearchData(d, static) for d in datas] if datas else []
 
 
 class SearchSuggestion(BaseData):
@@ -257,10 +266,10 @@ class SearchSuggestion(BaseData):
         if p == 'cities':
             return self.decode_city_params(data)
 
-    @staticmethod
-    def decode_city_params(data):
+    def decode_city_params(self, data):
         datas = data.get('cities')
-        return [SearchSuggestionCity(d) for d in datas] if datas else []
+        return [SearchSuggestionCity(d, self._static)
+                for d in datas] if datas else []
 
 
 class SearchSuggestionCity(BaseData):
@@ -284,15 +293,12 @@ class SearchData(BaseData):
         elif p == 'photos':
             return self.decode_photos(data)
 
-    @staticmethod
-    def decode_indoor_data(data):
-        return IndoorData(data.get('indoor_data'))
+    def decode_indoor_data(self, data):
+        return IndoorData(data.get('indoor_data'), static=self._static)
 
-    @staticmethod
-    def decode_biz_ext(data):
-        return BizExt(data.get('biz_ext'))
+    def decode_biz_ext(self, data):
+        return BizExt(data.get('biz_ext'), static=self._static)
 
-    @staticmethod
-    def decode_photos(data):
+    def decode_photos(self, data):
         datas = data.get('photos')
-        return [Photos(d) for d in datas] if datas else []
+        return [Photos(d, self._static) for d in datas] if datas else []

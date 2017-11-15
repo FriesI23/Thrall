@@ -309,6 +309,21 @@ class TestBaseResponseData(object):
         assert model.version == 4
         assert model.count == 0
 
+    def test_init_with_static_mode(self, mocker):
+        class Mock(_base_model.BaseResponseData):
+            def get_data(self, raw_data, static=False): return 123
+
+        data = """{"status": "1", "info": "OK", "infocode": "10000",
+         "count": "1", "geocodes":[]}"""
+
+        model = Mock(data, static_mode=True)
+
+        mocker.spy(model, '_get_data')
+
+        x = model.data
+
+        assert model._get_data.call_count == 0
+
 
 class TestLocationMixin(object):
     def test_location(self):

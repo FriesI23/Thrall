@@ -99,6 +99,27 @@ class TestBaseData(object):
         assert model.c == []
         assert model.d == [1, 2]
 
+    def test_static_data(self, mocker):
+        class Mock(BaseData):
+            _properties = ('a', 'b', 'c', 'd')
+
+        raw_data = {'a': 1, 'b': '2', 'c': [], 'd': [1, 2]}
+
+        model = Mock(raw_data, static=True)
+        model._properties = raw_data
+
+        mocker.spy(model, 'decode_param')
+
+        for i in model._properties:
+            hasattr(model, i)
+
+        assert model.a == 1
+        assert model.b == '2'
+        assert model.c == []
+        assert model.d == [1, 2]
+
+        assert model.decode_param.call_count == 0
+
 
 class TestBaseAdapterMixin(object):
     class MockAdapter(BaseAdapterMixin):

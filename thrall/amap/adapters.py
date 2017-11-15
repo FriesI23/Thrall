@@ -48,9 +48,16 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
 
 class AMapJsonDecoderAdapter(BaseDecoderAdapter):
 
+    def __init__(self, static_mode=False):
+        super(AMapJsonDecoderAdapter, self).__init__()
+        self._static = static_mode
+
     @contextmanager
     def decoder_context(self, func_name, *args, **kwargs):
         decoder = self.all_registered_coders[func_name]
+        if self._static:
+            kwargs['static_mode'] = True
+        
         p_decoder = decoder(*args, **kwargs)
         yield p_decoder
 

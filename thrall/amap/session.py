@@ -34,7 +34,7 @@ class AMapSession(object):
         self.request = None
         self.defaults = _set_default
         self.mount(self._ENCODE, AMapEncodeAdapter())
-        self.mount(self._DECODE, AMapJsonDecoderAdapter())
+        self.mount(self._DECODE, AMapJsonDecoderAdapter(static_mode=True))
         self.mount(self._REQUEST, AMapRequest())
         _set_default.set_default(key=default_key,
                                  private_key=default_private_key)

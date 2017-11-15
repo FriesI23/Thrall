@@ -37,8 +37,6 @@ class TestGeoCodePrepareModel(object):
 
         assert model.address == model.city == model.batch == model.key is None
 
-
-
     def test_prepare_single_address(self):
         model = _geo_code_model.PreparedGeoCodeRequestParams()
         model.prepare_address('address')
@@ -169,8 +167,23 @@ class TestGeoCodeResponseData(object):
 
         assert isinstance(model.data, list)
 
-        for i in model.data:
+        for i, j in zip(model.data, model.data):
             assert isinstance(i, _geo_code_model.GeoCodeData)
+            assert i != j
+            assert id(i) != id(j)
+
+    def test_init_static_data(self):
+        model = _geo_code_model.GeoCodeResponseData(self.RAW_DATA,
+                                                    static_mode=True)
+
+        assert isinstance(model.data, list)
+
+        for i, j in zip(model.data, model.data):
+            assert isinstance(i, _geo_code_model.GeoCodeData)
+            assert i == j
+            assert id(i) == id(j)
+
+        assert id(model.data) == id(model.data)
 
     def test_get_no_data(self):
         model = _geo_code_model.GeoCodeResponseData(self.RAW_DATA_NO_RESULT)

@@ -265,14 +265,18 @@ class BasePreparedRequestParams(object):
 class BaseResponseData(object):
     @check_params_type(raw_data=(str, unicode), version=(AMapVersion,))
     def __init__(self, raw_data, version=AMapVersion.V3,
-                 auto_version=False):
+                 auto_version=False, static_mode=False):
 
         self._raw_data = json_load_and_fix_amap_empty(raw_data)
         self.version = version
+        self._data = None
 
         if auto_version:
             self.version = self.auto_check_version(
                 self._raw_data, self.version)
+
+        if static_mode:
+            self._data = self._get_static_data()
 
     @property
     def status(self):
@@ -288,7 +292,7 @@ class BaseResponseData(object):
 
     @property
     def data(self):
-        return self._get_data()
+        return self._data or self._get_data()
 
     @staticmethod
     def auto_check_version(data, default_version=AMapVersion.V3):
@@ -340,7 +344,10 @@ class BaseResponseData(object):
     def _get_data(self):
         return self.get_data(self._raw_data)
 
-    def get_data(self, raw_data):
+    def _get_static_data(self):
+        return self.get_data(self._raw_data, static=True)
+
+    def get_data(self, raw_data, static=False):
         raise NotImplementedError
 
 

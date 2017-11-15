@@ -315,7 +315,7 @@ class TestSearchResponseData(object):
                         }
                     ]
                 },
-                "pois": []
+                "pois": [{}]
             }'''
 
     def test_get_suggestion(self, mocker):
@@ -338,6 +338,19 @@ class TestSearchResponseData(object):
 
         model.get_data.assert_called_once_with(model._raw_data)
 
+    def test_static_mode_enabled(self, mocker):
+        model = _search_model.SearchResponseData(self.RAW_DATA,
+                                                 static_mode=True)
+
+        mocker.spy(model, 'get_suggestions')
+        mocker.spy(model, 'get_data')
+
+        _ = model.suggestions
+        _ = model.data
+
+        assert model.get_suggestions.call_count == 0
+        assert model.get_data.call_count == 0
+
 
 class TestSearchSuggestion(object):
     def test_init(self):
@@ -355,6 +368,12 @@ class TestSearchSuggestion(object):
         assert isinstance(model.cities, list)
         assert len(model.cities) == 3
 
+    def test_decode_in_static(self):
+        raw_data = {'cities': [{}, {}, {}]}
+        model = _search_model.SearchSuggestion(raw_data, static=True)
+
+        assert model.cities is model.cities
+
 
 class TestSearchData(object):
     def test_init(self):
@@ -363,11 +382,22 @@ class TestSearchData(object):
         for m in model._properties:
             o = getattr(model, m)
             if m == 'photos':
+                assert o is not getattr(model, m)
                 assert isinstance(o, list)
                 assert not o
             elif m == 'indoor_data':
+                assert o is not getattr(model, m)
                 assert isinstance(o, _search_model.IndoorData)
             elif m == 'biz_ext':
+                assert o is not getattr(model, m)
                 assert isinstance(o, _search_model.BizExt)
             else:
                 assert o is None
+
+    def test_init_in_static(self):
+        model = _search_model.SearchData({}, static=True)
+
+        for m in model._properties:
+            o = getattr(model, m)
+            assert o is getattr(model, m)
+

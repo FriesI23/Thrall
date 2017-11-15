@@ -57,25 +57,33 @@ class BaseRequest(object):
 class BaseData(object):
     _properties = ()
 
-    def __init__(self, unpacked_data):
+    def __init__(self, unpacked_data, static=False):
         self._data = unpacked_data or {}
+        self._static = static
+
+        if self._static:
+            self._static_decode()
 
     def __getattr__(self, name):
         try:
-            if name not in self._properties:
-                raise KeyError(name)
-
-            if name in builtin_names:
-                name += u'_'
-
             return self._decode(name)
         except KeyError:
             msg = "'{0}' object has no attribute '{1}'"
             raise AttributeError(msg.format(type(self).__name__, name))
 
     def _decode(self, p):
+        if p not in self._properties:
+            raise KeyError(p)
+
+        if p in builtin_names:
+            p += u'_'
+
         r = self.decode_param(p, self._data)
         return r if r is not None else self._data.get(p)
+
+    def _static_decode(self):
+        for i in self._properties:
+            setattr(self, i, self._decode(i))
 
     def decode_param(self, p, data):
         """ Decode data param.

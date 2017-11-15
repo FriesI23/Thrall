@@ -267,9 +267,26 @@ class TestReGeoCodeResponseData(object):
         model = _regeo_code_model.ReGeoCodeResponseData(raw_data)
 
         assert model.data[0].formatted_address == 'xxx'
+        assert model._data is None
 
-        for i in model.data:
+        for i, j in zip(model.data, model.data):
             assert isinstance(i, _regeo_code_model.ReGeoCodeData)
+            assert i != j
+            assert id(i) != id(j)
+
+    def test_get_single_data_in_static(self):
+        raw_data = '{"status": "1","info": "OK","infocode": "10000",' \
+                   ' "regeocode": {"formatted_address": "xxx"}}'
+        model = _regeo_code_model.ReGeoCodeResponseData(raw_data,
+                                                        static_mode=True)
+
+        assert model.data[0].formatted_address == 'xxx'
+        assert model._data is not None
+
+        for i, j in zip(model.data, model.data):
+            assert isinstance(i, _regeo_code_model.ReGeoCodeData)
+            assert i == j
+            assert id(i) == id(j)
 
     def test_get_multi_data(self, mocker):
         raw_data = '{"status": "1","info": "OK","infocode": "10000",' \
@@ -293,9 +310,26 @@ class TestReGeoCodeResponseData(object):
         model = _regeo_code_model.ReGeoCodeResponseData(raw_data)
 
         assert model.data[0].formatted_address == 'xxx'
+        assert model._data is None
 
-        for i in model.data:
+        for i, j in zip(model.data, model.data):
             assert isinstance(i, _regeo_code_model.ReGeoCodeData)
+            assert i != j
+            assert id(i) != id(j)
+
+    def test_get_multi_data_in_static(self):
+        raw_data = '{"status": "1","info": "OK","infocode": "10000",' \
+                   ' "regeocodes": [{"formatted_address": "xxx"}]}'
+        model = _regeo_code_model.ReGeoCodeResponseData(raw_data,
+                                                        static_mode=True)
+
+        assert model.data[0].formatted_address == 'xxx'
+        assert model._data is not None
+
+        for i, j in zip(model.data, model.data):
+            assert isinstance(i, _regeo_code_model.ReGeoCodeData)
+            assert i == j
+            assert id(i) == id(j)
 
 
 class TestReGeoCodeData(object):
@@ -316,6 +350,16 @@ class TestReGeoCodeData(object):
         assert model.roads == 'roads'
         assert model.address_component == 'address_component'
         assert model.pois == 'pois'
+
+    def test_static_code_enable(self):
+        raw_data = {'formatted_address': 'xxx', 'address_component': None,
+                    'pois': None, 'roads': None, 'roadinters': None,
+                    'aois': None}
+        model = _regeo_code_model.ReGeoCodeData(raw_data, static=True)
+
+        for i in raw_data:
+            assert id(getattr(model, i)) == id(getattr(model, i))
+            assert i in model.__dict__
 
     @pytest.mark.parametrize('fn, param, decode', [
         ('decode_pois', 'pois', _regeo_code_model.ReGeoPoi),
@@ -338,7 +382,8 @@ class TestReGeoCodeData(object):
         assert isinstance(r, list)
 
         # assert
-        model._decode_to_list.assert_called_once_with(raw_data, param, decode)
+        model._decode_to_list.assert_called_once_with(
+            raw_data, param, decode, static=False)
 
         getattr(model, fn).assert_called_once_with(model, raw_data)
 
@@ -355,7 +400,7 @@ class TestReGeoCodeData(object):
 
         assert isinstance(r, _regeo_code_model.ReGeoAddressComponent)
 
-        model.decode_address_component.assert_called_once_with(raw_data)
+        model.decode_address_component.assert_called_once_with(model, raw_data)
 
 
 class TestReGeoAddressComponent(object):
@@ -378,6 +423,21 @@ class TestReGeoAddressComponent(object):
         assert model.building == 'decode_building_data'
         assert model.adcode is None
 
+    def test_static_mode_enable(self):
+        raw_data = {'adcode': None, 'building': None, 'business_areas': None,
+                    'city': None, 'citycode': None, 'district': None,
+                    'neighborhood': None, 'province': None, 'sea_area': None,
+                    'street_number': None, 'towncode': None, 'township': None}
+
+        model = _regeo_code_model.ReGeoAddressComponent(raw_data,
+                                                        static=True)
+
+        assert id(model.neighborhood) == id(model.neighborhood)
+
+        for i in raw_data:
+            assert id(getattr(model, i)) == id(getattr(model, i))
+            assert i in model.__dict__
+
     @pytest.mark.parametrize('raw_data, result', [
         ({'building': {'name': 'namef', 'type_': 'type_f'}},
          {'name': 'namef', 'type': 'type_f'}),
@@ -395,7 +455,7 @@ class TestReGeoAddressComponent(object):
 
         t = model.decode_building_data(raw_data)
 
-        model.decode_building_data.assert_called_once_with(raw_data)
+        model.decode_building_data.assert_called_once_with(model, raw_data)
 
         assert isinstance(t, _regeo_code_model.Building)
 
@@ -419,7 +479,7 @@ class TestReGeoAddressComponent(object):
 
         t = model.decode_neighborhood_data(raw_data)
 
-        model.decode_neighborhood_data.assert_called_once_with(raw_data)
+        model.decode_neighborhood_data.assert_called_once_with(model, raw_data)
 
         assert isinstance(t, _regeo_code_model.Neighborhood)
 
@@ -452,7 +512,7 @@ class TestReGeoAddressComponent(object):
 
         t = model.decode_street_number(raw_data)
 
-        model.decode_street_number.assert_called_once_with(raw_data)
+        model.decode_street_number.assert_called_once_with(model, raw_data)
 
         assert isinstance(t, _regeo_code_model.StreetNumber)
 
@@ -469,7 +529,7 @@ class TestReGeoAddressComponent(object):
 
         t = model.decode_business_areas(raw_data)
 
-        model.decode_business_areas.assert_called_once_with(raw_data)
+        model.decode_business_areas.assert_called_once_with(model, raw_data)
 
         assert t == []
 
@@ -485,7 +545,7 @@ class TestReGeoAddressComponent(object):
 
         t = model.decode_business_areas(raw_data)
 
-        model.decode_business_areas.assert_called_once_with(raw_data)
+        model.decode_business_areas.assert_called_once_with(model, raw_data)
 
         assert isinstance(t, list)
 
