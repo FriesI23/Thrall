@@ -1,6 +1,6 @@
 export PYTHONPATH ?= .
 
-.PHONY: init test ci cov clean build
+.PHONY: init test ci cov benckmark clean build
 
 init:
 	pip install pipenv --upgrade
@@ -15,6 +15,8 @@ ci:
 cov:
 	pipenv run py.test --doctest-module --cov-config .coveragerc --verbose --cov=thrall
 
+benckmark:
+	pipenv run py.test  --pyargs benchmarks
 
 clean:
 	rm -rf dist build
