@@ -18,6 +18,7 @@ from .urls import (
     GEO_CODING_URL,
     REGEO_CODING_URL,
     POI_SEARCH_TEXT_URL,
+    POI_SUGGEST_URL,
 )
 
 _set_default = SetDefault()
@@ -109,6 +110,22 @@ class AMapSession(object):
 
         d = self.decoder.decode_search(raw_data=r.content,
                                        version=POI_SEARCH_TEXT_URL.version)
+        return d
+
+    @_set_default
+    def suggest(self, keyword=None, types=None, location=None, city=None,
+                city_limit=None, data_type=None, **kwargs):
+        p = self.encoder.encode_suggest(keyword=keyword,
+                                        types=types,
+                                        location=location,
+                                        city=city,
+                                        city_limit=city_limit,
+                                        data_type=data_type,
+                                        **kwargs)
+        r = self.request.get(POI_SUGGEST_URL.url, params=p.params)
+
+        d = self.decoder.decode_suggest(raw_data=r.content,
+                                        version=POI_SUGGEST_URL.version)
         return d
 
 

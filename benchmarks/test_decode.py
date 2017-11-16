@@ -5,6 +5,7 @@ from thrall.amap.models import (
     GeoCodeResponseData,
     ReGeoCodeResponseData,
     SearchResponseData,
+    SuggestResponseData,
 )
 
 
@@ -53,6 +54,16 @@ class TestGeoCodeDecode(object):
         benchmark(get)
 
 
+class TestGeoCodeDecodeInit(object):
+    RAW_DATA = TestGeoCodeDecode.RAW_DATA
+
+    def test_init(self, benchmark):
+        benchmark(GeoCodeResponseData, self.RAW_DATA, static_mode=False)
+
+    def test_static_init(self, benchmark):
+        benchmark(GeoCodeResponseData, self.RAW_DATA, static_mode=True)
+
+
 class TestReGeoDecode(object):
     """http://restapi.amap.com/v3/geocode/regeo?location=116.307490,39.984154
     &radius=1000&extensions=base"""
@@ -96,6 +107,16 @@ class TestReGeoDecode(object):
             return r.data[0].address_component.business_areas[0].location
 
         benchmark(get)
+
+
+class TestReGeoDecodeInit(object):
+    RAW_DATA = TestReGeoDecode.RAW_DATA
+
+    def test_init(self, benchmark):
+        benchmark(ReGeoCodeResponseData, self.RAW_DATA, static_mode=False)
+
+    def test_static_init(self, benchmark):
+        benchmark(ReGeoCodeResponseData, self.RAW_DATA, static_mode=True)
 
 
 class TestSearchDecode(object):
@@ -142,3 +163,85 @@ class TestSearchDecode(object):
             return r.data[0].photos[0].url
 
         benchmark(get)
+
+
+class TestSearchDecodeInit(object):
+    RAW_DATA = TestSearchDecode.RAW_DATA
+
+    def test_init(self, benchmark):
+        benchmark(SearchResponseData, self.RAW_DATA, static_mode=False)
+
+    def test_static_init(self, benchmark):
+        benchmark(SearchResponseData, self.RAW_DATA, static_mode=True)
+
+
+class TestSuggestDecode(object):
+    """http://restapi.amap.com/v3/assistant/inputtips?
+    keywords=%E8%82%AF%E5%BE%B7%E5%9F%BA&type=050301
+    &location=116.481488,39.990464
+    &city=%E5%8C%97%E4%BA%AC&datatype=all"""
+
+    RAW_DATA = """{"status":"1","count":"10","info":"OK","infocode":"10000",
+    "tips":[{"id":[],"name":"肯德基","district":[],"adcode":[],"location":[],
+    "address":[],"typecode":[]},
+    {"id":"B000A7BM4H","name":"肯德基(花家地店)","district":"北京市朝阳区",
+    "adcode":"110105","location":"116.469271,39.985568",
+    "address":"花家地小区1号商业楼","typecode":"050301"},
+    {"id":"B000A7C99U","name":"肯德基(酒仙桥店)","district":"北京市朝阳区",
+    "adcode":"110105","location":"116.490377,39.975437",
+    "address":"酒仙桥路12号新华联丽港乐天玛特1层","typecode":"050301"},
+    {"id":"B000A7FVJQ","name":"肯德基(中福百货店)","district":"北京市朝阳区",
+    "adcode":"110105","location":"116.463384,40.000466",
+    "address":"望京南湖东园201号楼1层","typecode":"050301"},
+    {"id":"B000A875MK","name":"肯德基(来广营店)","district":"北京市朝阳区",
+    "adcode":"110105","location":"116.464233,40.016454",
+    "address":"香宾路66-1号","typecode":"050301"},
+    {"id":"B000A80GPM","name":"肯德基(酒仙桥二店)","district":"北京市朝阳区",
+    "adcode":"110105","location":"116.495544,39.961983",
+    "address":"酒仙桥路39号久隆百货B1层","typecode":"050301"},
+    {"id":"B000A9P8KT","name":"肯德基(太阳宫店)","district":"北京市朝阳区",
+    "adcode":"110105","location":"116.448512,39.971335",
+    "address":"太阳宫中路12号1层01-13A-14-15B","typecode":"050301"},
+    {"id":"B000A80HAN","name":"肯德基(霄云路店)","district":"北京市朝阳区",
+    "adcode":"110105","location":"116.464882,39.959215",
+    "address":"霄云路27号中国庆安大厦1层","typecode":"050301"},
+    {"id":"B0FFF3DEDV","name":"肯德基(凤凰汇购物中心)","district":"北京市朝阳区",
+    "adcode":"110105","location":"116.456296,39.962578",
+    "address":"曙光西里甲5号院24号楼凤凰汇购物中心B1层104号","typecode":"050301"},
+    {"id":"B000A8ZIKF","name":"肯德基(西坝河店)","district":"北京市朝阳区",
+    "adcode":"110105","location":"116.436102,39.969056",
+    "address":"西坝河西里","typecode":"050301"}]}"""
+
+    def test_suggest_origin(self, benchmark):
+        r = SuggestResponseData(self.RAW_DATA)
+
+        def get():
+            return r._raw_data['tips'][1]['address']
+
+        benchmark(get)
+
+    def test_suggest_dynamic(self, benchmark):
+        r = SuggestResponseData(self.RAW_DATA)
+
+        def get():
+            return r.data[1].address
+
+        benchmark(get)
+
+    def test_suggest_static(self, benchmark):
+        r = SuggestResponseData(self.RAW_DATA, static_mode=True)
+
+        def get():
+            return r.data[1].address
+
+        benchmark(get)
+
+
+class TestSuggestDecodeInit(object):
+    RAW_DATA = TestSuggestDecode.RAW_DATA
+
+    def test_init(self, benchmark):
+        benchmark(SuggestResponseData, self.RAW_DATA, static_mode=False)
+
+    def test_static_init(self, benchmark):
+        benchmark(SuggestResponseData, self.RAW_DATA, static_mode=True)

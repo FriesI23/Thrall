@@ -19,6 +19,8 @@ from thrall.amap.models import (
     PreparedReGeoCodeRequestParams,
     SearchResponseData,
     PreparedSearchTextRequestParams,
+    SuggestResponseData,
+    PreparedSuggestRequestParams,
 )
 
 
@@ -151,6 +153,16 @@ class TestAMapEncodeAdapterFunc(object):
 
         assert isinstance(r, PreparedSearchTextRequestParams)
 
+    def test_encode_suggest(self):
+        model = AMapEncodeAdapter()
+
+        r = model.encode_suggest(keyword=u'北京大学', key='def')
+
+        assert r.keyword == u'北京大学'
+        assert r.key == 'def'
+
+        assert isinstance(r, PreparedSuggestRequestParams)
+
 
 class TestAMapJsonDecoderAdapterFunc(object):
     def test_decode_geo_code(self):
@@ -179,3 +191,11 @@ class TestAMapJsonDecoderAdapterFunc(object):
         assert r.status == 1
 
         assert isinstance(r, SearchResponseData)
+
+    def test_decode_suggest(self):
+        model = AMapJsonDecoderAdapter()
+
+        r = model.decode_suggest(raw_data='{"status": "1"}')
+
+        assert r.status == 1
+        assert isinstance(r, SuggestResponseData)

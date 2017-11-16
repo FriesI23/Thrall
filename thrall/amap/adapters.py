@@ -12,6 +12,8 @@ from .models import (
     ReGeoCodeResponseData,
     SearchTextRequestParams,
     SearchResponseData,
+    SuggestRequestParams,
+    SuggestResponseData,
 )
 
 
@@ -27,6 +29,7 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
         self.registry(self.encode_geo_code, GeoCodeRequestParams)
         self.registry(self.encode_regeo_code, ReGeoCodeRequestParams)
         self.registry(self.encode_search_text, SearchTextRequestParams)
+        self.registry(self.encode_suggest, SuggestRequestParams)
 
     @check_params_type(coder=(type,))
     def registry(self, func, coder):
@@ -45,6 +48,10 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
                                   *args, **kwargs) as p:
             return p
 
+    def encode_suggest(self, *args, **kwargs):
+        with self.encoder_context('encode_suggest', *args, **kwargs) as p:
+            return p
+
 
 class AMapJsonDecoderAdapter(BaseDecoderAdapter):
 
@@ -57,7 +64,7 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
         decoder = self.all_registered_coders[func_name]
         if self._static:
             kwargs['static_mode'] = True
-        
+
         p_decoder = decoder(*args, **kwargs)
         yield p_decoder
 
@@ -65,6 +72,7 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
         self.registry(self.decode_geo_code, GeoCodeResponseData)
         self.registry(self.decode_regeo_code, ReGeoCodeResponseData)
         self.registry(self.decode_search, SearchResponseData)
+        self.registry(self.decode_suggest, SuggestResponseData)
 
     @check_params_type(coder=(type,))
     def registry(self, func, coder):
@@ -80,4 +88,8 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
 
     def decode_search(self, *args, **kwargs):
         with self.decoder_context('decode_search', *args, **kwargs) as p:
+            return p
+
+    def decode_suggest(self, *args, **kwargs):
+        with self.decoder_context('decode_suggest', *args, **kwargs) as p:
             return p

@@ -38,6 +38,12 @@ from ._search_model import (
     SearchSuggestionCity,
     SearchData,
 )
+from ._suggest_model import (
+    SuggestRequestParams,
+    PreparedSuggestRequestParams,
+    SuggestResponseData,
+    SuggestData,
+)
 
 __all__ = [
     # base
@@ -56,4 +62,7 @@ __all__ = [
     "SearchTextRequestParams", "PreparedSearchTextRequestParams",
     "SearchResponseData", "SearchSuggestion", "SearchSuggestionCity",
     "SearchData",
+    # suggest
+    "SuggestRequestParams", "PreparedSuggestRequestParams",
+    "SuggestResponseData", "SuggestData",
 ]
