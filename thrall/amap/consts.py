@@ -26,6 +26,20 @@ class ExtensionFlag(IntEnum):
     BASE = 0
     ALL = 1
 
+    @classmethod
+    def choose(cls, data):
+        if data:
+            return cls.ALL
+        else:
+            return cls.BASE
+
+    @property
+    def param(self):
+        if self == self.ALL:
+            return EXTENSION_ALL
+        else:
+            return EXTENSION_BASE
+
 
 class RoadLevel(IntEnum):
     ALL = 0
@@ -36,6 +50,26 @@ class HomeOrCorpControl(IntEnum):
     OFF = 0
     HOME = 1
     CORP = 2
+
+
+class SortRule(IntEnum):
+    DISTANCE = 0
+    WEIGHT = 1
+
+    @classmethod
+    def choose(cls, data):
+        _d = data.lower()
+        if _d == SORT_DISTANCE:
+            return cls.DISTANCE
+        elif _d == SORT_WEIGHT:
+            return cls.WEIGHT
+
+    @property
+    def param(self):
+        if self == self.WEIGHT:
+            return SORT_WEIGHT
+        else:
+            return SORT_DISTANCE
 
 
 class CityLimitFlag(IntEnum):
@@ -99,3 +133,6 @@ DATATYPE_ALL = 'all'
 DATATYPE_POI = 'poi'
 DATATYPE_BUS = 'bus'
 DATATYPE_BUSLINE = 'busline'
+
+SORT_DISTANCE = 'distance'
+SORT_WEIGHT = 'weight'

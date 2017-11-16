@@ -33,6 +33,8 @@ from ._regeo_code_model import (
 from ._search_model import (
     SearchTextRequestParams,
     PreparedSearchTextRequestParams,
+    SearchAroundRequestParams,
+    PreparedSearchAroundRequestParams,
     SearchResponseData,
     SearchSuggestion,
     SearchSuggestionCity,
@@ -60,6 +62,7 @@ __all__ = [
     "ReGeoCodeResponseData", "ReGeoCodeData",
     # search
     "SearchTextRequestParams", "PreparedSearchTextRequestParams",
+    "SearchAroundRequestParams", "PreparedSearchAroundRequestParams",
     "SearchResponseData", "SearchSuggestion", "SearchSuggestionCity",
     "SearchData",
     # suggest

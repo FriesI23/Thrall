@@ -18,6 +18,7 @@ from .urls import (
     GEO_CODING_URL,
     REGEO_CODING_URL,
     POI_SEARCH_TEXT_URL,
+    POI_SEARCH_AROUND_URL,
     POI_SUGGEST_URL,
 )
 
@@ -107,6 +108,27 @@ class AMapSession(object):
                                             extensions=extensions,
                                             **kwargs)
         r = self.request.get(POI_SEARCH_TEXT_URL.url, params=p.params)
+
+        d = self.decoder.decode_search(raw_data=r.content,
+                                       version=POI_SEARCH_TEXT_URL.version)
+        return d
+
+    @_set_default
+    def search_around(self, location=None, keywords=None, types=None,
+                      city=None,
+                      radius=None, sort_rule=None, offset=None, page=None,
+                      extensions=None, **kwargs):
+        p = self.encoder.encode_search_around(location=location,
+                                              keywords=keywords,
+                                              types=types,
+                                              city=city,
+                                              radius=radius,
+                                              sort_rule=sort_rule,
+                                              offset=offset,
+                                              page=page,
+                                              extensions=extensions,
+                                              **kwargs)
+        r = self.request.get(POI_SEARCH_AROUND_URL.url, params=p.params)
 
         d = self.decoder.decode_search(raw_data=r.content,
                                        version=POI_SEARCH_TEXT_URL.version)

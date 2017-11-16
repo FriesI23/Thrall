@@ -11,6 +11,7 @@ from .models import (
     ReGeoCodeRequestParams,
     ReGeoCodeResponseData,
     SearchTextRequestParams,
+    SearchAroundRequestParams,
     SearchResponseData,
     SuggestRequestParams,
     SuggestResponseData,
@@ -29,6 +30,7 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
         self.registry(self.encode_geo_code, GeoCodeRequestParams)
         self.registry(self.encode_regeo_code, ReGeoCodeRequestParams)
         self.registry(self.encode_search_text, SearchTextRequestParams)
+        self.registry(self.encode_search_around, SearchAroundRequestParams)
         self.registry(self.encode_suggest, SuggestRequestParams)
 
     @check_params_type(coder=(type,))
@@ -45,6 +47,11 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
 
     def encode_search_text(self, *args, **kwargs):
         with self.encoder_context('encode_search_text',
+                                  *args, **kwargs) as p:
+            return p
+
+    def encode_search_around(self, *args, **kwargs):
+        with self.encoder_context('encode_search_around',
                                   *args, **kwargs) as p:
             return p
 

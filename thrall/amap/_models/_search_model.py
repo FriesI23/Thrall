@@ -10,14 +10,17 @@ from ..consts import (
     ExtensionFlag,
     CityLimitFlag,
     ChildrenFlag,
+    SortRule,
     EXTENSION_BASE,
     EXTENSION_ALL,
 )
 from ..common import (
     prepare_multi_address,
+    prepare_multi_locations,
     prepare_multi_pois,
     merge_multi_address,
     merge_multi_poi,
+    merge_location,
 )
 
 from ._base_model import (
@@ -78,7 +81,97 @@ class SearchTextRequestParams(BaseRequestParams):
         return p
 
 
-class PreparedSearchTextRequestParams(BasePreparedRequestParams):
+class SearchAroundRequestParams(BaseRequestParams):
+    def __init__(self, location=None, keywords=None, types=None, city=None,
+                 radius=None, sort_rule=None, offset=None, page=None,
+                 extensions=None, **kwargs):
+        self.location = location
+        self.keywords = keywords
+        self.types = types
+        self.city = city
+        self.radius = radius
+        self.sort_rule = sort_rule
+        self.offset = offset
+        self.page = page
+        self.extensions = extensions
+        super(SearchAroundRequestParams, self).__init__(**kwargs)
+
+    def prepare_data(self):
+        _p = PreparedSearchAroundRequestParams()
+
+        with self.prepare_basic(_p) as p:
+            p.prepare(
+                location=self.location,
+                keywords=self.keywords,
+                types=self.types,
+                city=self.city,
+                radius=self.radius,
+                sort_rule=self.sort_rule,
+                offset=self.offset,
+                page=self.page,
+                extensions=self.extensions.status if isinstance(
+                    self.extensions, Extensions) else self.extensions,
+            )
+
+        return p
+
+
+class PreparedSearchMixin(object):
+    def __init__(self):
+        self.keywords = None
+        self.types = None
+        self.offset = None
+        self.page = None
+        self.extensions = None
+
+    def prepare_keywords(self, keywords):
+        self.keywords = prepare_multi_address(keywords)
+
+    def prepare_types(self, types):
+        self.types = prepare_multi_pois(types)
+
+    def prepare_offset(self, offset):
+        if offset is not None and (offset > 25 or offset < 0):
+            raise amap_params_exception('offset must in range 0 - 25.')
+        self.offset = offset
+
+    def prepare_page(self, page):
+        if page is not None and (page > 100 or page < 0):
+            raise amap_params_exception('page must in range 0 - 100.')
+        self.page = page
+
+    def prepare_extension(self, extension):
+        if isinstance(extension, bool):
+            self.extensions = ExtensionFlag.choose(extension)
+        elif isinstance(extension, ExtensionFlag):
+            self.extensions = extension
+
+    @property
+    def prepared_keywords(self):
+        if self.keywords is not None:
+            return merge_multi_address(self.keywords)
+
+    @property
+    def prepared_types(self):
+        if self.types is not None:
+            return merge_multi_poi(self.types)
+
+    @property
+    def prepared_page(self):
+        return self.page
+
+    @property
+    def prepared_offset(self):
+        return self.offset
+
+    @property
+    def prepared_extension(self):
+        if self.extensions is not None:
+            return self.extensions.param
+
+
+class PreparedSearchTextRequestParams(BasePreparedRequestParams,
+                                      PreparedSearchMixin):
     def __init__(self):
         super(PreparedSearchTextRequestParams, self).__init__()
         self.keywords = None
@@ -119,12 +212,6 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams):
         self.prepare_extension(extensions)
         self.prepare_base(**kwargs)
 
-    def prepare_keywords(self, keywords):
-        self.keywords = prepare_multi_address(keywords)
-
-    def prepare_types(self, types):
-        self.types = prepare_multi_pois(types)
-
     def prepare_city(self, city):
         if city is not None:
             self.city = unicode(city)
@@ -142,38 +229,11 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams):
         elif isinstance(children, ChildrenFlag):
             self.children = children
 
-    def prepare_offset(self, offset):
-        if offset is not None and (offset > 25 or offset < 0):
-            raise amap_params_exception('offset must in range 0 - 25.')
-        self.offset = offset
-
-    def prepare_page(self, page):
-        if page is not None and (page > 100 or page < 0):
-            raise amap_params_exception('page must in range 0 - 100.')
-        self.page = page
-
     def prepare_building(self, building):
         self.building = building
 
     def prepare_floor(self, floor):
         self.floor = floor
-
-    def prepare_extension(self, extension):
-        if isinstance(extension, bool):
-            self.extensions = (ExtensionFlag.ALL if extension
-                               else ExtensionFlag.BASE)
-        elif isinstance(extension, ExtensionFlag):
-            self.extensions = extension
-
-    @property
-    def prepared_keywords(self):
-        if self.keywords is not None:
-            return merge_multi_address(self.keywords)
-
-    @property
-    def prepared_types(self):
-        if self.types is not None:
-            return merge_multi_poi(self.types)
 
     @property
     def prepared_city(self):
@@ -194,27 +254,12 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams):
             return 0
 
     @property
-    def prepared_page(self):
-        return self.page
-
-    @property
-    def prepared_offset(self):
-        return self.offset
-
-    @property
     def prepared_building(self):
         return self.building
 
     @property
     def prepared_floor(self):
         return self.floor
-
-    @property
-    def prepared_extension(self):
-        if self.extensions == ExtensionFlag.ALL:
-            return EXTENSION_ALL
-        elif self.extensions == ExtensionFlag.BASE:
-            return EXTENSION_BASE
 
     def generate_params(self):
         _p = {}
@@ -231,6 +276,104 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams):
             'extensions': self.prepared_extension,
         }
         with self.init_basic_params(_p, optionals=optional_params) as params:
+            return params
+
+
+class PreparedSearchAroundRequestParams(BasePreparedRequestParams,
+                                        PreparedSearchMixin):
+    def __init__(self):
+        super(PreparedSearchAroundRequestParams, self).__init__()
+        self.location = None
+        self.keywords = None
+        self.types = None
+        self.city = None
+        self.radius = None
+        self.sort_rule = None
+        self.offset = None
+        self.page = None
+        self.extensions = None
+
+    @check_params_type(
+        location=(str, unicode, tuple, list),
+        keywords=(str, unicode, list, tuple),
+        types=(str, unicode, list, tuple),
+        city=(str, unicode, int),
+        radius=(int, float),
+        sort_rule=(str, unicode, SortRule),
+        offset=(int,),
+        page=(int,),
+        extensions=(bool, ExtensionFlag),
+    )
+    def prepare(self, location=None, keywords=None, types=None, city=None,
+                radius=None, sort_rule=None, offset=None, page=None,
+                extensions=None, **kwargs):
+        self.prepare_location(location)
+        self.prepare_keywords(keywords)
+        self.prepare_types(types)
+        self.prepare_city(city)
+        self.prepare_radius(radius)
+        self.prepare_sort_rule(sort_rule)
+        self.prepare_offset(offset)
+        self.prepare_page(page)
+        self.prepare_extension(extensions)
+        self.prepare_base(**kwargs)
+
+    def prepare_location(self, location):
+        r = prepare_multi_locations(location)
+
+        if r:
+            self.location = r[0]
+
+    def prepare_city(self, city):
+        if city is not None:
+            self.city = unicode(city)
+
+    def prepare_radius(self, radius):
+        if radius is not None and (radius < 0 or radius > 50000):
+            raise amap_params_exception(
+                msg='re_geo radius range must in 0~50000m')
+
+        self.radius = radius
+
+    def prepare_sort_rule(self, sort_rule):
+        if isinstance(sort_rule, (str, unicode)):
+            self.sort_rule = SortRule.choose(sort_rule)
+        elif isinstance(sort_rule, SortRule):
+            self.sort_rule = sort_rule
+
+    @property
+    def prepared_location(self):
+        if self.location is not None:
+            return merge_location(*self.location)
+
+    @property
+    def prepared_city(self):
+        return self.city
+
+    @property
+    def prepared_radius(self):
+        return self.radius
+
+    @property
+    def prepared_sort_rule(self):
+        if self.sort_rule is not None:
+            return self.sort_rule.param
+
+    def generate_params(self):
+        _p = {}
+        optional_params = {
+            'keywords': self.prepared_keywords,
+            'types': self.prepared_types,
+            'city': self.prepared_city,
+            'radius': self.prepared_radius,
+            'sortrule': self.prepared_sort_rule,
+            'offset': self.prepared_offset,
+            'page': self.prepared_page,
+            'extensions': self.prepared_extension,
+        }
+
+        with self.init_basic_params(_p, optionals=optional_params) as params:
+            _p['location'] = self.prepared_location
             return params
 
 

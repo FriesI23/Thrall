@@ -19,6 +19,7 @@ from thrall.amap.models import (
     PreparedReGeoCodeRequestParams,
     SearchResponseData,
     PreparedSearchTextRequestParams,
+    PreparedSearchAroundRequestParams,
     SuggestResponseData,
     PreparedSuggestRequestParams,
 )
@@ -152,6 +153,16 @@ class TestAMapEncodeAdapterFunc(object):
         assert r.key == 'def'
 
         assert isinstance(r, PreparedSearchTextRequestParams)
+
+    def test_encode_search_around(self):
+        model = AMapEncodeAdapter()
+
+        r = model.encode_search_around(location='123,45|322,33', key='def')
+
+        assert r.location == (123, 45)
+        assert r.key == 'def'
+
+        assert isinstance(r, PreparedSearchAroundRequestParams)
 
     def test_encode_suggest(self):
         model = AMapEncodeAdapter()

@@ -13,7 +13,7 @@ ci:
 	pipenv run flake8 thrall --verbose
 
 cov:
-	pipenv run py.test --doctest-module --cov-config .coveragerc --verbose --cov=thrall
+	pipenv run py.test --doctest-module --cov-config .coveragerc --verbose --cov=thrall --cov-report html
 
 benckmark:
 	pipenv run py.test  --pyargs benchmarks

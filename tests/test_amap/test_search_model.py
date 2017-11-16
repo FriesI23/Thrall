@@ -1,4 +1,5 @@
 # coding: utf-8
+# flake8: noqa
 from __future__ import absolute_import
 from six import iteritems
 from thrall.utils import unicode
@@ -60,6 +61,152 @@ class TestSearchTextRequestParams(object):
         assert 'keywords and types' in str(err.value)
 
 
+class TestSearchAroundRequestParams(object):
+    def test_init_ok(self):
+        model = _search_model.SearchAroundRequestParams(key='xxx',
+                                                        location='xxx')
+        assert model.location == 'xxx'
+
+    def test_prepare_ok(self):
+        model = _search_model.SearchAroundRequestParams(key='xxx',
+                                                        location='123,56')
+
+        p = model.prepare()
+
+        assert p.location == (123, 56)
+
+    @pytest.mark.parametrize('data, result', [
+        (True, _search_model.ExtensionFlag.ALL),
+        (False, _search_model.ExtensionFlag.BASE),
+        (_search_model.ExtensionFlag.ALL, _search_model.ExtensionFlag.ALL),
+        (_search_model.ExtensionFlag.BASE, _search_model.ExtensionFlag.BASE),
+        (_search_model.Extensions(True), _search_model.ExtensionFlag.ALL),
+        (_search_model.Extensions(False), _search_model.ExtensionFlag.BASE)
+    ])
+    def test_prepare_ok_with_extensions(self, data, result):
+        model = _search_model.SearchAroundRequestParams(key='xxx',
+                                                        location='123,56',
+                                                        extensions=data)
+
+        p = model.prepare()
+
+        assert p.extensions == result
+
+
+class TestPreparedSearchMixin(object):
+    def test_prepare_keywords(self, mocker):
+        model = _search_model.PreparedSearchMixin()
+
+        mocker.spy(_search_model, 'prepare_multi_address')
+        mocker.spy(_search_model, 'merge_multi_address')
+
+        model.prepare_keywords(u'aaa|你')
+
+        assert model.keywords == ['aaa', u'你']
+        _search_model.prepare_multi_address.assert_called_once_with(u'aaa|你')
+
+        assert model.prepared_keywords == u'aaa|你'
+        _search_model.merge_multi_address.assert_called_once_with(
+            ['aaa', u'你'])
+
+    def test_prepare_none_keywords(self, mocker):
+        model = _search_model.PreparedSearchMixin()
+
+        mocker.spy(_search_model, 'prepare_multi_address')
+        mocker.spy(_search_model, 'merge_multi_address')
+
+        model.prepare_keywords(None)
+
+        assert model.keywords is None
+        _search_model.prepare_multi_address.assert_called_once_with(None)
+
+        assert model.prepared_keywords is None
+        assert _search_model.merge_multi_address.call_count == 0
+
+    def test_prepare_types(self, mocker):
+        model = _search_model.PreparedSearchMixin()
+
+        mocker.spy(_search_model, 'prepare_multi_pois')
+        mocker.spy(_search_model, 'merge_multi_poi')
+
+        model.prepare_types(u'aaa|你')
+
+        assert model.types == ['aaa', u'你']
+        _search_model.prepare_multi_pois.assert_called_once_with(u'aaa|你')
+
+        assert model.prepared_types == u'aaa|你'
+        _search_model.merge_multi_poi.assert_called_once_with(['aaa', u'你'])
+
+    def test_prepare_none_types(self, mocker):
+        model = _search_model.PreparedSearchMixin()
+
+        mocker.spy(_search_model, 'prepare_multi_pois')
+        mocker.spy(_search_model, 'merge_multi_poi')
+
+        model.prepare_types(None)
+
+        assert model.types is None
+        _search_model.prepare_multi_pois.assert_called_once_with(None)
+
+        assert model.prepared_keywords is None
+        assert _search_model.merge_multi_poi.call_count == 0
+
+    @pytest.mark.parametrize('data', [0, 1, 10, 25])
+    def test_offset(self, data):
+        model = _search_model.PreparedSearchMixin()
+
+        model.prepare_offset(data)
+
+        assert model.offset == data
+        assert model.prepared_offset == data
+
+    @pytest.mark.parametrize('data', [-1, 26, 100, -10])
+    def test_offset_out_of_range(self, data):
+        model = _search_model.PreparedSearchMixin()
+
+        with pytest.raises(VendorParamError) as err:
+            model.prepare_offset(data)
+
+        assert 'offset must in range 0 - 25.' in str(err.value)
+        assert model.prepared_offset is None
+
+    @pytest.mark.parametrize('data', [0, 1, 10, 50, 100])
+    def test_page(self, data):
+        model = _search_model.PreparedSearchMixin()
+
+        model.prepare_page(data)
+
+        assert model.page == data
+        assert model.prepared_page == data
+
+    @pytest.mark.parametrize('data', [-1, 101, 1000, -10])
+    def test_page_out_of_range(self, data):
+        model = _search_model.PreparedSearchMixin()
+
+        with pytest.raises(VendorParamError) as err:
+            model.prepare_page(data)
+
+        assert 'page must in range 0 - 100.' in str(err.value)
+        assert model.prepared_page is None
+
+    @pytest.mark.parametrize('input, output, p_output', [
+        (True, _search_model.ExtensionFlag.ALL, _search_model.EXTENSION_ALL),
+        (False, _search_model.ExtensionFlag.BASE,
+         _search_model.EXTENSION_BASE),
+        (_search_model.ExtensionFlag.BASE, _search_model.ExtensionFlag.BASE,
+         _search_model.EXTENSION_BASE),
+        (_search_model.ExtensionFlag.ALL, _search_model.ExtensionFlag.ALL,
+         _search_model.EXTENSION_ALL),
+    ])
+    def test_prepare_extensions(self, input, output, p_output):
+        model = _search_model.PreparedSearchMixin()
+
+        model.prepare_extension(input)
+
+        assert model.extensions == output
+        assert model.prepared_extension == p_output
+
+
 class TestPreparedSearchTextRequestParams(object):
     def test_init_ok(self):
         model = _search_model.PreparedSearchTextRequestParams()
@@ -99,63 +246,6 @@ class TestPreparedSearchTextRequestParams(object):
         model.prepare_building.assert_called_once_with('building')
         model.prepare_floor.assert_called_once_with('floor')
         model.prepare_extension.assert_called_once_with(True)
-
-    def test_prepare_keywords(self, mocker):
-        model = _search_model.PreparedSearchTextRequestParams()
-
-        mocker.spy(_search_model, 'prepare_multi_address')
-        mocker.spy(_search_model, 'merge_multi_address')
-
-        model.prepare_keywords(u'aaa|你')
-
-        assert model.keywords == ['aaa', u'你']
-        _search_model.prepare_multi_address.assert_called_once_with(u'aaa|你')
-
-        assert model.prepared_keywords == u'aaa|你'
-        _search_model.merge_multi_address.assert_called_once_with(
-            ['aaa', u'你'])
-
-    def test_prepare_none_keywods(self, mocker):
-        model = _search_model.PreparedSearchTextRequestParams()
-
-        mocker.spy(_search_model, 'prepare_multi_address')
-        mocker.spy(_search_model, 'merge_multi_address')
-
-        model.prepare_keywords(None)
-
-        assert model.keywords is None
-        _search_model.prepare_multi_address.assert_called_once_with(None)
-
-        assert model.prepared_keywords is None
-        assert _search_model.merge_multi_address.call_count == 0
-
-    def test_prepare_types(self, mocker):
-        model = _search_model.PreparedSearchTextRequestParams()
-
-        mocker.spy(_search_model, 'prepare_multi_pois')
-        mocker.spy(_search_model, 'merge_multi_poi')
-
-        model.prepare_types(u'aaa|你')
-
-        assert model.types == ['aaa', u'你']
-        _search_model.prepare_multi_pois.assert_called_once_with(u'aaa|你')
-
-        assert model.prepared_types == u'aaa|你'
-        _search_model.merge_multi_poi.assert_called_once_with(['aaa', u'你'])
-
-    def test_prepare_none_types(self, mocker):
-        model = _search_model.PreparedSearchTextRequestParams()
-
-        mocker.spy(_search_model, 'prepare_multi_pois')
-        mocker.spy(_search_model, 'merge_multi_poi')
-
-        model.prepare_types(None)
-
-        assert model.types is None
-        _search_model.prepare_multi_pois.assert_called_once_with(None)
-
-        assert model.prepared_keywords is None
-        assert _search_model.merge_multi_poi.call_count == 0
 
     @pytest.mark.parametrize('input, output', [
         ('xxx', u'xxx'), (123, u'123'), (u'上海', u'上海'), (None, None),
@@ -207,61 +297,6 @@ class TestPreparedSearchTextRequestParams(object):
         assert model.children == output
         assert model.prepared_children == p_output
 
-    @pytest.mark.parametrize('data', [0, 1, 10, 25])
-    def test_offset(self, data):
-        model = _search_model.PreparedSearchTextRequestParams()
-
-        model.prepare_offset(data)
-
-        assert model.offset == data
-        assert model.prepared_offset == data
-
-    @pytest.mark.parametrize('data', [-1, 26, 100, -10])
-    def test_offset_out_of_range(self, data):
-        model = _search_model.PreparedSearchTextRequestParams()
-
-        with pytest.raises(VendorParamError) as err:
-            model.prepare_offset(data)
-
-        assert 'offset must in range 0 - 25.' in str(err.value)
-        assert model.prepared_offset is None
-
-    @pytest.mark.parametrize('data', [0, 1, 10, 50, 100])
-    def test_page(self, data):
-        model = _search_model.PreparedSearchTextRequestParams()
-
-        model.prepare_page(data)
-
-        assert model.page == data
-        assert model.prepared_page == data
-
-    @pytest.mark.parametrize('data', [-1, 101, 1000, -10])
-    def test_page_out_of_range(self, data):
-        model = _search_model.PreparedSearchTextRequestParams()
-
-        with pytest.raises(VendorParamError) as err:
-            model.prepare_page(data)
-
-        assert 'page must in range 0 - 100.' in str(err.value)
-        assert model.prepared_page is None
-
-    @pytest.mark.parametrize('input, output, p_output', [
-        (True, _search_model.ExtensionFlag.ALL, _search_model.EXTENSION_ALL),
-        (False, _search_model.ExtensionFlag.BASE,
-         _search_model.EXTENSION_BASE),
-        (_search_model.ExtensionFlag.BASE, _search_model.ExtensionFlag.BASE,
-         _search_model.EXTENSION_BASE),
-        (_search_model.ExtensionFlag.ALL, _search_model.ExtensionFlag.ALL,
-         _search_model.EXTENSION_ALL),
-    ])
-    def test_prepare_extensions(self, input, output, p_output):
-        model = _search_model.PreparedSearchTextRequestParams()
-
-        model.prepare_extension(input)
-
-        assert model.extensions == output
-        assert model.prepared_extension == p_output
-
     def test_prepare_others(self):
         model = _search_model.PreparedSearchTextRequestParams()
 
@@ -277,13 +312,14 @@ class TestPreparedSearchTextRequestParams(object):
               building='xxxx', floor='5', extensions=False),
          {'keywords': u'瓷器', 'types': u'饮食|www', 'city': '',
           'citylimit': 'false', 'children': 1, 'offset': 10, 'page': 1,
-          'building': 'xxxx', 'floor': '5', 'extensions': 'base'}),
+          'building': 'xxxx', 'floor': '5', 'extensions': 'base',
+          'key': None}),
         (dict(keywords=u'瓷器', types=[u'饮食', 'www'], city='',
               city_limit=False, children=True, offset=10, page=1,
               building='xxxx', extensions=None),
          {'keywords': u'瓷器', 'types': u'饮食|www', 'city': '',
           'citylimit': 'false', 'children': 1, 'offset': 10, 'page': 1,
-          'building': 'xxxx'}),
+          'building': 'xxxx', 'key': None}),
         (dict(keywords=None, types=None, city=None,
               city_limit=None, children=None, offset=None, page=None,
               building=None, floor=None, extensions=None, key='xxx'),
@@ -295,6 +331,116 @@ class TestPreparedSearchTextRequestParams(object):
 
         for k, v in iteritems(output):
             assert model.params[k] == v
+
+        assert len(model.params) == len(output)
+
+
+class TestPreparedSearchAroundRequestParams(object):
+    def test_init_ok(self):
+        _ = _search_model.PreparedSearchAroundRequestParams()
+
+    def test_prepare_ok(self, mocker):
+        model = _search_model.PreparedSearchAroundRequestParams()
+
+        model.prepare_location = lambda x: 'location'
+        model.prepare_keywords = lambda x: 'keywords'
+        model.prepare_types = lambda x: 'types'
+        model.prepare_city = lambda x: 'city'
+        model.prepare_radius = lambda x: 'radius'
+        model.prepare_sort_rule = lambda x: 'sort_rule'
+        model.prepare_offset = lambda x: 'offset'
+        model.prepare_page = lambda x: 'page'
+        model.prepare_extension = lambda x: 'extensions'
+
+        for i in ['prepare_location', 'prepare_keywords', 'prepare_types',
+                  'prepare_city', 'prepare_radius', 'prepare_sort_rule',
+                  'prepare_offset', 'prepare_page', 'prepare_extension']:
+            mocker.spy(model, i)
+
+        model.prepare('123,45|234,23', 'keyword', ['types1', 'type2'],
+                      u'上海', 1000, 'distance', 1, 1, True)
+
+        model.prepare_location.assert_called_once_with('123,45|234,23')
+        model.prepare_keywords.assert_called_once_with('keyword')
+        model.prepare_types.assert_called_once_with(['types1', 'type2'])
+        model.prepare_city.assert_called_once_with(u'上海')
+        model.prepare_radius.assert_called_once_with(1000)
+        model.prepare_sort_rule.assert_called_once_with('distance')
+        model.prepare_offset.assert_called_once_with(1)
+        model.prepare_page.assert_called_once_with(1)
+        model.prepare_extension.assert_called_once_with(True)
+
+    @pytest.mark.parametrize('data, result, p_result', [
+        ('123,45', (123, 45), '123.000000,45.000000'),
+        ('123,45|223,34', (123, 45), '123.000000,45.000000'),
+        (['123,45'], (123, 45), '123.000000,45.000000'),
+        ([(123, 45)], (123, 45), '123.000000,45.000000'),
+    ])
+    def test_prepare_location(self, mocker, data, result, p_result):
+        model = _search_model.PreparedSearchAroundRequestParams()
+
+        mocker.spy(_search_model, 'prepare_multi_locations')
+        model.prepare_location(data)
+
+        assert model.location == result
+        assert model.prepared_location == p_result
+
+        _search_model.prepare_multi_locations.assert_called_once_with(data)
+
+    @pytest.mark.parametrize('data', [0, 500, 1000, 5000, 10000, 50000])
+    def test_prepare_radius(self, data):
+        model = _search_model.PreparedSearchAroundRequestParams()
+        model.prepare_radius(data)
+
+        assert model.radius == data
+        assert model.prepared_radius == data
+
+    @pytest.mark.parametrize('data', [-1, 50001, 53001])
+    def test_prepare_radius_out_of_range(self, data):
+        model = _search_model.PreparedSearchAroundRequestParams()
+        with pytest.raises(VendorParamError) as e:
+            model.prepare_radius(data)
+
+        assert 'in 0~50000m' in str(e.value)
+
+    @pytest.mark.parametrize('data, output, p_output', [
+        ('distance', _search_model.SortRule.DISTANCE, 'distance'),
+        ('weight', _search_model.SortRule.WEIGHT, 'weight'),
+        ('DisTance', _search_model.SortRule.DISTANCE, 'distance'),
+        ('WeiGht', _search_model.SortRule.WEIGHT, 'weight'),
+        (_search_model.SortRule.DISTANCE,
+         _search_model.SortRule.DISTANCE, 'distance'),
+        (_search_model.SortRule.WEIGHT,
+         _search_model.SortRule.WEIGHT, 'weight'),
+    ])
+    def test_sort_rule(self, data, output, p_output):
+        model = _search_model.PreparedSearchAroundRequestParams()
+
+        model.prepare_sort_rule(data)
+
+        assert model.sort_rule == output
+        assert model.prepared_sort_rule == p_output
+
+    @pytest.mark.parametrize('input, output', [
+        (dict(location=[(111, 22), '222,33'], keywords='xxx|uuu', types='a',
+              city=u'火星', radius=1000, sort_rule='distancE', offset=1,
+              page=1, extensions=True, key='xxx'),
+         dict(location='111.000000,22.000000', keywords='xxx|uuu', types='a',
+              city=u'火星', radius=1000, sortrule='distance', offset=1,
+              page=1, extensions='all', key='xxx')),
+        (dict(location='111,22', keywords=None, types=None, city=None,
+              radius=None, sort_rule=None, offset=None, page=None,
+              extensions=None, key='xxx'),
+         dict(key='xxx', location='111.000000,22.000000'))
+    ])
+    def test_generate_params(self, input, output):
+        model = _search_model.PreparedSearchAroundRequestParams()
+        model.prepare(**input)
+
+        for k, v in iteritems(output):
+            assert model.params[k] == v
+
+        assert len(model.params) == len(output)
 
 
 class TestSearchResponseData(object):
@@ -400,4 +546,3 @@ class TestSearchData(object):
         for m in model._properties:
             o = getattr(model, m)
             assert o is getattr(model, m)
-
