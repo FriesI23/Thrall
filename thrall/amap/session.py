@@ -109,8 +109,9 @@ class AMapSession(object):
                                             **kwargs)
         r = self.request.get(POI_SEARCH_TEXT_URL.url, params=p.params)
 
-        d = self.decoder.decode_search(raw_data=r.content,
-                                       version=POI_SEARCH_TEXT_URL.version)
+        d = self.decoder.decode_search_text(
+            raw_data=r.content,
+            version=POI_SEARCH_TEXT_URL.version)
         return d
 
     @_set_default
@@ -130,8 +131,9 @@ class AMapSession(object):
                                               **kwargs)
         r = self.request.get(POI_SEARCH_AROUND_URL.url, params=p.params)
 
-        d = self.decoder.decode_search(raw_data=r.content,
-                                       version=POI_SEARCH_TEXT_URL.version)
+        d = self.decoder.decode_search_around(
+            raw_data=r.content,
+            version=POI_SEARCH_TEXT_URL.version)
         return d
 
     @_set_default

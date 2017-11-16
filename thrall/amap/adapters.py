@@ -78,7 +78,8 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
     def registry_decoders(self):
         self.registry(self.decode_geo_code, GeoCodeResponseData)
         self.registry(self.decode_regeo_code, ReGeoCodeResponseData)
-        self.registry(self.decode_search, SearchResponseData)
+        self.registry(self.decode_search_text, SearchResponseData)
+        self.registry(self.decode_search_around, SearchResponseData)
         self.registry(self.decode_suggest, SuggestResponseData)
 
     @check_params_type(coder=(type,))
@@ -93,8 +94,14 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
         with self.decoder_context('decode_regeo_code', *args, **kwargs) as p:
             return p
 
-    def decode_search(self, *args, **kwargs):
-        with self.decoder_context('decode_search', *args, **kwargs) as p:
+    def decode_search_text(self, *args, **kwargs):
+        with self.decoder_context('decode_search_text',
+                                  *args, **kwargs) as p:
+            return p
+
+    def decode_search_around(self, *args, **kwargs):
+        with self.decoder_context('decode_search_around',
+                                  *args, **kwargs) as p:
             return p
 
     def decode_suggest(self, *args, **kwargs):

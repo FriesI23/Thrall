@@ -123,90 +123,51 @@ class TestAMapJsonDecoderAdapter(object):
                 pass
 
 
-class TestAMapEncodeAdapterFunc(object):
-    def test_encode_geo_code(self):
-        model = AMapEncodeAdapter()
+@pytest.mark.parametrize('func, params, result, instance', [
+    ('encode_geo_code',
+     dict(address='abc', key='def'),
+     dict(address=['abc'], key='def'),
+     PreparedGeoCodeRequestParams),
+    ('encode_regeo_code',
+     dict(location='125,25', key='def'),
+     dict(location=[(125, 25)], key='def'),
+     PreparedReGeoCodeRequestParams),
+    ('encode_search_text',
+     dict(keywords=u'北京大学|xxx', key='def'),
+     dict(keywords=[u'北京大学', 'xxx'], key='def'),
+     PreparedSearchTextRequestParams),
+    ('encode_search_around',
+     dict(location='123,45|322,33', key='def'),
+     dict(location=(123, 45), key='def'),
+     PreparedSearchAroundRequestParams),
+    ('encode_suggest',
+     dict(keyword=u'北京大学', key='def'),
+     dict(keyword=u'北京大学', key='def'),
+     PreparedSuggestRequestParams),
+])
+def test_amap_encode_adapter_func(func, params, result, instance):
+    model = AMapEncodeAdapter()
 
-        r = model.encode_geo_code(address='abc', key='def')
+    r = getattr(model, func)(**params)
 
-        assert r.address == ['abc']
-        assert r.key == 'def'
+    for k, v in result.items():
+        assert getattr(r, k) == v
 
-        assert isinstance(r, PreparedGeoCodeRequestParams)
-
-    def test_encode_regeo_code(self):
-        model = AMapEncodeAdapter()
-
-        r = model.encode_regeo_code('125,25', key='def')
-
-        assert r.location == [(125, 25)]
-        assert r.key == 'def'
-
-        assert isinstance(r, PreparedReGeoCodeRequestParams)
-
-    def test_encode_search_text(self):
-        model = AMapEncodeAdapter()
-
-        r = model.encode_search_text(keywords=u'北京大学|xxx', key='def')
-
-        assert r.keywords == [u'北京大学', 'xxx']
-        assert r.key == 'def'
-
-        assert isinstance(r, PreparedSearchTextRequestParams)
-
-    def test_encode_search_around(self):
-        model = AMapEncodeAdapter()
-
-        r = model.encode_search_around(location='123,45|322,33', key='def')
-
-        assert r.location == (123, 45)
-        assert r.key == 'def'
-
-        assert isinstance(r, PreparedSearchAroundRequestParams)
-
-    def test_encode_suggest(self):
-        model = AMapEncodeAdapter()
-
-        r = model.encode_suggest(keyword=u'北京大学', key='def')
-
-        assert r.keyword == u'北京大学'
-        assert r.key == 'def'
-
-        assert isinstance(r, PreparedSuggestRequestParams)
+    assert isinstance(r, instance)
 
 
-class TestAMapJsonDecoderAdapterFunc(object):
-    def test_decode_geo_code(self):
-        model = AMapJsonDecoderAdapter()
+@pytest.mark.parametrize("func, instance", [
+    ('decode_geo_code', GeoCodeResponseData),
+    ('decode_regeo_code', ReGeoCodeResponseData),
+    ('decode_search_text', SearchResponseData),
+    ('decode_search_around', SearchResponseData),
+    ('decode_suggest', SuggestResponseData)
+])
+def test_amap_json_decode_adapter_func(func, instance):
+    model = AMapJsonDecoderAdapter()
 
-        r = model.decode_geo_code(raw_data='{"status": "1"}')
+    r = getattr(model, func)(raw_data='{"status": "1"}')
 
-        assert r.status == 1
+    assert r.status == 1
 
-        assert isinstance(r, GeoCodeResponseData)
-
-    def test_decode_regeo_code(self):
-        model = AMapJsonDecoderAdapter()
-
-        r = model.decode_regeo_code(raw_data='{"status": "1"}')
-
-        assert r.status == 1
-
-        assert isinstance(r, ReGeoCodeResponseData)
-
-    def test_decode_search(self):
-        model = AMapJsonDecoderAdapter()
-
-        r = model.decode_search(raw_data='{"status": "1"}')
-
-        assert r.status == 1
-
-        assert isinstance(r, SearchResponseData)
-
-    def test_decode_suggest(self):
-        model = AMapJsonDecoderAdapter()
-
-        r = model.decode_suggest(raw_data='{"status": "1"}')
-
-        assert r.status == 1
-        assert isinstance(r, SuggestResponseData)
+    assert isinstance(r, instance)
