@@ -66,6 +66,21 @@ def merge_location(lng, lat):
     return u'%.6f,%.6f' % (lng, lat)
 
 
+def merge_multi_locations(locations):
+    """ merge multi locations to single string
+
+    >>> merge_multi_locations([(123,34), (12345,67)]) \
+    == u'123.000000,34.000000|12345.000000,67.000000'
+    True
+    >>> merge_multi_locations([(123,34)]) == u'123.000000,34.000000'
+    True
+
+    :param locations: locations like: [(lng1, lat1), ...]
+    :return: mixed string
+    """
+    return merge_multi_poi((merge_location(*loc) for loc in locations))
+
+
 def prepare_multi_locations(location):
     """ prepare locations to lng, lat pairs.
 

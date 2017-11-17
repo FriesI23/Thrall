@@ -69,3 +69,9 @@ NAVI_RIDING_URL = NamedURL.from_args(
     url='http://restapi.amap.com/v4/direction/bicycling',
     version=AMapVersion.V4,
 )
+
+DISRANCE_URL = NamedURL.from_args(
+    name='distance',
+    url='http://restapi.amap.com/v3/distance',
+    version=AMapVersion.V3,
+)

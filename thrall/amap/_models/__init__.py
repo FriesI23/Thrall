@@ -46,6 +46,12 @@ from ._suggest_model import (
     SuggestResponseData,
     SuggestData,
 )
+from ._distance_model import (
+    DistanceRequestParams,
+    PreparedDistanceRequestParams,
+    DistanceResponseData,
+    DistanceData,
+)
 
 __all__ = [
     # base
@@ -68,4 +74,7 @@ __all__ = [
     # suggest
     "SuggestRequestParams", "PreparedSuggestRequestParams",
     "SuggestResponseData", "SuggestData",
+    # distance
+    "DistanceRequestParams", "PreparedDistanceRequestParams",
+    "DistanceResponseData", "DistanceData",
 ]

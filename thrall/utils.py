@@ -23,6 +23,8 @@ def required_params(*params):
     """
     import inspect
 
+    _empty_dict = {}
+
     def _required_params(fn):
 
         def __check_param(param, arg2value, kw):
@@ -32,12 +34,12 @@ def required_params(*params):
                 return
             else:
                 raise RuntimeError(
-                    "Checked param '{}' not found".format(param))
+                    "Required param '{}' not found".format(param))
 
         @functools.wraps(fn)
         def __wrapper(*args, **kwargs):
             d = inspect.getcallargs(fn, *args, **kwargs)
-            kw = d.get('kwargs', {})
+            kw = d.get('kwargs', _empty_dict)
 
             for p in params:
                 __check_param(p, d, kw)
@@ -62,12 +64,14 @@ def check_params_type(enforce=False, **types):
     def _check_params_type(fn):
         def __enforce_check_type(key, type_list, arg2value, kw):
             if key not in arg2value:
-                if not isinstance(kw.get(key), tuple(type_list)):
-                    raise TypeError(
-                        'Check params "{}" type failed'.format(key))
+                v = kw.get(key)
+            else:
+                v = arg2value.get(key)
 
-            elif not isinstance(arg2value.get(key), tuple(type_list)):
-                raise TypeError('Check params "{}" type failed'.format(key))
+            if not isinstance(v, tuple(type_list)):
+                raise TypeError(
+                    'Check params "{}" type failed, {} --> {}'.format(
+                        key, type(v), type_list))
 
         def __check_type(key, type_list, arg2value, kw):
             if (key not in arg2value and kw.get(key) is None) or (

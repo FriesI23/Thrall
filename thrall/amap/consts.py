@@ -126,6 +126,24 @@ class DataType(IntEnum):
             return DATATYPE_ALL
 
 
+class DistanceType(IntEnum):
+    DIRECT = 0
+    DRIVING = 1
+    BUSLINE = 2
+    WALKING = 3
+
+    @classmethod
+    def choose(cls, data):
+        if data == 0:
+            return cls.DIRECT
+        elif data == 1:
+            return cls.DRIVING
+        elif data == 2:
+            return cls.BUSLINE
+        elif data == 3:
+            return cls.WALKING
+
+
 EXTENSION_BASE = 'base'
 EXTENSION_ALL = 'all'
 

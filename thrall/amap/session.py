@@ -20,6 +20,7 @@ from .urls import (
     POI_SEARCH_TEXT_URL,
     POI_SEARCH_AROUND_URL,
     POI_SUGGEST_URL,
+    DISRANCE_URL,
 )
 
 _set_default = SetDefault()
@@ -150,6 +151,19 @@ class AMapSession(object):
 
         d = self.decoder.decode_suggest(raw_data=r.content,
                                         version=POI_SUGGEST_URL.version)
+        return d
+
+    @_set_default
+    def distance(self, origins=None, destination=None, type=None, **kwargs):
+        p = self.encoder.encode_distance(origins=origins,
+                                         destination=destination,
+                                         type=type,
+                                         **kwargs)
+        r = self.request.get(DISRANCE_URL.url, params=p.params)
+
+        d = self.decoder.decode_distance(raw_data=r.content,
+                                         version=DISRANCE_URL.version)
+
         return d
 
 

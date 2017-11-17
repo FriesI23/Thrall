@@ -11,8 +11,6 @@ from ..consts import (
     CityLimitFlag,
     ChildrenFlag,
     SortRule,
-    EXTENSION_BASE,
-    EXTENSION_ALL,
 )
 from ..common import (
     prepare_multi_address,
