@@ -220,7 +220,7 @@
                 "sha256:5ce3c71c5545b472da17b72268978914d0252980348636840bd34a00b5cc96c1",
                 "sha256:b158b6df76edd239b8208d481dc46b6afd45a846b7812ff0ce58971cf5bc8bba"
             ],
-            "markers": "python_version in '2.6, 2.7, 3.2'",
+            "markers": "python_version == '2.6' or python_version == '2.7'",
             "version": "==2.0.0"
         },
         "pathlib": {
@@ -245,10 +245,10 @@
         },
         "py": {
             "hashes": [
-                "sha256:2ccb79b01769d99115aa600d7eed99f524bf752bba8f041dc1c184853514655a",
-                "sha256:0f2d585d22050e90c7d293b6451c83db097df77871974d90efd5a30dc12fcde3"
+                "sha256:8cca5c229d225f8c1e3085be4fcf306090b00850fefad892f9d96c7b6e2f310f",
+                "sha256:ca18943e28235417756316bfada6cd96b23ce60dd532642690dcfdaba988a76d"
             ],
-            "version": "==1.4.34"
+            "version": "==1.5.2"
         },
         "py-cpuinfo": {
             "hashes": [
@@ -272,10 +272,10 @@
         },
         "pytest": {
             "hashes": [
-                "sha256:cfee9a9b6c0e76962490135fb978b65734e639ff39cde1358f5473fad92dabd9",
-                "sha256:f50c9d0e07f0b028f6046448cd7b66bd48ff4ed004641db3ea2898af3b9eaeee"
+                "sha256:241d7e7798d79192a123ceaf64c602b4d233eacf6d6e42ae27caa97f498b7dc6",
+                "sha256:6d5bd4f7113b444c55a3bbb5c738a3dd80d43563d063fc42dcb0aaefbdd78b81"
             ],
-            "version": "==3.2.4"
+            "version": "==3.2.5"
         },
         "pytest-benchmark": {
             "hashes": [
