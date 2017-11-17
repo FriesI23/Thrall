@@ -1,28 +1,23 @@
 # coding: utf-8
 from __future__ import absolute_import
-from thrall.compat import unicode
 
-from thrall.utils import (
-    check_params_type,
-    required_params,
-)
 from thrall.base import BaseData
 from thrall.exceptions import (
     amap_batch_status_exception,
-    amap_status_exception,
+    amap_status_exception
 )
+from thrall.utils import required_params
 
-from ..consts import DistanceType
 from ..common import (
-    prepare_multi_locations,
-    merge_multi_locations,
     merge_location,
+    merge_multi_locations,
+    prepare_multi_locations
 )
-
+from ..consts import DistanceType
 from ._base_model import (
-    BaseRequestParams,
     BasePreparedRequestParams,
-    BaseResponseData,
+    BaseRequestParams,
+    BaseResponseData
 )
 
 
@@ -54,11 +49,6 @@ class PreparedDistanceRequestParams(BasePreparedRequestParams):
         self.type = None
         super(PreparedDistanceRequestParams, self).__init__()
 
-    @check_params_type(
-        origins=(str, unicode, tuple, list),
-        destination=(str, unicode, tuple),
-        type=(int, DistanceType),
-    )
     def prepare(self, origins=None, destination=None, type=None, **kwargs):
         self.prepare_origins(origins)
         self.prepare_destination(destination)
@@ -66,16 +56,21 @@ class PreparedDistanceRequestParams(BasePreparedRequestParams):
         self.prepare_base(**kwargs)
 
     def prepare_origins(self, origins):
-        self.origins = prepare_multi_locations(origins)
+        if origins is not None:
+            self.origins = prepare_multi_locations(origins)
 
     def prepare_destination(self, destination):
+        if destination is None:
+            return
+
         r = prepare_multi_locations(destination)
 
         if r:
             self.destination = r[0]
 
     def prepare_type(self, type_):
-        self.type = DistanceType.choose(type_)
+        if type_ is not None:
+            self.type = DistanceType.choose(type_)
 
     @property
     def prepared_origins(self):

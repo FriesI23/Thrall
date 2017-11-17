@@ -1,37 +1,26 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from thrall.utils import check_params_type
-from thrall.exceptions import amap_params_exception
-from thrall.compat import unicode
 from thrall.base import BaseData
+from thrall.compat import unicode
+from thrall.utils import required_params
 
-from ..consts import (
-    ExtensionFlag,
-    CityLimitFlag,
-    ChildrenFlag,
-    SortRule,
-)
 from ..common import (
-    prepare_multi_address,
-    prepare_multi_locations,
-    prepare_multi_pois,
+    merge_location,
     merge_multi_address,
     merge_multi_poi,
-    merge_location,
+    prepare_multi_address,
+    prepare_multi_locations,
+    prepare_multi_pois
 )
-
+from ..consts import ChildrenFlag, CityLimitFlag, ExtensionFlag, SortRule
 from ._base_model import (
-    BaseRequestParams,
     BasePreparedRequestParams,
+    BaseRequestParams,
     BaseResponseData,
-    Extensions,
+    Extensions
 )
-from ._common_model import (
-    IndoorData,
-    BizExt,
-    Photos,
-)
+from ._common_model import BizExt, IndoorData, Photos
 
 
 class SearchTextRequestParams(BaseRequestParams):
@@ -55,9 +44,12 @@ class SearchTextRequestParams(BaseRequestParams):
             return 1
 
     def prepare_data(self):
+
         if self._no_keywords_and_types():
-            raise amap_params_exception(
-                'keywords and types must be required one at least.')
+            # TODO: add raise mode to raise this exc
+            #     raise amap_params_exception(
+            #         'keywords and types must be required one at least.')
+            pass
 
         _p = PreparedSearchTextRequestParams()
 
@@ -80,6 +72,7 @@ class SearchTextRequestParams(BaseRequestParams):
 
 
 class SearchAroundRequestParams(BaseRequestParams):
+    @required_params('location')
     def __init__(self, location=None, keywords=None, types=None, city=None,
                  radius=None, sort_rule=None, offset=None, page=None,
                  extensions=None, **kwargs):
@@ -123,19 +116,23 @@ class PreparedSearchMixin(object):
         self.extensions = None
 
     def prepare_keywords(self, keywords):
-        self.keywords = prepare_multi_address(keywords)
+        if keywords is not None:
+            self.keywords = prepare_multi_address(keywords)
 
     def prepare_types(self, types):
-        self.types = prepare_multi_pois(types)
+        if types is not None:
+            self.types = prepare_multi_pois(types)
 
     def prepare_offset(self, offset):
-        if offset is not None and (offset > 25 or offset < 0):
-            raise amap_params_exception('offset must in range 0 - 25.')
+        # TODO: add raise mode to raise this exc
+        # if offset is not None and (offset > 25 or offset < 0):
+        #     raise amap_params_exception('offset must in range 0 - 25.')
         self.offset = offset
 
     def prepare_page(self, page):
-        if page is not None and (page > 100 or page < 0):
-            raise amap_params_exception('page must in range 0 - 100.')
+        # TODO: add raise mode to raise this exc
+        # if page is not None and (page > 100 or page < 0):
+        #     raise amap_params_exception('page must in range 0 - 100.')
         self.page = page
 
     def prepare_extension(self, extension):
@@ -183,18 +180,6 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
         self.floor = None
         self.extensions = None
 
-    @check_params_type(
-        keywords=(str, unicode, list, tuple),
-        types=(str, unicode, list, tuple),
-        city=(str, unicode, int),
-        city_limit=(bool, CityLimitFlag),
-        children=(bool, int, ChildrenFlag),
-        offset=(int,),
-        page=(int,),
-        building=(str, unicode),
-        floor=(str, unicode),
-        extensions=(bool, ExtensionFlag),
-    )
     def prepare(self, keywords=None, types=None, city=None, city_limit=None,
                 children=None, offset=None, page=None, building=None,
                 floor=None, extensions=None, **kwargs):
@@ -215,17 +200,23 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
             self.city = unicode(city)
 
     def prepare_city_limit(self, city_limit):
-        if isinstance(city_limit, bool):
+        if city_limit is None:
+            return
+
+        if isinstance(city_limit, CityLimitFlag):
+            self.city_limit = city_limit
+        else:
             self.city_limit = (CityLimitFlag.ON if city_limit
                                else CityLimitFlag.OFF)
-        elif isinstance(city_limit, CityLimitFlag):
-            self.city_limit = city_limit
 
     def prepare_children(self, children):
-        if isinstance(children, (int, bool)):
-            self.children = ChildrenFlag.ON if children else ChildrenFlag.OFF
-        elif isinstance(children, ChildrenFlag):
+        if children is None:
+            return
+
+        if isinstance(children, ChildrenFlag):
             self.children = children
+        else:
+            self.children = ChildrenFlag.ON if children else ChildrenFlag.OFF
 
     def prepare_building(self, building):
         self.building = building
@@ -239,17 +230,13 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
 
     @property
     def prepared_city_limit(self):
-        if self.city_limit == CityLimitFlag.ON:
-            return 'true'
-        elif self.city_limit == CityLimitFlag.OFF:
-            return 'false'
+        if self.city_limit is not None:
+            return self.city_limit.param
 
     @property
     def prepared_children(self):
-        if self.children == ChildrenFlag.ON:
-            return 1
-        elif self.children == ChildrenFlag.OFF:
-            return 0
+        if self.children is not None:
+            return self.children.param
 
     @property
     def prepared_building(self):
@@ -291,17 +278,6 @@ class PreparedSearchAroundRequestParams(BasePreparedRequestParams,
         self.page = None
         self.extensions = None
 
-    @check_params_type(
-        location=(str, unicode, tuple, list),
-        keywords=(str, unicode, list, tuple),
-        types=(str, unicode, list, tuple),
-        city=(str, unicode, int),
-        radius=(int, float),
-        sort_rule=(str, unicode, SortRule),
-        offset=(int,),
-        page=(int,),
-        extensions=(bool, ExtensionFlag),
-    )
     def prepare(self, location=None, keywords=None, types=None, city=None,
                 radius=None, sort_rule=None, offset=None, page=None,
                 extensions=None, **kwargs):
@@ -317,27 +293,32 @@ class PreparedSearchAroundRequestParams(BasePreparedRequestParams,
         self.prepare_base(**kwargs)
 
     def prepare_location(self, location):
-        r = prepare_multi_locations(location)
+        if location is not None:
+            r = prepare_multi_locations(location)
 
-        if r:
-            self.location = r[0]
+            if r:
+                self.location = r[0]
 
     def prepare_city(self, city):
         if city is not None:
             self.city = unicode(city)
 
     def prepare_radius(self, radius):
-        if radius is not None and (radius < 0 or radius > 50000):
-            raise amap_params_exception(
-                msg='re_geo radius range must in 0~50000m')
+        # TODO: add raise mode to raise this exc
+        # if radius is not None and (radius < 0 or radius > 50000):
+        #     raise amap_params_exception(
+        #         msg='re_geo radius range must in 0~50000m')
 
         self.radius = radius
 
     def prepare_sort_rule(self, sort_rule):
-        if isinstance(sort_rule, (str, unicode)):
-            self.sort_rule = SortRule.choose(sort_rule)
-        elif isinstance(sort_rule, SortRule):
+        if sort_rule is None:
+            return
+
+        if isinstance(sort_rule, SortRule):
             self.sort_rule = sort_rule
+        else:
+            self.sort_rule = SortRule.choose(sort_rule)
 
     @property
     def prepared_location(self):

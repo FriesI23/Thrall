@@ -124,12 +124,6 @@ class TestBasePrepareModel(object):
         assert model.output == OutputFmt.XML
         assert model.prepared_output == 'xml'
 
-    def test_prepare_output_unknown(self):
-        model = _base_model.BasePreparedRequestParams()
-
-        with pytest.raises(TypeError):
-            model.prepare_output('output')
-
     def test_prepare_callback(self):
         try:
             from urlparse import ParseResult

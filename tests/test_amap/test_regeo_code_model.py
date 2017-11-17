@@ -107,13 +107,13 @@ class TestPreparedReGeoCodeRequestParams(object):
         assert model.radius == data
         assert model.prepared_radius == data
 
-    @pytest.mark.parametrize('data', [-1, 4000, 3001])
-    def test_prepare_radius_out_of_range(self, data):
-        model = _regeo_code_model.PreparedReGeoCodeRequestParams()
-        with pytest.raises(VendorParamError) as e:
-            model.prepare_radius(data)
-
-        assert 'in 0~3000m' in str(e.value)
+    # @pytest.mark.parametrize('data', [-1, 4000, 3001])
+    # def test_prepare_radius_out_of_range(self, data):
+    #     model = _regeo_code_model.PreparedReGeoCodeRequestParams()
+    #     with pytest.raises(VendorParamError) as e:
+    #         model.prepare_radius(data)
+    #
+    #     assert 'in 0~3000m' in str(e.value)
 
     @pytest.mark.parametrize('data, result, p_result', [
         (True, BatchFlag.ON, 'true'),

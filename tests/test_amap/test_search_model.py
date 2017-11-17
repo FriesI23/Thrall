@@ -7,6 +7,7 @@ from thrall.utils import unicode
 import pytest
 
 from thrall.amap._models import _search_model
+from thrall.amap.consts import EXTENSION_ALL, EXTENSION_BASE
 
 from thrall.exceptions import VendorParamError
 
@@ -49,16 +50,16 @@ class TestSearchTextRequestParams(object):
         assert p.types == [u'xxx', u'中国', u'001']
         assert p.key == 'xx'
 
-    def test_preapre_data_no_keywords_and_types_err(self):
-        model = _search_model.SearchTextRequestParams(key=u'xx')
-
-        with pytest.raises(VendorParamError) as err:
-            model.prepare()
-
-        assert isinstance(err.value.data,
-                          _search_model.SearchTextRequestParams)
-
-        assert 'keywords and types' in str(err.value)
+    # def test_preapre_data_no_keywords_and_types_err(self):
+    #     model = _search_model.SearchTextRequestParams(key=u'xx')
+    #
+    #     with pytest.raises(VendorParamError) as err:
+    #         model.prepare()
+    #
+    #     assert isinstance(err.value.data,
+    #                       _search_model.SearchTextRequestParams)
+    #
+    #     assert 'keywords and types' in str(err.value)
 
 
 class TestSearchAroundRequestParams(object):
@@ -118,7 +119,7 @@ class TestPreparedSearchMixin(object):
         model.prepare_keywords(None)
 
         assert model.keywords is None
-        _search_model.prepare_multi_address.assert_called_once_with(None)
+        assert _search_model.prepare_multi_address.call_count == 0
 
         assert model.prepared_keywords is None
         assert _search_model.merge_multi_address.call_count == 0
@@ -146,7 +147,7 @@ class TestPreparedSearchMixin(object):
         model.prepare_types(None)
 
         assert model.types is None
-        _search_model.prepare_multi_pois.assert_called_once_with(None)
+        assert _search_model.prepare_multi_pois.call_count == 0
 
         assert model.prepared_keywords is None
         assert _search_model.merge_multi_poi.call_count == 0
@@ -160,15 +161,15 @@ class TestPreparedSearchMixin(object):
         assert model.offset == data
         assert model.prepared_offset == data
 
-    @pytest.mark.parametrize('data', [-1, 26, 100, -10])
-    def test_offset_out_of_range(self, data):
-        model = _search_model.PreparedSearchMixin()
-
-        with pytest.raises(VendorParamError) as err:
-            model.prepare_offset(data)
-
-        assert 'offset must in range 0 - 25.' in str(err.value)
-        assert model.prepared_offset is None
+    # @pytest.mark.parametrize('data', [-1, 26, 100, -10])
+    # def test_offset_out_of_range(self, data):
+    #     model = _search_model.PreparedSearchMixin()
+    #
+    #     with pytest.raises(VendorParamError) as err:
+    #         model.prepare_offset(data)
+    #
+    #     assert 'offset must in range 0 - 25.' in str(err.value)
+    #     assert model.prepared_offset is None
 
     @pytest.mark.parametrize('data', [0, 1, 10, 50, 100])
     def test_page(self, data):
@@ -179,24 +180,23 @@ class TestPreparedSearchMixin(object):
         assert model.page == data
         assert model.prepared_page == data
 
-    @pytest.mark.parametrize('data', [-1, 101, 1000, -10])
-    def test_page_out_of_range(self, data):
-        model = _search_model.PreparedSearchMixin()
-
-        with pytest.raises(VendorParamError) as err:
-            model.prepare_page(data)
-
-        assert 'page must in range 0 - 100.' in str(err.value)
-        assert model.prepared_page is None
+    # @pytest.mark.parametrize('data', [-1, 101, 1000, -10])
+    # def test_page_out_of_range(self, data):
+    #     model = _search_model.PreparedSearchMixin()
+    #
+    #     with pytest.raises(VendorParamError) as err:
+    #         model.prepare_page(data)
+    #
+    #     assert 'page must in range 0 - 100.' in str(err.value)
+    #     assert model.prepared_page is None
 
     @pytest.mark.parametrize('input, output, p_output', [
-        (True, _search_model.ExtensionFlag.ALL, _search_model.EXTENSION_ALL),
-        (False, _search_model.ExtensionFlag.BASE,
-         _search_model.EXTENSION_BASE),
+        (True, _search_model.ExtensionFlag.ALL, EXTENSION_ALL),
+        (False, _search_model.ExtensionFlag.BASE, EXTENSION_BASE),
         (_search_model.ExtensionFlag.BASE, _search_model.ExtensionFlag.BASE,
-         _search_model.EXTENSION_BASE),
+         EXTENSION_BASE),
         (_search_model.ExtensionFlag.ALL, _search_model.ExtensionFlag.ALL,
-         _search_model.EXTENSION_ALL),
+         EXTENSION_ALL),
     ])
     def test_prepare_extensions(self, input, output, p_output):
         model = _search_model.PreparedSearchMixin()
@@ -395,13 +395,13 @@ class TestPreparedSearchAroundRequestParams(object):
         assert model.radius == data
         assert model.prepared_radius == data
 
-    @pytest.mark.parametrize('data', [-1, 50001, 53001])
-    def test_prepare_radius_out_of_range(self, data):
-        model = _search_model.PreparedSearchAroundRequestParams()
-        with pytest.raises(VendorParamError) as e:
-            model.prepare_radius(data)
-
-        assert 'in 0~50000m' in str(e.value)
+    # @pytest.mark.parametrize('data', [-1, 50001, 53001])
+    # def test_prepare_radius_out_of_range(self, data):
+    #     model = _search_model.PreparedSearchAroundRequestParams()
+    #     with pytest.raises(VendorParamError) as e:
+    #         model.prepare_radius(data)
+    #
+    #     assert 'in 0~50000m' in str(e.value)
 
     @pytest.mark.parametrize('data, output, p_output', [
         ('distance', _search_model.SortRule.DISTANCE, 'distance'),

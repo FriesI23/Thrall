@@ -63,7 +63,7 @@ class TestGeoCodePrepareModel(object):
         model = _geo_code_model.PreparedGeoCodeRequestParams()
         model.prepare_city(123)
 
-        assert model.city == 123
+        assert model.city == '123'
         assert model.prepared_city == '123'
 
     @pytest.mark.parametrize('flag', [True, BatchFlag.ON])

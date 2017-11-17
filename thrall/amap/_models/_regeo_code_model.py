@@ -2,9 +2,7 @@
 from __future__ import absolute_import
 
 from thrall.base import BaseData
-from thrall.compat import unicode
-from thrall.exceptions import amap_params_exception
-from thrall.utils import check_params_type, required_params
+from thrall.utils import required_params
 
 from ..common import (
     merge_location,
@@ -13,14 +11,7 @@ from ..common import (
     prepare_multi_locations,
     prepare_multi_pois
 )
-from ..consts import (
-    EXTENSION_ALL,
-    EXTENSION_BASE,
-    BatchFlag,
-    ExtensionFlag,
-    HomeOrCorpControl,
-    RoadLevel
-)
+from ..consts import BatchFlag, ExtensionFlag, HomeOrCorpControl, RoadLevel
 from ._base_model import (
     BasePreparedRequestParams,
     BaseRequestParams,
@@ -101,76 +92,6 @@ class PreparedReGeoCodeRequestParams(BasePreparedRequestParams):
         self.road_level = None
         self.home_or_corp = None
 
-    def generate_params(self):
-        _p = {}
-        optional_params = {'radius': self.prepared_radius,
-                           'batch': self.prepared_batch,
-                           'extensions': self.prepared_extensions,
-                           'poitype': self.prepared_poi_type,
-                           'roadlevel': self.prepared_road_level,
-                           'homeorcorp': self.prepared_home_or_corp}
-
-        with self.init_basic_params(_p, optionals=optional_params) as params:
-            params['location'] = self.prepared_location
-
-            return params
-
-    @property
-    def prepared_location(self):
-        if self.location is not None:
-            return merge_multi_poi(
-                (merge_location(*loc) for loc in self.location))
-
-    @property
-    def prepared_radius(self):
-        return self.radius
-
-    @property
-    def prepared_batch(self):
-        if self.batch == BatchFlag.ON:
-            return 'true'
-        elif self.batch == BatchFlag.OFF:
-            return 'false'
-
-    @property
-    def prepared_extensions(self):
-        if self.extensions == ExtensionFlag.ALL:
-            return EXTENSION_ALL
-        elif self.extensions == ExtensionFlag.BASE:
-            return EXTENSION_BASE
-
-    @property
-    def prepared_poi_type(self):
-        if self.extensions == ExtensionFlag.ALL and self.poi_type is not None:
-            return merge_poi_type(self.poi_type)
-
-    @property
-    def prepared_road_level(self):
-        if self.extensions == ExtensionFlag.ALL:
-            if self.road_level == RoadLevel.ALL:
-                return 0
-            elif self.road_level == RoadLevel.DIRECT:
-                return 1
-
-    @property
-    def prepared_home_or_corp(self):
-        if self.extensions == ExtensionFlag.ALL:
-            if self.home_or_corp == HomeOrCorpControl.OFF:
-                return 0
-            elif self.home_or_corp == HomeOrCorpControl.HOME:
-                return 1
-            elif self.home_or_corp == HomeOrCorpControl.CORP:
-                return 2
-
-    @check_params_type(
-        location=(str, unicode, tuple, list),
-        radius=(int, float),
-        batch=(bool, BatchFlag),
-        extensions=(ExtensionFlag,),
-        poi_type=(tuple, list, str, unicode),
-        road_level=(int, RoadLevel),
-        home_or_corp=(int, HomeOrCorpControl),
-    )
     def prepare(self, location=None, radius=None, batch=None, extensions=None,
                 poi_type=None, road_level=None, home_or_corp=None, **kwargs):
         self.prepare_location(location)
@@ -184,43 +105,98 @@ class PreparedReGeoCodeRequestParams(BasePreparedRequestParams):
         self.prepare_home_or_corp(home_or_corp)
 
     def prepare_location(self, location):
-        self.location = prepare_multi_locations(location)
+        if location is not None:
+            self.location = prepare_multi_locations(location)
 
     def prepare_radius(self, radius):
-        if radius is not None and (radius < 0 or radius > 3000):
-            raise amap_params_exception(
-                msg='re_geo radius range must in 0~3000m')
-
+        # TODO: Add exc_mode to raise this exception
+        # if radius is not None and (radius < 0 or radius > 3000):
+        #     raise amap_params_exception(
+        #         msg='re_geo radius range must in 0~3000m')
         self.radius = radius
 
     def prepare_batch(self, batch):
-        if isinstance(batch, bool):
-            self.batch = BatchFlag.ON if batch else BatchFlag.OFF
-        elif isinstance(batch, BatchFlag):
+        if batch is None:
+            return
+
+        if isinstance(batch, BatchFlag):
             self.batch = batch
+        else:
+            self.batch = BatchFlag.ON if batch else BatchFlag.OFF
 
     def prepare_extensions(self, extensions):
         self.extensions = extensions
 
     def prepare_poi_type(self, poi_type):
-        self.poi_type = prepare_multi_pois(poi_type)
+        if poi_type is not None:
+            self.poi_type = prepare_multi_pois(poi_type)
 
     def prepare_road_level(self, road_level):
-        if isinstance(road_level, int):
-            self.road_level = RoadLevel.DIRECT if road_level else RoadLevel.ALL
-        elif isinstance(road_level, RoadLevel):
+        if road_level is None:
+            return
+
+        if isinstance(road_level, RoadLevel):
             self.road_level = road_level
+        else:
+            self.road_level = RoadLevel.DIRECT if road_level else RoadLevel.ALL
 
     def prepare_home_or_corp(self, home_or_corp):
-        if isinstance(home_or_corp, int):
-            if home_or_corp == 1:
-                self.home_or_corp = HomeOrCorpControl.HOME
-            elif home_or_corp == 2:
-                self.home_or_corp = HomeOrCorpControl.CORP
-            else:
-                self.home_or_corp = HomeOrCorpControl.OFF
-        elif isinstance(home_or_corp, HomeOrCorpControl):
+        if home_or_corp is None:
+            return
+
+        if isinstance(home_or_corp, HomeOrCorpControl):
             self.home_or_corp = home_or_corp
+        else:
+            self.home_or_corp = HomeOrCorpControl.choose(home_or_corp)
+
+    @property
+    def prepared_location(self):
+        if self.location is not None:
+            return merge_multi_poi(
+                (merge_location(*loc) for loc in self.location))
+
+    @property
+    def prepared_radius(self):
+        return self.radius
+
+    @property
+    def prepared_batch(self):
+        if self.batch is not None:
+            return self.batch.param
+
+    @property
+    def prepared_extensions(self):
+        if self.extensions is not None:
+            return self.extensions.param
+
+    @property
+    def prepared_poi_type(self):
+        if self.extensions == ExtensionFlag.ALL and self.poi_type is not None:
+            return merge_poi_type(self.poi_type)
+
+    @property
+    def prepared_road_level(self):
+        if self.road_level is not None and self.extensions:
+            return self.road_level.param
+
+    @property
+    def prepared_home_or_corp(self):
+        if self.home_or_corp is not None and self.extensions:
+            return self.home_or_corp.param
+
+    def generate_params(self):
+        _p = {}
+        optional_params = {'radius': self.prepared_radius,
+                           'batch': self.prepared_batch,
+                           'extensions': self.prepared_extensions,
+                           'poitype': self.prepared_poi_type,
+                           'roadlevel': self.prepared_road_level,
+                           'homeorcorp': self.prepared_home_or_corp}
+
+        with self.init_basic_params(_p, optionals=optional_params) as params:
+            params['location'] = self.prepared_location
+
+            return params
 
 
 class ReGeoCodeResponseData(BaseResponseData):

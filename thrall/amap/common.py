@@ -3,7 +3,7 @@ import json
 
 from six import iteritems
 
-from thrall.compat import unicode
+from thrall.compat import basestring, long
 from thrall.utils import camelcase_to_snakecase, is_list_empty
 
 
@@ -106,25 +106,40 @@ def prepare_multi_locations(location):
     >>> prepare_multi_locations(["111,11|222,22", (333, 33), {}])\
      == [(111, 11), (222, 22), (333, 33)]
     True
+    >>> prepare_multi_locations([125, 25]) ==  [(125, 25)]
+    True
+    >>> prepare_multi_locations([[125, 25]]) == [(125, 25)]
+    True
+    >>> prepare_multi_locations(["111,11|222,22", [333, 33]])\
+     == [(111, 11), (222, 22), (333, 33)]
+    True
 
     :param location: mixed locations
     :return: [(lng, lat), ...]
     """
-    if isinstance(location, (str, unicode)):
+    if not location:
+        return
+
+    if isinstance(location, basestring):
         _locations = parse_multi_poi(location)
         return [parse_location(loc) for loc in _locations]
-    elif isinstance(location, tuple):
-        return [location]
-    elif isinstance(location, list):
-        _tmp = []
-        for num, item in enumerate(location):
-            if isinstance(item, (str, unicode)):
-                _locations = parse_multi_poi(item)
-                _tmp.extend((parse_location(j) for j in _locations))
-            elif isinstance(item, tuple):
-                _tmp.append(item)
+    else:
+        return _prepare_multi_location_from_list(location)
 
-        return _tmp
+
+def _prepare_multi_location_from_list(locations):
+    tmp_list = []
+
+    for num, data in enumerate(locations):
+        if isinstance(data, basestring):
+            _locations = parse_multi_poi(data)
+            tmp_list.extend((parse_location(j) for j in _locations))
+        elif isinstance(data, (int, long)):
+            return [(data, locations[num + 1]), ]
+        elif data:
+            tmp_list.append(tuple(data))
+
+    return tmp_list
 
 
 def prepare_multi_string(pois):
@@ -148,9 +163,12 @@ def prepare_multi_string(pois):
     :param pois: mixed pois
     :return: ['a', 'b', ...]
     """
-    if isinstance(pois, (str, unicode)):
+    if not pois:
+        return
+
+    if isinstance(pois, basestring):
         return parse_poi_type(pois)
-    elif isinstance(pois, (tuple, list)):
+    else:
         _tmp = []
         for num, item in enumerate(pois):
             _pois = parse_multi_poi(item)

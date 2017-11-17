@@ -3,10 +3,10 @@ import functools
 import re
 from operator import itemgetter
 
+from future.utils import python_2_unicode_compatible
 from six import iteritems
 
 from thrall.compat import __builtin__, unicode
-from future.utils import python_2_unicode_compatible
 
 builtin_names = frozenset(
     name for name in dir(__builtin__)

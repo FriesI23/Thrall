@@ -2,21 +2,24 @@
 # flake8: noqa
 from __future__ import absolute_import
 
-import six
+from six import PY2, PY3
 
-if six.PY3:
+if PY3:
+    from past.builtins import (
+        unicode,
+        str,
+        basestring as basestring,
+        xrange,
+        long
+    )
     from urllib.parse import urlparse
-elif six.PY2:
-    from urlparse import urlparse
-
-if six.PY3:
-    unicode = str
-    xrange = range
-elif six.PY2:
-    unicode = unicode
-    xrange = xrange
-
-if six.PY2:
-    import __builtin__
-elif six.PY3:
     import builtins as __builtin__
+elif PY2:
+    from urlparse import urlparse
+    import __builtin__
+
+    basestring = basestring
+    unicode = unicode
+    str = str
+    xrange = xrange
+    long = long

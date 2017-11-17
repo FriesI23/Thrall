@@ -1,10 +1,11 @@
 # coding: utf-8
 # coding: utf-8
 from __future__ import absolute_import
-from thrall.compat import unicode
 
 from requests.adapters import HTTPAdapter
 from requests.sessions import Session
+
+from thrall.compat import basestring
 
 from .hooks import SetDefault
 from .utils import builtin_names, is_func_bound
@@ -143,7 +144,7 @@ class BaseAdapterMixin(object):
 
     def un_registry(self, func):
         try:
-            if isinstance(func, (str, unicode)):
+            if isinstance(func, basestring):
                 self._registered_coders.pop(func)
             elif is_func_bound(func, self):
                 self._registered_coders.pop(func.__name__)

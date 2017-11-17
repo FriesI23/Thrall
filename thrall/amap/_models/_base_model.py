@@ -10,11 +10,7 @@ from six import iteritems
 from thrall.compat import unicode, urlparse
 from thrall.consts import FORMAT_JSON, FORMAT_XML
 from thrall.exceptions import VendorError, amap_status_exception
-from thrall.utils import (
-    MapStatusMessage,
-    check_params_type,
-    required_params
-)
+from thrall.utils import MapStatusMessage, required_params
 
 from ..common import json_load_and_fix_amap_empty, parse_location
 from ..consts import AMapVersion, ExtensionFlag, OutputFmt, StatusFlag
@@ -159,32 +155,6 @@ class BasePreparedRequestParams(object):
         p.update({'sig': self.prepared_sig} if self._pkey else {})
         return p
 
-    @property
-    def prepared_key(self):
-        return self.key
-
-    @property
-    def prepared_output(self):
-        if self.output == OutputFmt.JSON:
-            return FORMAT_JSON
-        elif self.output == OutputFmt.XML:
-            return FORMAT_XML
-
-    @property
-    def prepared_callback(self):
-        if self.callback:
-            return self.callback.geturl()
-
-    @property
-    def sig(self):
-        if self._pkey:
-            return Sig(pkey=self._pkey, kwargs=self.generate_params())
-
-    @property
-    def prepared_sig(self):
-        if self._pkey:
-            return self.sig.hashed_sig
-
     def prepare(self, **kwargs):
         """ called prepare data functions
 
@@ -202,12 +172,6 @@ class BasePreparedRequestParams(object):
         """
         raise NotImplementedError
 
-    @check_params_type(
-        key=(str, unicode),
-        pkey=(str, unicode),
-        output=(str, unicode, OutputFmt),
-        callback=(str, unicode)
-    )
     def prepare_base(self, key=None, pkey=None, output=None, callback=None):
         self._pkey = pkey
         self.prepare_key(key)
@@ -218,20 +182,48 @@ class BasePreparedRequestParams(object):
         self.key = key
 
     def prepare_output(self, output):
-        if isinstance(output, (str, unicode)):
+        if output is None:
+            return
+
+        if isinstance(output, OutputFmt):
+            self.output = output
+        else:
             if output.lower() == FORMAT_JSON:
                 self.output = OutputFmt.JSON
             elif output.lower() == FORMAT_XML:
                 self.output = OutputFmt.XML
-            else:
-                raise TypeError('Unknown output param type.')
-
-        if isinstance(output, OutputFmt):
-            self.output = output
 
     def prepare_callback(self, callback):
-        if isinstance(callback, (str, unicode)):
-            self.callback = urlparse(callback)
+        if callback is None:
+            return
+
+        self.callback = urlparse(callback)
+
+    @property
+    def prepared_key(self):
+        return self.key
+
+    @property
+    def prepared_output(self):
+        if self.output == OutputFmt.JSON:
+            return FORMAT_JSON
+        elif self.output == OutputFmt.XML:
+            return FORMAT_XML
+
+    @property
+    def prepared_callback(self):
+        if self.callback is not None:
+            return self.callback.geturl()
+
+    @property
+    def sig(self):
+        if self._pkey:
+            return Sig(pkey=self._pkey, kwargs=self.generate_params())
+
+    @property
+    def prepared_sig(self):
+        if self._pkey:
+            return self.sig.hashed_sig
 
     @contextlib.contextmanager
     def init_basic_params(self, params, optionals=None):
@@ -263,7 +255,6 @@ class BasePreparedRequestParams(object):
 
 
 class BaseResponseData(object):
-    @check_params_type(raw_data=(str, unicode), version=(AMapVersion,))
     def __init__(self, raw_data, version=AMapVersion.V3,
                  auto_version=False, static_mode=False):
 

@@ -4,7 +4,7 @@ from __future__ import absolute_import
 from thrall.amap.consts import BatchFlag
 from thrall.base import BaseData
 from thrall.compat import unicode
-from thrall.utils import check_params_type, required_params
+from thrall.utils import required_params
 
 from ..common import merge_multi_address, prepare_multi_address
 from ._base_model import (
@@ -63,8 +63,7 @@ class PreparedGeoCodeRequestParams(BasePreparedRequestParams):
 
     @property
     def prepared_city(self):
-        if self.city is not None:
-            return unicode(self.city)
+        return self.city
 
     @property
     def prepared_batch(self):
@@ -73,11 +72,6 @@ class PreparedGeoCodeRequestParams(BasePreparedRequestParams):
         elif self.batch == BatchFlag.OFF:
             return False
 
-    @check_params_type(
-        address=(str, unicode, list, tuple),
-        city=(str, unicode, int),
-        batch=(bool, BatchFlag),
-    )
     def prepare(self, address=None, city=None, batch=None, **kwargs):
         """ prepare geo code data to amap request params
 
@@ -96,13 +90,17 @@ class PreparedGeoCodeRequestParams(BasePreparedRequestParams):
         self.address = prepare_multi_address(address)
 
     def prepare_city(self, city):
-        self.city = city
+        if city is not None:
+            self.city = unicode(city)
 
     def prepare_batch(self, batch):
-        if isinstance(batch, bool):
-            self.batch = BatchFlag.ON if batch else BatchFlag.OFF
-        elif isinstance(batch, BatchFlag):
+        if batch is None:
+            return
+
+        if isinstance(batch, BatchFlag):
             self.batch = batch
+        else:
+            self.batch = BatchFlag.ON if batch else BatchFlag.OFF
 
     def generate_params(self):
         optional_params = {'city': self.prepared_city,

@@ -1,30 +1,24 @@
 # coding: utf-8
 from __future__ import absolute_import
-from thrall.compat import unicode
 
-from thrall.utils import (
-    required_params,
-    check_params_type,
-)
 from thrall.base import BaseData
+from thrall.compat import basestring, unicode
+from thrall.utils import required_params
 
-from ._base_model import (
-    BaseRequestParams,
-    BasePreparedRequestParams,
-    BaseResponseData,
-    LocationMixin,
-)
-from ..consts import (
-    CityLimitFlag,
-    DataType,
-)
 from ..common import (
-    prepare_multi_pois,
-    prepare_multi_locations,
-    parse_multi_address,
+    merge_location,
     merge_multi_address,
     merge_multi_poi,
-    merge_location,
+    parse_multi_address,
+    prepare_multi_locations,
+    prepare_multi_pois
+)
+from ..consts import CityLimitFlag, DataType
+from ._base_model import (
+    BasePreparedRequestParams,
+    BaseRequestParams,
+    BaseResponseData,
+    LocationMixin
 )
 
 
@@ -67,14 +61,6 @@ class PreparedSuggestRequestParams(BasePreparedRequestParams):
         self.city_limit = None
         self.data_type = None
 
-    @check_params_type(
-        keyword=(str, unicode),
-        types=(str, unicode, list, tuple),
-        location=(str, unicode, tuple),
-        city=(str, unicode, int),
-        city_limit=(bool, CityLimitFlag),
-        data_type=(str, unicode, list, tuple, DataType)
-    )
     def prepare(self, keyword=None, types=None, location=None,
                 city=None, city_limit=None, data_type=None, **kwargs):
         self.prepare_keyword(keyword)
@@ -90,23 +76,28 @@ class PreparedSuggestRequestParams(BasePreparedRequestParams):
             self.keyword = unicode(keyword)
 
     def prepare_types(self, types):
-        self.types = prepare_multi_pois(types)
+        if types is not None:
+            self.types = prepare_multi_pois(types)
 
     def prepare_location(self, location):
-        rls = prepare_multi_locations(location)
+        if location is not None:
+            rls = prepare_multi_locations(location)
 
-        if rls:
-            self.location = rls[0]
+            if rls:
+                self.location = rls[0]
 
     def prepare_city(self, city):
         if city is not None:
             self.city = unicode(city)
 
     def prepare_city_limit(self, city_limit):
-        if isinstance(city_limit, bool):
-            self.city_limit = CityLimitFlag.choose(city_limit)
-        elif isinstance(city_limit, CityLimitFlag):
+        if city_limit is None:
+            return
+
+        if isinstance(city_limit, CityLimitFlag):
             self.city_limit = city_limit
+        else:
+            self.city_limit = CityLimitFlag.choose(city_limit)
 
     @staticmethod
     def prepare_multi_data_types(data_types):
@@ -150,7 +141,7 @@ class PreparedSuggestRequestParams(BasePreparedRequestParams):
         _tmp = []
         if isinstance(data_types, DataType):
             _tmp = [data_types]
-        elif isinstance(data_types, (str, unicode)):
+        elif isinstance(data_types, basestring):
             x = parse_multi_address(data_types)
             for i in x:
                 data_type = DataType.choose(i)
@@ -158,7 +149,7 @@ class PreparedSuggestRequestParams(BasePreparedRequestParams):
                     _tmp.append(data_type)
         elif isinstance(data_types, (list, tuple)):
             for num, item in enumerate(data_types):
-                if isinstance(item, (str, unicode)):
+                if isinstance(item, basestring):
                     _types = parse_multi_address(item)
                     for j in _types:
                         data_type = DataType.choose(j)
@@ -171,7 +162,8 @@ class PreparedSuggestRequestParams(BasePreparedRequestParams):
             return sorted(set(_tmp), key=_tmp.index)
 
     def prepare_data_type(self, data_types):
-        self.data_type = self.prepare_multi_data_types(data_types)
+        if data_types is not None:
+            self.data_type = self.prepare_multi_data_types(data_types)
 
     @property
     def prepared_keyword(self):

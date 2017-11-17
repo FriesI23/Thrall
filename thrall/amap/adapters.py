@@ -6,17 +6,17 @@ from contextlib import contextmanager
 from ..base import BaseDecoderAdapter, BaseEncoderAdapter
 from ..utils import check_params_type
 from .models import (
+    DistanceRequestParams,
+    DistanceResponseData,
     GeoCodeRequestParams,
     GeoCodeResponseData,
     ReGeoCodeRequestParams,
     ReGeoCodeResponseData,
-    SearchTextRequestParams,
     SearchAroundRequestParams,
     SearchResponseData,
+    SearchTextRequestParams,
     SuggestRequestParams,
-    SuggestResponseData,
-    DistanceRequestParams,
-    DistanceResponseData,
+    SuggestResponseData
 )
 
 

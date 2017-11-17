@@ -11,6 +11,13 @@ class BatchFlag(IntEnum):
     OFF = 0
     ON = 1
 
+    @property
+    def param(self):
+        if self == self.ON:
+            return 'true'
+        else:
+            return 'false'
+
 
 class AMapVersion(IntEnum):
     V3 = 3
@@ -45,11 +52,28 @@ class RoadLevel(IntEnum):
     ALL = 0
     DIRECT = 1
 
+    @property
+    def param(self):
+        return self
+
 
 class HomeOrCorpControl(IntEnum):
     OFF = 0
     HOME = 1
     CORP = 2
+
+    @classmethod
+    def choose(cls, data):
+        if data == 0:
+            return cls.OFF
+        elif data == 1:
+            return cls.HOME
+        elif data == 2:
+            return cls.CORP
+
+    @property
+    def param(self):
+        return self
 
 
 class SortRule(IntEnum):
@@ -94,6 +118,10 @@ class CityLimitFlag(IntEnum):
 class ChildrenFlag(IntEnum):
     OFF = 0
     ON = 1
+
+    @property
+    def param(self):
+        return self
 
 
 class DataType(IntEnum):
