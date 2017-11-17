@@ -8,7 +8,6 @@ from .consts import AMAP
 
 class VendorError(Exception):
     def __init__(self, *args, **kwargs):
-        self.response = kwargs.pop('response', None)
         self.data = kwargs.pop('data', None)
         super(VendorError, self).__init__(*args, **kwargs)
 
@@ -25,6 +24,10 @@ class VendorParamError(VendorError):
     """raise this error when vendor type/value check error"""
 
 
+class VendorConnectionError(VendorError):
+    """raise this error if got connection error"""
+
+
 class AMapBatchStatusError(VendorStatusError):
     """raise this error when amap batch request status error"""
 
@@ -34,24 +37,24 @@ class AMapBatchStatusError(VendorStatusError):
 
 
 def map_status_exception(err_msg=u'', map_source='UNKNOWN', err_code=-1,
-                         response=None, data=None, exc=VendorStatusError):
+                         data=None, exc=VendorStatusError):
     msg = u"{source}-ERROR: {err_code}-{err_msg}".format(
         source=map_source,
         err_code=err_code,
         err_msg=err_msg)
 
-    return exc(msg, response=response, data=data)
+    return exc(msg, data=data)
 
 
 def map_batch_status_exception(err_msg=u'', map_source='UNKNOWN', err_code=-1,
-                               response=None, data=None, errors=None,
+                               data=None, errors=None,
                                exc=VendorStatusError):
     msg = u"{source}-ERROR: {err_code}-{err_msg}".format(
         source=map_source,
         err_code=err_code,
         err_msg=err_msg)
 
-    return exc(msg, response=response, data=data, errors=errors)
+    return exc(msg, data=data, errors=errors)
 
 
 def map_params_exception(msg=u'', map_source='UNKNOWN', data=None,

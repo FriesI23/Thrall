@@ -4,8 +4,8 @@ import pytest
 import responses
 
 from requests.sessions import Session
-from requests.exceptions import HTTPError
 
+from thrall.exceptions import VendorConnectionError
 from thrall.base import BaseRequest, BaseAdapterMixin, BaseData
 
 
@@ -67,7 +67,7 @@ class TestBaseRequest(object):
 
         model = BaseRequest()
 
-        with pytest.raises(HTTPError):
+        with pytest.raises(VendorConnectionError):
             model.get('http://example.com', None)
 
 

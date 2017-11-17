@@ -2,10 +2,14 @@
 # coding: utf-8
 from __future__ import absolute_import
 
+from contextlib import contextmanager
+
 from requests.adapters import HTTPAdapter
 from requests.sessions import Session
+from requests.exceptions import RequestException
 
 from thrall.compat import basestring
+from thrall.exceptions import VendorConnectionError
 
 from .hooks import SetDefault
 from .utils import builtin_names, is_func_bound
@@ -26,7 +30,8 @@ class BaseRequest(object):
 
     @set_default
     def get(self, url, params, timeout=1, callback=None, **kwargs):
-        r = self._get_result(url, params, timeout, **kwargs)
+        with self.catch_exception():
+            r = self._get_result(url, params, timeout, **kwargs)
 
         if callable(callback):
             callback(r)
@@ -35,7 +40,8 @@ class BaseRequest(object):
 
     @set_default
     def post(self, url, data, timeout=1, callback=None, **kwargs):
-        r = self._post_result(url, data, timeout, **kwargs)
+        with self.catch_exception():
+            r = self._post_result(url, data, timeout, **kwargs)
 
         if callable(callback):
             callback(r)
@@ -53,6 +59,13 @@ class BaseRequest(object):
         r.raise_for_status()
 
         return r
+
+    @contextmanager
+    def catch_exception(self):
+        try:
+            yield
+        except RequestException as err:
+            raise VendorConnectionError(data=err)
 
 
 class BaseData(object):
