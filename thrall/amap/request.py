@@ -1,15 +1,41 @@
 # coding: utf-8
 from __future__ import absolute_import
 
+from thrall.utils import partialmethod
+
+from .urls import (
+    DISRANCE_URL,
+    GEO_CODING_URL,
+    POI_SEARCH_AROUND_URL,
+    POI_SEARCH_TEXT_URL,
+    POI_SUGGEST_URL,
+    REGEO_CODING_URL
+)
 from ..base import BaseRequest
 
 
 class AMapRequest(BaseRequest):
 
-    def get(self, url, params, timeout=1, callback=None, **kwargs):
-        return super(AMapRequest, self).get(
-            url, params, timeout, callback, **kwargs)
+    def _url_swith(self, oru, dfu, url):
+        if oru:
+            return oru
+        else:
+            return url or dfu
 
-    def post(self, url, data, timeout=1, callback=None, **kwargs):
-        return super(AMapRequest, self).post(
-            url, data, timeout, callback, **kwargs)
+    def get_data(self, p, default_url, url=None, **kwargs):
+        params = p.params
+        url = self._url_swith(url, default_url, p.DEFAULT_URL)
+        return self.get(url.url, params=params, **kwargs)
+
+    get_geo_code = partialmethod(get_data, default_url=GEO_CODING_URL)
+
+    get_regeo_code = partialmethod(get_data, default_url=REGEO_CODING_URL)
+
+    get_search_text = partialmethod(get_data, default_url=POI_SEARCH_TEXT_URL)
+
+    get_search_around = partialmethod(get_data,
+                                      default_url=POI_SEARCH_AROUND_URL)
+
+    get_suggest = partialmethod(get_data, default_url=POI_SUGGEST_URL)
+
+    get_distance = partialmethod(get_data, default_url=DISRANCE_URL)
