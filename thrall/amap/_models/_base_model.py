@@ -125,6 +125,8 @@ class BaseRequestParams(object):
 
 
 class BasePreparedRequestParams(object):
+    DEFAULT_URL = None
+
     def __init__(self):
         self.key = None
         self._pkey = None

@@ -20,20 +20,20 @@ class AMapStatusError(VendorStatusError):
     """amap status error"""
 
 
-class VendorParamError(VendorError):
-    """raise this error when vendor type/value check error"""
-
-
-class VendorConnectionError(VendorError):
-    """raise this error if got connection error"""
-
-
 class AMapBatchStatusError(VendorStatusError):
     """raise this error when amap batch request status error"""
 
     def __init__(self, *args, **kwargs):
         self.errors = kwargs.pop('errors', None)
         super(AMapBatchStatusError, self).__init__(*args, **kwargs)
+
+
+class VendorParamError(VendorError):
+    """raise this error when vendor type/value check error"""
+
+
+class VendorConnectionError(VendorError):
+    """raise this error if got connection error"""
 
 
 def map_status_exception(err_msg=u'', map_source='UNKNOWN', err_code=-1,
