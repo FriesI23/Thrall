@@ -215,5 +215,22 @@ class AMapSession(SessionHookMixin):
 
         return d
 
+    @_set_default
+    def riding(self, origin=None, destination=None, prepared_hook=None,
+               response_hook=None, **kwargs):
+        route_key = 'riding'
+
+        p = self.encoder.encode_riding(origin=origin,
+                                       destination=destination,
+                                       **kwargs)
+        self._run_prepared_hook(route_key, p, prepared_hook)
+
+        r = self.request.get_riding(p)
+        self._run_response_hook(route_key, r, response_hook)
+
+        d = self.decoder.decode_riding(raw_data=r.content, auto_version=True)
+
+        return d
+
 
 amap_session = AMapSession(default_key=GLOBAL_CONFIG.AMAP_TEST_KEY)

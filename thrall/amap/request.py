@@ -9,7 +9,8 @@ from .urls import (
     POI_SEARCH_AROUND_URL,
     POI_SEARCH_TEXT_URL,
     POI_SUGGEST_URL,
-    REGEO_CODING_URL
+    REGEO_CODING_URL,
+    NAVI_RIDING_URL,
 )
 from ..base import BaseRequest
 
@@ -39,3 +40,5 @@ class AMapRequest(BaseRequest):
     get_suggest = partialmethod(get_data, default_url=POI_SUGGEST_URL)
 
     get_distance = partialmethod(get_data, default_url=DISRANCE_URL)
+
+    get_riding = partialmethod(get_data, default_url=NAVI_RIDING_URL)

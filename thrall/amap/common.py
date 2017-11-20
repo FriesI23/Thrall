@@ -92,6 +92,8 @@ def prepare_multi_locations(location):
     True
     >>> prepare_multi_locations((125, 25)) ==  [(125, 25)]
     True
+    >>> prepare_multi_locations((125.0, 25)) ==  [(125, 25)]
+    True
     >>> prepare_multi_locations([(125, 25)]) == [(125, 25)]
     True
     >>> prepare_multi_locations([(111, 11), (222, 22)])\
@@ -134,12 +136,17 @@ def _prepare_multi_location_from_list(locations):
         if isinstance(data, basestring):
             _locations = parse_multi_poi(data)
             tmp_list.extend((parse_location(j) for j in _locations))
-        elif isinstance(data, (int, long)):
+        elif isinstance(data, (int, long, float)):
             return [(data, locations[num + 1]), ]
         elif data:
             tmp_list.append(tuple(data))
 
     return tmp_list
+
+
+def prepare_first_location(locations):
+    r = prepare_multi_locations(location=locations)
+    return r[0] if r else None
 
 
 def prepare_multi_string(pois):

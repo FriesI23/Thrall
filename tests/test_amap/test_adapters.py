@@ -22,6 +22,10 @@ from thrall.amap.models import (
     PreparedSearchAroundRequestParams,
     SuggestResponseData,
     PreparedSuggestRequestParams,
+    DistanceResponseData,
+    PreparedDistanceRequestParams,
+    NaviRidingResponseData,
+    PreparedNaviRidingRequestParams,
 )
 
 
@@ -144,6 +148,15 @@ class TestAMapJsonDecoderAdapter(object):
      dict(keyword=u'北京大学', key='def'),
      dict(keyword=u'北京大学', key='def'),
      PreparedSuggestRequestParams),
+    ('encode_distance',
+     dict(origins='111,222.0', destination='111.1,333.0', type=0, key='xxx'),
+     dict(origins=[(111, 222.0)], destination=(111.1, 333.0), type=0,
+          key='xxx'),
+     PreparedDistanceRequestParams),
+    ('encode_riding',
+     dict(origin='111.0,22', destination='1,2.0', key='xxx'),
+     dict(origin=(111.0, 22), destination=(1, 2.0), key='xxx'),
+     PreparedNaviRidingRequestParams),
 ])
 def test_amap_encode_adapter_func(func, params, result, instance):
     model = AMapEncodeAdapter()
@@ -161,7 +174,9 @@ def test_amap_encode_adapter_func(func, params, result, instance):
     ('decode_regeo_code', ReGeoCodeResponseData),
     ('decode_search_text', SearchResponseData),
     ('decode_search_around', SearchResponseData),
-    ('decode_suggest', SuggestResponseData)
+    ('decode_suggest', SuggestResponseData),
+    ('decode_distance', DistanceResponseData),
+    ('decode_riding', NaviRidingResponseData),
 ])
 def test_amap_json_decode_adapter_func(func, instance):
     model = AMapJsonDecoderAdapter()

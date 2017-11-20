@@ -52,6 +52,14 @@ from ._distance_model import (
     DistanceResponseData,
     DistanceData,
 )
+from ._navi_model import (
+    NaviRidingRequestParams,
+    PreparedNaviRidingRequestParams,
+    NaviRidingResponseData,
+    NaviRidingData,
+    RidingPath,
+    RidingSteps,
+)
 
 __all__ = [
     # base
@@ -77,4 +85,7 @@ __all__ = [
     # distance
     "DistanceRequestParams", "PreparedDistanceRequestParams",
     "DistanceResponseData", "DistanceData",
+    # navi-riding
+    "NaviRidingRequestParams", "PreparedNaviRidingRequestParams",
+    "NaviRidingResponseData", "NaviRidingData", "RidingSteps", "RidingPath",
 ]

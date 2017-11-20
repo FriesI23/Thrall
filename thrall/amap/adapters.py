@@ -16,7 +16,9 @@ from .models import (
     SearchResponseData,
     SearchTextRequestParams,
     SuggestRequestParams,
-    SuggestResponseData
+    SuggestResponseData,
+    NaviRidingRequestParams,
+    NaviRidingResponseData,
 )
 
 
@@ -35,6 +37,7 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
         self.registry(self.encode_search_around, SearchAroundRequestParams)
         self.registry(self.encode_suggest, SuggestRequestParams)
         self.registry(self.encode_distance, DistanceRequestParams)
+        self.registry(self.encode_riding, NaviRidingRequestParams)
 
     @check_params_type(coder=(type,))
     def registry(self, func, coder):
@@ -66,6 +69,10 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
         with self.encoder_context('encode_distance', *args, **kwargs) as p:
             return p
 
+    def encode_riding(self, *args, **kwargs):
+        with self.encoder_context('encode_riding', *args, **kwargs) as p:
+            return p
+
 
 class AMapJsonDecoderAdapter(BaseDecoderAdapter):
 
@@ -89,6 +96,7 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
         self.registry(self.decode_search_around, SearchResponseData)
         self.registry(self.decode_suggest, SuggestResponseData)
         self.registry(self.decode_distance, DistanceResponseData)
+        self.registry(self.decode_riding, NaviRidingResponseData)
 
     @check_params_type(coder=(type,))
     def registry(self, func, coder):
@@ -118,4 +126,8 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
 
     def decode_distance(self, *args, **kwargs):
         with self.decoder_context('decode_distance', *args, **kwargs) as p:
+            return p
+
+    def decode_riding(self, *args, **kwargs):
+        with self.decoder_context('decode_riding', *args, **kwargs) as p:
             return p
