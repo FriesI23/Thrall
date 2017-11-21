@@ -15,6 +15,7 @@ from thrall.amap.urls import (
     POI_SEARCH_TEXT_URL,
     POI_SUGGEST_URL,
     DISRANCE_URL,
+    NAVI_RIDING_URL,
 )
 
 
@@ -85,5 +86,27 @@ def mock_distance_result():
         url=re.compile('{}.*'.format(DISRANCE_URL.url)),
         body=open(str(
             request_amap_result_dir().join('distance_result.json'))).read(),
+        status=200,
+    )
+
+
+@pytest.fixture
+def mock_riding_result():
+    return responses.Response(
+        method='GET',
+        url=re.compile('{}.*'.format(NAVI_RIDING_URL.url)),
+        body=open(str(
+            request_amap_result_dir().join('riding_result.json'))).read(),
+        status=200,
+    )
+
+
+@pytest.fixture
+def mock_batch_result():
+    return responses.Response(
+        method='POST',
+        url=re.compile('{}.*'.format('http://restapi.amap.com/v3/batch')),
+        body=open(str(
+            request_amap_result_dir().join('batch_result.json'))).read(),
         status=200,
     )

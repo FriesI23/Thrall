@@ -15,6 +15,10 @@ class VendorError(Exception):
 class VendorStatusError(VendorError):
     """raise this error when vendor status check error"""
 
+    def __init__(self, *args, **kwargs):
+        self.errors = kwargs.pop('errors', None)
+        super(VendorStatusError, self).__init__(*args, **kwargs)
+
 
 class AMapStatusError(VendorStatusError):
     """amap status error"""
@@ -23,13 +27,17 @@ class AMapStatusError(VendorStatusError):
 class AMapBatchStatusError(VendorStatusError):
     """raise this error when amap batch request status error"""
 
-    def __init__(self, *args, **kwargs):
-        self.errors = kwargs.pop('errors', None)
-        super(AMapBatchStatusError, self).__init__(*args, **kwargs)
-
 
 class VendorParamError(VendorError):
     """raise this error when vendor type/value check error"""
+
+    def __init__(self, *args, **kwargs):
+        self.errors = kwargs.pop('errors', None)
+        super(VendorParamError, self).__init__(*args, **kwargs)
+
+
+class AMapBatchParamError(VendorParamError):
+    """raise this error when amap batch params prepared error"""
 
 
 class VendorConnectionError(VendorError):
@@ -64,6 +72,13 @@ def map_params_exception(msg=u'', map_source='UNKNOWN', data=None,
     return exc(_msg, data=data)
 
 
+def map_batch_params_exception(msg=u'', map_source='UNKNOWN', data=None,
+                               exc=VendorParamError, errors=None):
+    _msg = u"{}-ERROR: {}".format(map_source, msg)
+
+    return exc(_msg, data=data, errors=errors)
+
+
 amap_status_exception = partial(
     map_status_exception, map_source=AMAP, exc=AMapStatusError)
 
@@ -73,3 +88,7 @@ amap_batch_status_exception = partial(
 
 amap_params_exception = partial(
     map_params_exception, map_source=AMAP)
+
+amap_batch_params_exception = partial(
+    map_batch_params_exception, map_source=AMAP, exc=AMapBatchParamError,
+    msg='Got error when prepare batch requests data')

@@ -12,9 +12,10 @@ if PY3:
         xrange,
         long
     )
-    from urllib.parse import urlparse
+    from urllib.parse import urlparse, urlencode
     import builtins as __builtin__
 elif PY2:
+    from urllib import urlencode
     from urlparse import urlparse
     import __builtin__
 

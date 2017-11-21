@@ -213,8 +213,8 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
         if isinstance(city_limit, CityLimitFlag):
             self.city_limit = city_limit
         else:
-            self.city_limit = (CityLimitFlag.ON if city_limit
-            else CityLimitFlag.OFF)
+            self.city_limit = (
+                CityLimitFlag.ON if city_limit else CityLimitFlag.OFF)
 
     def prepare_children(self, children):
         if children is None:

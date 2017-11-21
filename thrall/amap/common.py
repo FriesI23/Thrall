@@ -186,6 +186,8 @@ def prepare_multi_string(pois):
 
 prepare_multi_address = prepare_multi_pois = prepare_multi_string
 
+_EMPTY_DICT = {}
+
 
 def json_load_and_fix_amap_empty(raw_data):
     u""" Fix amap json empty value problem
@@ -200,7 +202,7 @@ def json_load_and_fix_amap_empty(raw_data):
     >>> x = json_load_and_fix_amap_empty(data)
     >>> x['a'] is not None and x['a']['b'] is None and x['a']['c'] is not None\
     and x['a']['c']['d'] == [1] and x['a']['c']['e'] is None and \
-    x['a']['c']['f'] == {}
+    x['a']['c']['f'] is None
     True
     >>> x = json_load_and_fix_amap_empty('{"a": "b", "CdE": []}')
     >>> x['a'] == 'b' and x['cd_e'] is None
@@ -208,6 +210,9 @@ def json_load_and_fix_amap_empty(raw_data):
     """
 
     def _json_load_hook(obj):
+        if obj == _EMPTY_DICT:
+            return
+
         for k, w in iteritems(obj):
             if is_list_empty(w):
                 obj[k] = None

@@ -26,6 +26,8 @@ from thrall.amap.models import (
     PreparedDistanceRequestParams,
     NaviRidingResponseData,
     PreparedNaviRidingRequestParams,
+    BatchResponseData,
+    PreparedBatchParams,
 )
 
 
@@ -52,20 +54,13 @@ class TestAMapEncodeAdapter(object):
 
         assert BaseEncoderAdapter.registry.call_count == 1
 
-    def test_registry_type_err(self):
-        model = AMapEncodeAdapter()
-
-        with pytest.raises(TypeError):
-            model.registry(model.encode_geo_code, 'GeoCodeRequestParams')
-
     def test_encoder_context(self, mocker):
         model = AMapEncodeAdapter()
         model.registry(model.encode_geo_code, GeoCodeRequestParams)
 
         mocker.spy(GeoCodeRequestParams, 'prepare')
 
-        with model.encoder_context('encode_geo_code', address='xx', key=''):
-            pass
+        model.get_encoder('encode_geo_code', address='xx', key='')
 
         assert GeoCodeRequestParams.prepare.call_count == 1
 
@@ -74,8 +69,7 @@ class TestAMapEncodeAdapter(object):
         model.registry(model.encode_geo_code, GeoCodeRequestParams)
 
         with pytest.raises(KeyError):
-            with model.encoder_context('encode_xgeo_code', address='', key=''):
-                pass
+            model.get_encoder('encode_xgeo_code', address='', key='')
 
 
 class TestAMapJsonDecoderAdapter(object):
@@ -101,20 +95,13 @@ class TestAMapJsonDecoderAdapter(object):
 
         assert BaseDecoderAdapter.registry.call_count == 1
 
-    def test_registry_type_err(self):
-        model = AMapJsonDecoderAdapter()
-
-        with pytest.raises(TypeError):
-            model.registry(model.decode_geo_code, 'GeoCodeResponseData')
-
     def test_decoder_context(self, mocker):
         model = AMapJsonDecoderAdapter()
         model.registry(model.decode_geo_code, GeoCodeResponseData)
 
         mocker.spy(GeoCodeResponseData, '__init__')
 
-        with model.decoder_context('decode_geo_code', raw_data='{}'):
-            pass
+        model.get_decoder('decode_geo_code', raw_data='{}')
 
         assert GeoCodeResponseData.__init__.call_count == 1
 
@@ -123,8 +110,7 @@ class TestAMapJsonDecoderAdapter(object):
         model.registry(model.decode_geo_code, GeoCodeResponseData)
 
         with pytest.raises(KeyError):
-            with model.decoder_context('encode_xgeo_code', raw_data={}):
-                pass
+            model.get_decoder('encode_xgeo_code', raw_data={})
 
 
 @pytest.mark.parametrize('func, params, result, instance', [
@@ -157,6 +143,10 @@ class TestAMapJsonDecoderAdapter(object):
      dict(origin='111.0,22', destination='1,2.0', key='xxx'),
      dict(origin=(111.0, 22), destination=(1, 2.0), key='xxx'),
      PreparedNaviRidingRequestParams),
+    ('encode_batch',
+     dict(key='xxx'),
+     dict(key='xxx'),
+     PreparedBatchParams)
 ])
 def test_amap_encode_adapter_func(func, params, result, instance):
     model = AMapEncodeAdapter()
@@ -186,3 +176,13 @@ def test_amap_json_decode_adapter_func(func, instance):
     assert r.status == 1
 
     assert isinstance(r, instance)
+
+
+def test_amap_json_batch_decode_adapter_func():
+    model = AMapJsonDecoderAdapter()
+
+    r = model.decode_batch('{"status": "1"}', None, None)
+
+    assert r.status == 1
+
+    assert isinstance(r, BatchResponseData)

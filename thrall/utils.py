@@ -6,7 +6,7 @@ from operator import itemgetter
 from future.utils import python_2_unicode_compatible
 from six import iteritems
 
-from thrall.compat import __builtin__, unicode
+from thrall.compat import __builtin__, unicode, urlparse
 
 builtin_names = frozenset(
     name for name in dir(__builtin__)
@@ -108,6 +108,8 @@ class NamedURL(tuple):
     ('name', 'url', None, 'xxx')
     >>> NamedURL.from_args('name', 'url', 'v1', 'xxx')
     ('name', 'url', 'v1', 'xxx')
+    >>> NamedURL.from_args('name', 'http://x.x/1/2', 'v1', 'xxx').path
+    '/1/2'
     """
     name = property(itemgetter(0))
     url = property(itemgetter(1))
@@ -120,6 +122,10 @@ class NamedURL(tuple):
 
     def __str__(self):
         return unicode(getattr(self, 'url'))
+
+    @property
+    def path(self):
+        return urlparse(getattr(self, 'url')).path
 
 
 def is_func_bound(method, instance=None):

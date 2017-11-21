@@ -28,3 +28,4 @@ class RouteKey(Enum):
     SUGGEST = 'suggest'
     DISTANCE = 'distance'
     NAVI_RIDING = 'navi_riding'
+    BATCH = 'batch'

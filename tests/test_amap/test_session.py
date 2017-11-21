@@ -68,8 +68,9 @@ class TestAMapSession(object):
         assert model.encoder is not None
         assert model.decoder is not None
         assert model.request is not None
+        assert model.brequest is not None
 
-        assert model.mount.call_count == 3
+        assert model.mount.call_count == 4
         _set_default.set_default.assert_called_once_with(
             key=default_key,
             private_key=default_pkey)
@@ -136,4 +137,29 @@ class TestAMapSession(object):
             rsps.add(mock_distance_result)
             result = AMapSession(default_key='x').distance(origins='1,2',
                                                            destination='1,2')
+            result.raise_for_status()
+
+    def test_riding(self, mock_riding_result):
+        with responses.RequestsMock() as rsps:
+            rsps.add(mock_riding_result)
+            result = AMapSession(default_key='x').riding(origin='1,2',
+                                                         destination='1,2')
+            result.raise_for_status()
+
+    def test_batch(self, mock_batch_result):
+        from thrall.amap.models import (GeoCodeRequestParams,
+                                        ReGeoCodeRequestParams)
+        from thrall.amap.session import (BATCH_URL_DEFAULT_PAIRS,
+                                         BATCH_DECODE_DEFAULT_PAIRS)
+        with responses.RequestsMock() as rsps:
+            rsps.add(mock_batch_result)
+            result = AMapSession(default_key='x').batch(
+                batch_list=[
+                    GeoCodeRequestParams(address='xx', key='xxx'),
+                    ReGeoCodeRequestParams(location='1,2', key='xss')
+                ],
+                url_pairs=BATCH_URL_DEFAULT_PAIRS,
+                decode_pairs=BATCH_DECODE_DEFAULT_PAIRS,
+                key='x'
+            )
             result.raise_for_status()

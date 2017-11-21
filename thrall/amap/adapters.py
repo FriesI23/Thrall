@@ -1,10 +1,7 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from contextlib import contextmanager
-
 from ..base import BaseDecoderAdapter, BaseEncoderAdapter
-from ..utils import check_params_type
 from .models import (
     DistanceRequestParams,
     DistanceResponseData,
@@ -19,16 +16,17 @@ from .models import (
     SuggestResponseData,
     NaviRidingRequestParams,
     NaviRidingResponseData,
+    BatchRequestParams,
+    BatchResponseData,
 )
 
 
 class AMapEncodeAdapter(BaseEncoderAdapter):
 
-    @contextmanager
-    def encoder_context(self, func_name, *args, **kwargs):
+    def get_encoder(self, func_name, *args, **kwargs):
         encoder = self.all_registered_coders[func_name]
         p_encoder = encoder(*args, **kwargs).prepare()
-        yield p_encoder
+        return p_encoder
 
     def registry_encoders(self):
         self.registry(self.encode_geo_code, GeoCodeRequestParams)
@@ -38,40 +36,34 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
         self.registry(self.encode_suggest, SuggestRequestParams)
         self.registry(self.encode_distance, DistanceRequestParams)
         self.registry(self.encode_riding, NaviRidingRequestParams)
+        self.registry(self.encode_batch, BatchRequestParams)
 
-    @check_params_type(coder=(type,))
     def registry(self, func, coder):
         return super(AMapEncodeAdapter, self).registry(func, coder)
 
     def encode_geo_code(self, *args, **kwargs):
-        with self.encoder_context('encode_geo_code', *args, **kwargs) as p:
-            return p
+        return self.get_encoder('encode_geo_code', *args, **kwargs)
 
     def encode_regeo_code(self, *args, **kwargs):
-        with self.encoder_context('encode_regeo_code', *args, **kwargs) as p:
-            return p
+        return self.get_encoder('encode_regeo_code', *args, **kwargs)
 
     def encode_search_text(self, *args, **kwargs):
-        with self.encoder_context('encode_search_text',
-                                  *args, **kwargs) as p:
-            return p
+        return self.get_encoder('encode_search_text', *args, **kwargs)
 
     def encode_search_around(self, *args, **kwargs):
-        with self.encoder_context('encode_search_around',
-                                  *args, **kwargs) as p:
-            return p
+        return self.get_encoder('encode_search_around', *args, **kwargs)
 
     def encode_suggest(self, *args, **kwargs):
-        with self.encoder_context('encode_suggest', *args, **kwargs) as p:
-            return p
+        return self.get_encoder('encode_suggest', *args, **kwargs)
 
     def encode_distance(self, *args, **kwargs):
-        with self.encoder_context('encode_distance', *args, **kwargs) as p:
-            return p
+        return self.get_encoder('encode_distance', *args, **kwargs)
 
     def encode_riding(self, *args, **kwargs):
-        with self.encoder_context('encode_riding', *args, **kwargs) as p:
-            return p
+        return self.get_encoder('encode_riding', *args, **kwargs)
+
+    def encode_batch(self, *args, **kwargs):
+        return self.get_encoder('encode_batch', *args, **kwargs)
 
 
 class AMapJsonDecoderAdapter(BaseDecoderAdapter):
@@ -80,14 +72,13 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
         super(AMapJsonDecoderAdapter, self).__init__()
         self._static = static_mode
 
-    @contextmanager
-    def decoder_context(self, func_name, *args, **kwargs):
+    def get_decoder(self, func_name, *args, **kwargs):
         decoder = self.all_registered_coders[func_name]
         if self._static:
             kwargs['static_mode'] = True
 
         p_decoder = decoder(*args, **kwargs)
-        yield p_decoder
+        return p_decoder
 
     def registry_decoders(self):
         self.registry(self.decode_geo_code, GeoCodeResponseData)
@@ -97,37 +88,31 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
         self.registry(self.decode_suggest, SuggestResponseData)
         self.registry(self.decode_distance, DistanceResponseData)
         self.registry(self.decode_riding, NaviRidingResponseData)
+        self.registry(self.decode_batch, BatchResponseData)
 
-    @check_params_type(coder=(type,))
     def registry(self, func, coder):
         return super(AMapJsonDecoderAdapter, self).registry(func, coder)
 
     def decode_geo_code(self, *args, **kwargs):
-        with self.decoder_context('decode_geo_code', *args, **kwargs) as p:
-            return p
+        return self.get_decoder('decode_geo_code', *args, **kwargs)
 
     def decode_regeo_code(self, *args, **kwargs):
-        with self.decoder_context('decode_regeo_code', *args, **kwargs) as p:
-            return p
+        return self.get_decoder('decode_regeo_code', *args, **kwargs)
 
     def decode_search_text(self, *args, **kwargs):
-        with self.decoder_context('decode_search_text',
-                                  *args, **kwargs) as p:
-            return p
+        return self.get_decoder('decode_search_text', *args, **kwargs)
 
     def decode_search_around(self, *args, **kwargs):
-        with self.decoder_context('decode_search_around',
-                                  *args, **kwargs) as p:
-            return p
+        return self.get_decoder('decode_search_around', *args, **kwargs)
 
     def decode_suggest(self, *args, **kwargs):
-        with self.decoder_context('decode_suggest', *args, **kwargs) as p:
-            return p
+        return self.get_decoder('decode_suggest', *args, **kwargs)
 
     def decode_distance(self, *args, **kwargs):
-        with self.decoder_context('decode_distance', *args, **kwargs) as p:
-            return p
+        return self.get_decoder('decode_distance', *args, **kwargs)
 
     def decode_riding(self, *args, **kwargs):
-        with self.decoder_context('decode_riding', *args, **kwargs) as p:
-            return p
+        return self.get_decoder('decode_riding', *args, **kwargs)
+
+    def decode_batch(self, *args, **kwargs):
+        return self.get_decoder('decode_batch', *args, **kwargs)

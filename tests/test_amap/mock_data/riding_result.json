@@ -1,0 +1,27 @@
+{
+  "data": {
+    "destination": "116.434307,39.90909",
+    "origin": "116.434307,39.90909",
+    "paths": [
+      {
+        "distance": 1,
+        "duration": 0,
+        "steps": [
+          {
+            "action": "",
+            "assistant_action": "到达目的地",
+            "distance": 1,
+            "duration": 0,
+            "instruction": "向南骑行1米到达目的地",
+            "orientation": "南",
+            "polyline": "116.434303,39.909084;116.434303,39.909084",
+            "road": ""
+          }
+        ]
+      }
+    ]
+  },
+  "errcode": 0,
+  "errdetail": null,
+  "errmsg": "OK"
+}

@@ -17,7 +17,7 @@ from ._base_model import (
 
 
 class NaviRidingRequestParams(BaseRequestParams):
-    ROUTE_KEY = RouteKey.DISTANCE
+    ROUTE_KEY = RouteKey.NAVI_RIDING
 
     @required_params('origin', 'destination')
     def __init__(self, origin=None, destination=None, **kwargs):
@@ -36,7 +36,7 @@ class NaviRidingRequestParams(BaseRequestParams):
 
 
 class PreparedNaviRidingRequestParams(BasePreparedRequestParams):
-    ROUTE_KEY = RouteKey.DISTANCE
+    ROUTE_KEY = RouteKey.NAVI_RIDING
 
     def __init__(self):
         self.origin = None
@@ -78,7 +78,7 @@ class PreparedNaviRidingRequestParams(BasePreparedRequestParams):
 
 
 class NaviRidingResponseData(BaseResponseData):
-    ROUTE_KEY = RouteKey.DISTANCE
+    ROUTE_KEY = RouteKey.NAVI_RIDING
     _ROUTE = 'data'
 
     def get_data(self, raw_data, static=False):

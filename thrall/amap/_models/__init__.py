@@ -60,11 +60,18 @@ from ._navi_model import (
     RidingPath,
     RidingSteps,
 )
+from ._batch_model import (
+    BatchRequestParams,
+    PreparedBatchParams,
+    BatchResponseData,
+)
 
 __all__ = [
     # base
     "Sig", "BaseRequestParams", "BasePreparedRequestParams",
     "BaseResponseData", "Extensions",
+    # batch
+    "BatchRequestParams", "PreparedBatchParams", "BatchResponseData",
     # common
     "Neighborhood", "StreetNumber", "BusinessArea", "Building",
     "IndoorData", "BizExt", "Photos",

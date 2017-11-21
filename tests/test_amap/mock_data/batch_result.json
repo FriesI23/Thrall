@@ -1,0 +1,92 @@
+[
+  {
+    "status": 200,
+    "body": {
+      "info": "OK",
+      "status": "1",
+      "count": "1",
+      "geocodes": [
+        {
+          "level": "兴趣点",
+          "city": "上海市",
+          "province": "上海市",
+          "neighborhood": {
+            "name": {},
+            "type": {}
+          },
+          "building": {
+            "name": {},
+            "type": {}
+          },
+          "street": {},
+          "number": {},
+          "township": {},
+          "formatted_address": "上海市普陀区近铁城市广场",
+          "location": "121.380638,31.231571",
+          "adcode": "310107",
+          "district": "普陀区",
+          "citycode": "021"
+        }
+      ],
+      "infocode": "10000"
+    },
+    "header": {
+      "gsid": "011131017012151133374522300213782593150",
+      "Content-Type": "application\/json;charset=UTF-8",
+      "Access-Control-Allow-Methods": "*",
+      "Access-Control-Allow-Origin": "*",
+      "sc": "0.012",
+      "Content-Length": 393,
+      "Access-Control-Allow-Headers": "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,key,x-biz,x-info,platinfo,encr,enginever,gzipped,poiid",
+      "X-Powered-By": "ring\/1.0.0"
+    }
+  },
+  {
+    "status": 200,
+    "body": {
+      "status": "1",
+      "regeocode": {
+        "addressComponent": {
+          "city": "廊坊市",
+          "province": "河北省",
+          "adcode": "131023",
+          "district": "永清县",
+          "towncode": "131023100000",
+          "streetNumber": {
+            "number": {},
+            "direction": {},
+            "distance": {},
+            "street": {}
+          },
+          "country": "中国",
+          "township": "永清镇",
+          "businessAreas": [
+            {}
+          ],
+          "building": {
+            "name": {},
+            "type": {}
+          },
+          "neighborhood": {
+            "name": {},
+            "type": {}
+          },
+          "citycode": "0316"
+        },
+        "formatted_address": "河北省廊坊市永清县永清镇永信线"
+      },
+      "info": "OK",
+      "infocode": "10000"
+    },
+    "header": {
+      "gsid": "011131017012151133374522300213782593150",
+      "Content-Type": "application\/json;charset=UTF-8",
+      "Access-Control-Allow-Methods": "*",
+      "Access-Control-Allow-Origin": "*",
+      "sc": "0.012",
+      "Content-Length": 478,
+      "Access-Control-Allow-Headers": "DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,key,x-biz,x-info,platinfo,encr,enginever,gzipped,poiid",
+      "X-Powered-By": "ring\/1.0.0"
+    }
+  }
+]

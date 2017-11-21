@@ -263,9 +263,12 @@ class BaseResponseData(object):
     ROUTE_KEY = RouteKey.UNKNOWN
 
     def __init__(self, raw_data, version=AMapVersion.V3,
-                 auto_version=False, static_mode=False):
+                 auto_version=False, static_mode=False, raw_mode=False):
 
-        self._raw_data = json_load_and_fix_amap_empty(raw_data)
+        if raw_mode:
+            self._raw_data = raw_data
+        else:
+            self._raw_data = json_load_and_fix_amap_empty(raw_data)
         self.version = version
         self._data = None
 
