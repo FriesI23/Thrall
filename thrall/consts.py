@@ -1,7 +1,7 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from enum import IntEnum
+from enum import IntEnum, Enum
 
 
 class MapSource(IntEnum):
@@ -16,3 +16,15 @@ FORMAT_XML = 'xml'
 AMAP = 'AMAP'
 QQMAP = 'QQMAP'
 BAIDUMAP = 'BDMAP'
+
+
+class RouteKey(Enum):
+    UNKNOWN = 'unknown'
+    GEO_CODE = 'geo_code'
+    REGEO_CODE = 'regeo_code'
+    SEARCH = 'search'
+    SEARCH_TEXT = 'search_text'
+    SEARCH_AROUND = 'search_around'
+    SUGGEST = 'suggest'
+    DISTANCE = 'distance'
+    NAVI_RIDING = 'navi_riding'

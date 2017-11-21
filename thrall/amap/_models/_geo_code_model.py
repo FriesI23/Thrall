@@ -2,6 +2,7 @@
 from __future__ import absolute_import
 
 from thrall.amap.consts import BatchFlag
+from thrall.consts import RouteKey
 from thrall.base import BaseData
 from thrall.compat import unicode
 from thrall.utils import required_params
@@ -17,6 +18,7 @@ from ._common_model import Building, Neighborhood
 
 
 class GeoCodeRequestParams(BaseRequestParams):
+    ROUTE_KEY = RouteKey.GEO_CODE
 
     @required_params('address')
     def __init__(self, address=None, city=None, batch=None, **kwargs):
@@ -50,6 +52,8 @@ class GeoCodeRequestParams(BaseRequestParams):
 
 
 class PreparedGeoCodeRequestParams(BasePreparedRequestParams):
+    ROUTE_KEY = RouteKey.GEO_CODE
+
     def __init__(self):
         super(PreparedGeoCodeRequestParams, self).__init__()
         self.address = None
@@ -112,6 +116,7 @@ class PreparedGeoCodeRequestParams(BasePreparedRequestParams):
 
 
 class GeoCodeResponseData(BaseResponseData):
+    ROUTE_KEY = RouteKey.GEO_CODE
     _ROUTE = 'geocodes'
 
     def get_data(self, raw_data, static=False):

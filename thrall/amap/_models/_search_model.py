@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from thrall.base import BaseData
 from thrall.compat import unicode
 from thrall.utils import required_params
+from thrall.consts import RouteKey
 
 from ..common import (
     merge_location,
@@ -24,6 +25,8 @@ from ._common_model import BizExt, IndoorData, Photos
 
 
 class SearchTextRequestParams(BaseRequestParams):
+    ROUTE_KEY = RouteKey.SEARCH_TEXT
+
     def __init__(self, keywords=None, types=None, city=None, city_limit=None,
                  children=None, offset=None, page=None, building=None,
                  floor=None, extensions=None, **kwargs):
@@ -72,6 +75,8 @@ class SearchTextRequestParams(BaseRequestParams):
 
 
 class SearchAroundRequestParams(BaseRequestParams):
+    ROUTE_KEY = RouteKey.SEARCH_AROUND
+
     @required_params('location')
     def __init__(self, location=None, keywords=None, types=None, city=None,
                  radius=None, sort_rule=None, offset=None, page=None,
@@ -167,6 +172,8 @@ class PreparedSearchMixin(object):
 
 class PreparedSearchTextRequestParams(BasePreparedRequestParams,
                                       PreparedSearchMixin):
+    ROUTE_KEY = RouteKey.SEARCH_TEXT
+
     def __init__(self):
         super(PreparedSearchTextRequestParams, self).__init__()
         self.keywords = None
@@ -207,7 +214,7 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
             self.city_limit = city_limit
         else:
             self.city_limit = (CityLimitFlag.ON if city_limit
-                               else CityLimitFlag.OFF)
+            else CityLimitFlag.OFF)
 
     def prepare_children(self, children):
         if children is None:
@@ -266,6 +273,8 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
 
 class PreparedSearchAroundRequestParams(BasePreparedRequestParams,
                                         PreparedSearchMixin):
+    ROUTE_KEY = RouteKey.SEARCH_AROUND
+
     def __init__(self):
         super(PreparedSearchAroundRequestParams, self).__init__()
         self.location = None
@@ -357,6 +366,8 @@ class PreparedSearchAroundRequestParams(BasePreparedRequestParams,
 
 
 class SearchResponseData(BaseResponseData):
+    ROUTE_KEY = RouteKey.SEARCH
+
     _SUGGESTION_ROUTE = 'suggestion'
     _POIS_ROUTE = 'pois'
 

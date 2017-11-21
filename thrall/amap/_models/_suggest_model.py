@@ -4,6 +4,7 @@ from __future__ import absolute_import
 from thrall.base import BaseData
 from thrall.compat import basestring, unicode
 from thrall.utils import required_params
+from thrall.consts import RouteKey
 
 from ..common import (
     merge_location,
@@ -23,6 +24,8 @@ from ._base_model import (
 
 
 class SuggestRequestParams(BaseRequestParams):
+    ROUTE_KEY = RouteKey.SUGGEST
+
     @required_params('keyword')
     def __init__(self, keyword=None, types=None, location=None,
                  city=None, city_limit=None, data_type=None,
@@ -52,6 +55,8 @@ class SuggestRequestParams(BaseRequestParams):
 
 
 class PreparedSuggestRequestParams(BasePreparedRequestParams):
+    ROUTE_KEY = RouteKey.SUGGEST
+
     def __init__(self):
         super(PreparedSuggestRequestParams, self).__init__()
         self.keyword = None
@@ -209,6 +214,8 @@ class PreparedSuggestRequestParams(BasePreparedRequestParams):
 
 
 class SuggestResponseData(BaseResponseData):
+    ROUTE_KEY = RouteKey.SUGGEST
+
     _ROUTE = 'tips'
 
     def get_data(self, raw_data, static=False):

@@ -8,7 +8,7 @@ from hashlib import md5
 from six import iteritems
 
 from thrall.compat import unicode, urlparse
-from thrall.consts import FORMAT_JSON, FORMAT_XML
+from thrall.consts import FORMAT_JSON, FORMAT_XML, RouteKey
 from thrall.exceptions import VendorError, amap_status_exception
 from thrall.utils import MapStatusMessage, required_params
 
@@ -81,6 +81,8 @@ class Sig(object):
 
 
 class BaseRequestParams(object):
+    ROUTE_KEY = RouteKey.UNKNOWN
+
     @required_params('key')
     def __init__(self, key=None, output=None, private_key=None, callback=None):
         self.key = key
@@ -126,6 +128,7 @@ class BaseRequestParams(object):
 
 class BasePreparedRequestParams(object):
     DEFAULT_URL = None
+    ROUTE_KEY = RouteKey.UNKNOWN
 
     def __init__(self):
         self.key = None
@@ -257,6 +260,8 @@ class BasePreparedRequestParams(object):
 
 
 class BaseResponseData(object):
+    ROUTE_KEY = RouteKey.UNKNOWN
+
     def __init__(self, raw_data, version=AMapVersion.V3,
                  auto_version=False, static_mode=False):
 

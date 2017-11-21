@@ -6,6 +6,7 @@ from thrall.exceptions import (
     amap_batch_status_exception,
     amap_status_exception
 )
+from thrall.consts import RouteKey
 from thrall.utils import required_params
 
 from ..common import (
@@ -22,6 +23,8 @@ from ._base_model import (
 
 
 class DistanceRequestParams(BaseRequestParams):
+    ROUTE_KEY = RouteKey.DISTANCE
+
     @required_params('origins', 'destination')
     def __init__(self, origins=None, destination=None, type=None, **kwargs):
         self.origins = origins
@@ -43,6 +46,8 @@ class DistanceRequestParams(BaseRequestParams):
 
 
 class PreparedDistanceRequestParams(BasePreparedRequestParams):
+    ROUTE_KEY = RouteKey.DISTANCE
+
     def __init__(self):
         self.origins = None
         self.destination = None
@@ -97,6 +102,7 @@ class PreparedDistanceRequestParams(BasePreparedRequestParams):
 
 
 class DistanceResponseData(BaseResponseData):
+    ROUTE_KEY = RouteKey.DISTANCE
     _ROUTE = 'results'
 
     def get_data(self, raw_data, static=False):

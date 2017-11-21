@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 from thrall.base import BaseData
 from thrall.utils import required_params
+from thrall.consts import RouteKey
 
 from ..common import (
     merge_location,
@@ -16,6 +17,8 @@ from ._base_model import (
 
 
 class NaviRidingRequestParams(BaseRequestParams):
+    ROUTE_KEY = RouteKey.DISTANCE
+
     @required_params('origin', 'destination')
     def __init__(self, origin=None, destination=None, **kwargs):
         self.origin = origin
@@ -33,6 +36,8 @@ class NaviRidingRequestParams(BaseRequestParams):
 
 
 class PreparedNaviRidingRequestParams(BasePreparedRequestParams):
+    ROUTE_KEY = RouteKey.DISTANCE
+
     def __init__(self):
         self.origin = None
         self.destination = None
@@ -73,6 +78,7 @@ class PreparedNaviRidingRequestParams(BasePreparedRequestParams):
 
 
 class NaviRidingResponseData(BaseResponseData):
+    ROUTE_KEY = RouteKey.DISTANCE
     _ROUTE = 'data'
 
     def get_data(self, raw_data, static=False):

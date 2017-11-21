@@ -3,6 +3,7 @@ from __future__ import absolute_import
 
 from thrall.base import BaseData
 from thrall.utils import required_params
+from thrall.consts import RouteKey
 
 from ..common import (
     merge_location,
@@ -23,6 +24,7 @@ from ._common_model import Building, BusinessArea, Neighborhood, StreetNumber
 
 
 class ReGeoCodeRequestParams(BaseRequestParams):
+    ROUTE_KEY = RouteKey.REGEO_CODE
 
     @required_params('location')
     def __init__(self, location=None, radius=None, extensions=None,
@@ -82,6 +84,8 @@ class ReGeoCodeRequestParams(BaseRequestParams):
 
 
 class PreparedReGeoCodeRequestParams(BasePreparedRequestParams):
+    ROUTE_KEY = RouteKey.REGEO_CODE
+
     def __init__(self):
         super(PreparedReGeoCodeRequestParams, self).__init__()
         self.location = None
@@ -200,6 +204,8 @@ class PreparedReGeoCodeRequestParams(BasePreparedRequestParams):
 
 
 class ReGeoCodeResponseData(BaseResponseData):
+    ROUTE_KEY = RouteKey.REGEO_CODE
+
     _ROUTE_SINGLE = 'regeocode'
     _ROUTE_MULTI = 'regeocodes'
 
