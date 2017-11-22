@@ -190,6 +190,24 @@ class TestPreparedSearchMixin(object):
     #     assert 'page must in range 0 - 100.' in str(err.value)
     #     assert model.prepared_page is None
 
+    @pytest.mark.parametrize('data, output, p_output', [
+        ('distance', _search_model.SortRule.DISTANCE, 'distance'),
+        ('weight', _search_model.SortRule.WEIGHT, 'weight'),
+        ('DisTance', _search_model.SortRule.DISTANCE, 'distance'),
+        ('WeiGht', _search_model.SortRule.WEIGHT, 'weight'),
+        (_search_model.SortRule.DISTANCE,
+         _search_model.SortRule.DISTANCE, 'distance'),
+        (_search_model.SortRule.WEIGHT,
+         _search_model.SortRule.WEIGHT, 'weight'),
+    ])
+    def test_sort_rule(self, data, output, p_output):
+        model = _search_model.PreparedSearchMixin()
+
+        model.prepare_sort_rule(data)
+
+        assert model.sort_rule == output
+        assert model.prepared_sort_rule == p_output
+
     @pytest.mark.parametrize('input, output, p_output', [
         (True, _search_model.ExtensionFlag.ALL, EXTENSION_ALL),
         (False, _search_model.ExtensionFlag.BASE, EXTENSION_BASE),
@@ -225,16 +243,17 @@ class TestPreparedSearchTextRequestParams(object):
         model.prepare_page = lambda x: 'page'
         model.prepare_building = lambda x: 'building'
         model.prepare_floor = lambda x: 'floor'
+        model.prepare_sort_rule = lambda x: 'sort_rule'
         model.prepare_extension = lambda x: 'extensions'
 
         for i in ['prepare_keywords', 'prepare_types', 'prepare_city',
                   'prepare_city_limit', 'prepare_children', 'prepare_offset',
                   'prepare_page', 'prepare_building', 'prepare_floor',
-                  'prepare_extension']:
+                  'prepare_sort_rule', 'prepare_extension']:
             mocker.spy(model, i)
 
         model.prepare('keywords', 'types', 'city', True, True,
-                      1, 1, 'building', 'floor', True)
+                      1, 1, 'building', 'floor', 'all', True)
 
         model.prepare_keywords.assert_called_once_with('keywords')
         model.prepare_types.assert_called_once_with('types')
@@ -245,6 +264,7 @@ class TestPreparedSearchTextRequestParams(object):
         model.prepare_page.assert_called_once_with(1)
         model.prepare_building.assert_called_once_with('building')
         model.prepare_floor.assert_called_once_with('floor')
+        model.prepare_sort_rule.assert_called_once_with('all')
         model.prepare_extension.assert_called_once_with(True)
 
     @pytest.mark.parametrize('input, output', [
@@ -402,24 +422,6 @@ class TestPreparedSearchAroundRequestParams(object):
     #         model.prepare_radius(data)
     #
     #     assert 'in 0~50000m' in str(e.value)
-
-    @pytest.mark.parametrize('data, output, p_output', [
-        ('distance', _search_model.SortRule.DISTANCE, 'distance'),
-        ('weight', _search_model.SortRule.WEIGHT, 'weight'),
-        ('DisTance', _search_model.SortRule.DISTANCE, 'distance'),
-        ('WeiGht', _search_model.SortRule.WEIGHT, 'weight'),
-        (_search_model.SortRule.DISTANCE,
-         _search_model.SortRule.DISTANCE, 'distance'),
-        (_search_model.SortRule.WEIGHT,
-         _search_model.SortRule.WEIGHT, 'weight'),
-    ])
-    def test_sort_rule(self, data, output, p_output):
-        model = _search_model.PreparedSearchAroundRequestParams()
-
-        model.prepare_sort_rule(data)
-
-        assert model.sort_rule == output
-        assert model.prepared_sort_rule == p_output
 
     @pytest.mark.parametrize('input, output', [
         (dict(location=[(111, 22), '222,33'], keywords='xxx|uuu', types='a',
