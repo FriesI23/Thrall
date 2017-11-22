@@ -29,7 +29,7 @@ class SearchTextRequestParams(BaseRequestParams):
 
     def __init__(self, keywords=None, types=None, city=None, city_limit=None,
                  children=None, offset=None, page=None, building=None,
-                 floor=None, extensions=None, **kwargs):
+                 floor=None, sort_rule=None, extensions=None, **kwargs):
         self.keywords = keywords
         self.types = types
         self.city = city
@@ -39,6 +39,7 @@ class SearchTextRequestParams(BaseRequestParams):
         self.page = page
         self.building = building
         self.floor = floor
+        self.sort_rule = sort_rule
         self.extensions = extensions
         super(SearchTextRequestParams, self).__init__(**kwargs)
 
@@ -67,6 +68,7 @@ class SearchTextRequestParams(BaseRequestParams):
                 page=self.page,
                 building=self.building,
                 floor=self.floor,
+                sort_rule=self.sort_rule,
                 extensions=self.extensions.status if isinstance(
                     self.extensions, Extensions) else self.extensions,
             )
@@ -118,6 +120,7 @@ class PreparedSearchMixin(object):
         self.types = None
         self.offset = None
         self.page = None
+        self.sort_rule = None
         self.extensions = None
 
     def prepare_keywords(self, keywords):
@@ -139,6 +142,15 @@ class PreparedSearchMixin(object):
         # if page is not None and (page > 100 or page < 0):
         #     raise amap_params_exception('page must in range 0 - 100.')
         self.page = page
+
+    def prepare_sort_rule(self, sort_rule):
+        if sort_rule is None:
+            return
+
+        if isinstance(sort_rule, SortRule):
+            self.sort_rule = sort_rule
+        else:
+            self.sort_rule = SortRule.choose(sort_rule)
 
     def prepare_extension(self, extension):
         if isinstance(extension, bool):
@@ -165,6 +177,11 @@ class PreparedSearchMixin(object):
         return self.offset
 
     @property
+    def prepared_sort_rule(self):
+        if self.sort_rule is not None:
+            return self.sort_rule.param
+
+    @property
     def prepared_extension(self):
         if self.extensions is not None:
             return self.extensions.param
@@ -185,11 +202,12 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
         self.page = None
         self.building = None
         self.floor = None
+        self.sort_rule = None
         self.extensions = None
 
     def prepare(self, keywords=None, types=None, city=None, city_limit=None,
                 children=None, offset=None, page=None, building=None,
-                floor=None, extensions=None, **kwargs):
+                floor=None, sort_rule=None, extensions=None, **kwargs):
         self.prepare_keywords(keywords)
         self.prepare_types(types)
         self.prepare_city(city)
@@ -200,6 +218,7 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
         self.prepare_building(building)
         self.prepare_floor(floor)
         self.prepare_extension(extensions)
+        self.prepare_sort_rule(sort_rule)
         self.prepare_base(**kwargs)
 
     def prepare_city(self, city):
@@ -265,6 +284,7 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
             'page': self.prepared_page,
             'building': self.prepared_building,
             'floor': self.prepared_floor,
+            'sortrule': self.prepared_sort_rule,
             'extensions': self.prepared_extension,
         }
         with self.init_basic_params(_p, optionals=optional_params) as params:
@@ -320,15 +340,6 @@ class PreparedSearchAroundRequestParams(BasePreparedRequestParams,
 
         self.radius = radius
 
-    def prepare_sort_rule(self, sort_rule):
-        if sort_rule is None:
-            return
-
-        if isinstance(sort_rule, SortRule):
-            self.sort_rule = sort_rule
-        else:
-            self.sort_rule = SortRule.choose(sort_rule)
-
     @property
     def prepared_location(self):
         if self.location is not None:
@@ -341,11 +352,6 @@ class PreparedSearchAroundRequestParams(BasePreparedRequestParams,
     @property
     def prepared_radius(self):
         return self.radius
-
-    @property
-    def prepared_sort_rule(self):
-        if self.sort_rule is not None:
-            return self.sort_rule.param
 
     def generate_params(self):
         _p = {}
