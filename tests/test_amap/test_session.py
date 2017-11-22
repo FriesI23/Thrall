@@ -61,7 +61,6 @@ class TestAMapSession(object):
     ])
     def test_init(self, mocker, default_key, default_pkey):
         mocker.spy(AMapSession, 'mount')
-        mocker.spy(_set_default, 'set_default')
         model = AMapSession(default_key=default_key,
                             default_private_key=default_pkey)
 
@@ -71,9 +70,6 @@ class TestAMapSession(object):
         assert model.brequest is not None
 
         assert model.mount.call_count == 4
-        _set_default.set_default.assert_called_once_with(
-            key=default_key,
-            private_key=default_pkey)
 
     @pytest.mark.parametrize('schema, coder', [
         ('encode', AMapEncodeAdapter()),
