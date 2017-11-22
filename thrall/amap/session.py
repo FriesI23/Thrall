@@ -197,8 +197,9 @@ class AMapSession(SessionHookMixin):
 
     def _search_text(self, keywords=None, types=None, city=None,
                      city_limit=None, children=None, offset=None, page=None,
-                     building=None, floor=None, extensions=None,
-                     prepared_hook=None, response_hook=None, **kwargs):
+                     building=None, floor=None, sort_rule=None,
+                     extensions=None, prepared_hook=None, response_hook=None,
+                     **kwargs):
         route_key = RouteKey.SEARCH_TEXT.value
 
         p = self.encoder.encode_search_text(keywords=keywords,
@@ -210,6 +211,7 @@ class AMapSession(SessionHookMixin):
                                             page=page,
                                             building=building,
                                             floor=floor,
+                                            sort_rule=sort_rule,
                                             extensions=extensions,
                                             **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
