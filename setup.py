@@ -21,7 +21,7 @@ setup(
     description='Maps web-service HTTP Api',
     author='Zoltan Qin',
     author_email='qinzezzhen@outlook.com',
-    packages=find_packages(),
+    packages=find_packages(exclude=('benchmarks',)),
     tests_require=test_requirements,
     install_requires=install_requires,
 )
