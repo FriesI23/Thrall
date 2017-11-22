@@ -6,10 +6,19 @@ from contextlib import contextmanager
 
 from requests.adapters import HTTPAdapter
 from requests.sessions import Session
-from requests.exceptions import RequestException
+from requests.exceptions import (
+    RequestException,
+    ConnectionError,
+    Timeout,
+    HTTPError
+)
 
 from thrall.compat import basestring
-from thrall.exceptions import VendorConnectionError
+from thrall.exceptions import (
+    VendorRequestError,
+    VendorConnectionError,
+    VendorHTTPError,
+)
 
 from .hooks import SetDefault
 from .utils import builtin_names, is_func_bound
@@ -64,8 +73,12 @@ class BaseRequest(object):
     def catch_exception(self):
         try:
             yield
-        except RequestException as err:
+        except(ConnectionError, Timeout) as err:
             raise VendorConnectionError(data=err)
+        except HTTPError as err:
+            raise VendorHTTPError(data=err)
+        except RequestException as err:
+            raise VendorRequestError(data=err)
 
 
 class BaseData(object):

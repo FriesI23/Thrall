@@ -5,7 +5,7 @@ import responses
 
 from requests.sessions import Session
 
-from thrall.exceptions import VendorConnectionError
+from thrall.exceptions import VendorHTTPError
 from thrall.base import BaseRequest, BaseAdapterMixin, BaseData
 
 
@@ -67,7 +67,7 @@ class TestBaseRequest(object):
 
         model = BaseRequest()
 
-        with pytest.raises(VendorConnectionError):
+        with pytest.raises(VendorHTTPError):
             model.get('http://example.com', None)
 
 

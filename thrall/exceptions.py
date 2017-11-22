@@ -40,8 +40,16 @@ class AMapBatchParamError(VendorParamError):
     """raise this error when amap batch params prepared error"""
 
 
-class VendorConnectionError(VendorError):
+class VendorRequestError(VendorError):
+    """raise this error if got request error"""
+
+
+class VendorConnectionError(VendorRequestError):
     """raise this error if got connection error"""
+
+
+class VendorHTTPError(VendorRequestError):
+    """raise this error if got http error"""
 
 
 def map_status_exception(err_msg=u'', map_source='UNKNOWN', err_code=-1,
