@@ -19,7 +19,8 @@ from ._base_model import (
     BasePreparedRequestParams,
     BaseRequestParams,
     BaseResponseData,
-    Extensions
+    Extensions,
+    LocationMixin,
 )
 from ._common_model import BizExt, IndoorData, Photos
 
@@ -415,7 +416,7 @@ class SearchSuggestionCity(BaseData):
     _properties = ('name', 'num', 'citycode', 'adcode')
 
 
-class SearchData(BaseData):
+class SearchData(BaseData, LocationMixin):
     _properties = ('id', 'tag', 'name', 'type', 'typecode', 'biz_type',
                    'address', 'location', 'distance', 'tel', 'postcode',
                    'website', 'email', 'pcode', 'pname', 'citycode',
