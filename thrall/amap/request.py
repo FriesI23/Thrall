@@ -5,7 +5,6 @@ from six import iteritems
 import json
 
 from thrall.compat import urlencode, unicode
-from thrall.utils import partialmethod
 
 from .urls import (
     DISRANCE_URL,
@@ -32,20 +31,26 @@ class AMapRequest(BaseRequest):
         url = self._url_swith(url, default_url, p.DEFAULT_URL)
         return self.get(url.url, params=params, **kwargs)
 
-    get_geo_code = partialmethod(get_data, default_url=GEO_CODING_URL)
+    def get_geo_code(self, p, **kwargs):
+        return self.get_data(p, default_url=GEO_CODING_URL, **kwargs)
 
-    get_regeo_code = partialmethod(get_data, default_url=REGEO_CODING_URL)
+    def get_regeo_code(self, p, **kwargs):
+        return self.get_data(p, default_url=REGEO_CODING_URL, **kwargs)
 
-    get_search_text = partialmethod(get_data, default_url=POI_SEARCH_TEXT_URL)
+    def get_search_text(self, p, **kwargs):
+        return self.get_data(p, default_url=POI_SEARCH_TEXT_URL, **kwargs)
 
-    get_search_around = partialmethod(get_data,
-                                      default_url=POI_SEARCH_AROUND_URL)
+    def get_search_around(self, p, **kwargs):
+        return self.get_data(p, default_url=POI_SEARCH_AROUND_URL, **kwargs)
 
-    get_suggest = partialmethod(get_data, default_url=POI_SUGGEST_URL)
+    def get_suggest(self, p, **kwargs):
+        return self.get_data(p, default_url=POI_SUGGEST_URL, **kwargs)
 
-    get_distance = partialmethod(get_data, default_url=DISRANCE_URL)
+    def get_distance(self, p, **kwargs):
+        return self.get_data(p, default_url=DISRANCE_URL, **kwargs)
 
-    get_riding = partialmethod(get_data, default_url=NAVI_RIDING_URL)
+    def get_riding(self, p, **kwargs):
+        return self.get_data(p, default_url=NAVI_RIDING_URL, **kwargs)
 
 
 class AMapBatchRequest(BaseRequest):
