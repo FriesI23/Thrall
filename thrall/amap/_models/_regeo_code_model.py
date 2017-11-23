@@ -281,7 +281,8 @@ class ReGeoCodeData(BaseData):
 
 
 class ReGeoAddressComponent(BaseData):
-    _properties = ("province",
+    _properties = ('country',
+                   "province",
                    'city',
                    'citycode',
                    'district',

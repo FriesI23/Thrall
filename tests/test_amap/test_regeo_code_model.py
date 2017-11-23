@@ -408,7 +408,8 @@ class TestReGeoAddressComponent(object):
         raw_data = {'adcode': None, 'building': None, 'business_areas': None,
                     'city': None, 'citycode': None, 'district': None,
                     'neighborhood': None, 'province': None, 'sea_area': None,
-                    'street_number': None, 'towncode': None, 'township': None}
+                    'street_number': None, 'towncode': None, 'township': None,
+                    'country': None}
 
         model = _regeo_code_model.ReGeoAddressComponent(raw_data)
 
@@ -422,6 +423,7 @@ class TestReGeoAddressComponent(object):
         assert model.neighborhood == 'decode_neighborhood_data'
         assert model.building == 'decode_building_data'
         assert model.adcode is None
+        assert model.country is None
 
     def test_static_mode_enable(self):
         raw_data = {'adcode': None, 'building': None, 'business_areas': None,
