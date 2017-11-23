@@ -74,11 +74,11 @@ class BaseRequest(object):
         try:
             yield
         except(ConnectionError, Timeout) as err:
-            raise VendorConnectionError(data=err)
+            raise VendorConnectionError(str(err), data=err)
         except HTTPError as err:
-            raise VendorHTTPError(data=err)
+            raise VendorHTTPError(str(err), data=err)
         except RequestException as err:
-            raise VendorRequestError(data=err)
+            raise VendorRequestError(str(err), data=err)
 
 
 class BaseData(object):
