@@ -3,6 +3,8 @@ from __future__ import absolute_import
 
 from thrall.base import BaseData
 
+from ._base_model import LocationMixin
+
 
 class Building(BaseData):
     _properties = ('name', 'type')
@@ -12,11 +14,11 @@ class Neighborhood(BaseData):
     _properties = ('name', 'type')
 
 
-class StreetNumber(BaseData):
+class StreetNumber(BaseData, LocationMixin):
     _properties = ('street', 'number', 'location', 'direction', 'distance')
 
 
-class BusinessArea(BaseData):
+class BusinessArea(BaseData, LocationMixin):
     _properties = ('id', 'name', 'location')
 
 
