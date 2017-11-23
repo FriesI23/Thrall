@@ -17,7 +17,7 @@ if sys.version_info == (2, 7):
 
 setup(
     name='thrall',
-    version='0.0.7',
+    version='0.0.8',
     description='Maps web-service HTTP Api',
     author='Zoltan Qin',
     author_email='qinzezzhen@outlook.com',
