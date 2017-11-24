@@ -14,6 +14,8 @@ from .urls import (
     POI_SUGGEST_URL,
     REGEO_CODING_URL,
     NAVI_RIDING_URL,
+    NAVI_DRIVING_URL,
+    NAVI_WALKING_URL,
 )
 from ..base import BaseRequest
 
@@ -51,6 +53,12 @@ class AMapRequest(BaseRequest):
 
     def get_riding(self, p, **kwargs):
         return self.get_data(p, default_url=NAVI_RIDING_URL, **kwargs)
+
+    def get_walking(self, p, **kwargs):
+        return self.get_data(p, default_url=NAVI_WALKING_URL, **kwargs)
+
+    def get_driving(self, p, **kwargs):
+        return self.get_data(p, default_url=NAVI_DRIVING_URL, **kwargs)
 
 
 class AMapBatchRequest(BaseRequest):

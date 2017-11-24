@@ -28,6 +28,10 @@ from thrall.amap.models import (
     PreparedNaviRidingRequestParams,
     BatchResponseData,
     PreparedBatchParams,
+    NaviWalkingResponseData,
+    PreparedNaviWalkingRequestParams,
+    NaviDrivingResponseData,
+    PreparedNaviDrivingRequestParams,
 )
 
 
@@ -143,6 +147,14 @@ class TestAMapJsonDecoderAdapter(object):
      dict(origin='111.0,22', destination='1,2.0', key='xxx'),
      dict(origin=(111.0, 22), destination=(1, 2.0), key='xxx'),
      PreparedNaviRidingRequestParams),
+    ('encode_walking',
+     dict(origin='111.0,22', destination='1,2.0', key='xxx'),
+     dict(origin=(111.0, 22), destination=(1, 2.0), key='xxx'),
+     PreparedNaviWalkingRequestParams),
+    ('encode_driving',
+     dict(origin='111.0,22', destination='1,2.0', key='xxx'),
+     dict(origin=(111.0, 22), destination=(1, 2.0), key='xxx'),
+     PreparedNaviDrivingRequestParams),
     ('encode_batch',
      dict(key='xxx'),
      dict(key='xxx'),
@@ -167,6 +179,8 @@ def test_amap_encode_adapter_func(func, params, result, instance):
     ('decode_suggest', SuggestResponseData),
     ('decode_distance', DistanceResponseData),
     ('decode_riding', NaviRidingResponseData),
+    ('decode_walking', NaviWalkingResponseData),
+    ('decode_driving', NaviDrivingResponseData),
 ])
 def test_amap_json_decode_adapter_func(func, instance):
     model = AMapJsonDecoderAdapter()
