@@ -16,10 +16,6 @@ from .models import (
     SuggestResponseData,
     NaviRidingRequestParams,
     NaviRidingResponseData,
-    NaviWalkingRequestParams,
-    NaviWalkingResponseData,
-    NaviDrivingRequestParams,
-    NaviDrivingResponseData,
     BatchRequestParams,
     BatchResponseData,
 )
@@ -40,8 +36,6 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
         self.registry(self.encode_suggest, SuggestRequestParams)
         self.registry(self.encode_distance, DistanceRequestParams)
         self.registry(self.encode_riding, NaviRidingRequestParams)
-        self.registry(self.encode_walking, NaviWalkingRequestParams)
-        self.registry(self.encode_driving, NaviDrivingRequestParams)
         self.registry(self.encode_batch, BatchRequestParams)
 
     def registry(self, func, coder):
@@ -67,12 +61,6 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
 
     def encode_riding(self, *args, **kwargs):
         return self.get_encoder('encode_riding', *args, **kwargs)
-
-    def encode_walking(self, *args, **kwargs):
-        return self.get_encoder('encode_walking', *args, **kwargs)
-
-    def encode_driving(self, *args, **kwargs):
-        return self.get_encoder('encode_driving', *args, **kwargs)
 
     def encode_batch(self, *args, **kwargs):
         return self.get_encoder('encode_batch', *args, **kwargs)
@@ -100,8 +88,6 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
         self.registry(self.decode_suggest, SuggestResponseData)
         self.registry(self.decode_distance, DistanceResponseData)
         self.registry(self.decode_riding, NaviRidingResponseData)
-        self.registry(self.decode_walking, NaviWalkingResponseData)
-        self.registry(self.decode_driving, NaviDrivingResponseData)
         self.registry(self.decode_batch, BatchResponseData)
 
     def registry(self, func, coder):
@@ -127,12 +113,6 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
 
     def decode_riding(self, *args, **kwargs):
         return self.get_decoder('decode_riding', *args, **kwargs)
-
-    def decode_walking(self, *args, **kwargs):
-        return self.get_decoder('decode_walking', *args, **kwargs)
-
-    def decode_driving(self, *args, **kwargs):
-        return self.get_decoder('decode_driving', *args, **kwargs)
 
     def decode_batch(self, *args, **kwargs):
         return self.get_decoder('decode_batch', *args, **kwargs)

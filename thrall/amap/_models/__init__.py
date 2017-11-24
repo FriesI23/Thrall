@@ -59,18 +59,6 @@ from ._navi_model import (
     NaviRidingData,
     RidingPath,
     RidingSteps,
-    NaviWalkingRequestParams,
-    PreparedNaviWalkingRequestParams,
-    NaviWalkingResponseData,
-    NaviWalkingData,
-    WalkingPath,
-    WalkingSteps,
-    NaviDrivingRequestParams,
-    PreparedNaviDrivingRequestParams,
-    NaviDrivingResponseData,
-    NaviDrivingData,
-    DrivingPath,
-    DrivingSteps,
 )
 from ._batch_model import (
     BatchRequestParams,
@@ -107,12 +95,4 @@ __all__ = [
     # navi-riding
     "NaviRidingRequestParams", "PreparedNaviRidingRequestParams",
     "NaviRidingResponseData", "NaviRidingData", "RidingSteps", "RidingPath",
-    # navi-walking
-    "NaviWalkingRequestParams", "PreparedNaviWalkingRequestParams",
-    "NaviWalkingResponseData", "NaviWalkingData", "WalkingPath",
-    "WalkingSteps",
-    # navi-driving
-    "NaviDrivingRequestParams", "PreparedNaviDrivingRequestParams",
-    "NaviDrivingResponseData", "NaviDrivingData", "DrivingPath",
-    "DrivingSteps",
 ]
