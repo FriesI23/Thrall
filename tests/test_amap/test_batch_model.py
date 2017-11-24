@@ -221,6 +221,19 @@ class TestBatchResponseData(object):
 
         assert model.count == count
 
+    @pytest.mark.parametrize('raw_data, status_msg', [
+        ('{"status": "0", "info": "INVALID_BATCH_PARAM", "infocode": "20005"}',
+         (20005, 'INVALID_BATCH_PARAM', '')),
+        ('[]',
+         (10000, 'OK', '')),
+        ('[{}, {}]',
+         (10000, 'OK', ''))
+    ])
+    def test_status_msg(self, raw_data, status_msg):
+        model = _batch_model.BatchResponseData(raw_data, None, None)
+
+        assert model.status_msg == status_msg
+
     @pytest.fixture
     def mock_prepared_data(self):
         from thrall.amap.session import BATCH_URL_DEFAULT_PAIRS
