@@ -8,7 +8,7 @@ from thrall.compat import basestring
 from thrall.amap._models import _navi_model
 
 
-class TestNaviRidingRequestParams(object):
+class TestNaviRequestParams(object):
     def test_init_ok(self):
         model = _navi_model.NaviRidingRequestParams(origin='aaa',
                                                     destination='vvv',
@@ -26,6 +26,22 @@ class TestNaviRidingRequestParams(object):
         p = model.prepare_data()
 
         assert isinstance(p, _navi_model.PreparedNaviRidingRequestParams)
+
+
+@pytest.mark.parametrize('data, result, p_result', [
+    ('111,22', (111, 22), u'111.000000,22.000000'),
+    (['111,22', '333,44'], (111, 22), u'111.000000,22.000000'),
+    ('111,22|333,44', (111, 22), u'111.000000,22.000000'),
+    (None, None, None),
+])
+def test_prepare_navi_basic(data, result, p_result):
+    model = _navi_model.PreparedNaviRAndWRequestParams()
+
+    model.prepare_origin(data)
+    model.prepare_destination(data)
+
+    assert model.origin == model.destination == result
+    assert model.prepared_origin == model.prepared_destination == p_result
 
 
 class TestPreparedNaviRidingRequestParams(object):
@@ -49,21 +65,6 @@ class TestPreparedNaviRidingRequestParams(object):
         model.prepare_origin.assert_called_once_with('11')
         model.prepare_destination.assert_called_once_with(22)
         assert model.prepare_base.call_count == 1
-
-    @pytest.mark.parametrize('data, result, p_result', [
-        ('111,22', (111, 22), u'111.000000,22.000000'),
-        (['111,22', '333,44'], (111, 22), u'111.000000,22.000000'),
-        ('111,22|333,44', (111, 22), u'111.000000,22.000000'),
-        (None, None, None),
-    ])
-    def test_prepare_location_input(self, data, result, p_result):
-        model = _navi_model.PreparedNaviRidingRequestParams()
-
-        model.prepare_origin(data)
-        model.prepare_destination(data)
-
-        assert model.origin == model.destination == result
-        assert model.prepared_origin == model.prepared_destination == p_result
 
     def test_generate_params(self):
         model = _navi_model.PreparedNaviRidingRequestParams()
@@ -103,6 +104,9 @@ class TestNaviRidingResponseData(object):
 
         assert isinstance(model.data.paths, list)
         assert len(model.data.paths) == 1
+
+        for i in model.data.paths:
+            assert isinstance(i, _navi_model.RidingPath)
 
         assert model.data.origin == "116.434307,39.90909"
         assert (model.data.destination

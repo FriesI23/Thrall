@@ -3,7 +3,7 @@
 import pytest
 import responses
 
-from thrall.amap.session import AMapSession, SessionHookMixin, _set_default
+from thrall.amap.session import AMapSession, SessionHookMixin
 from thrall.amap.adapters import AMapEncodeAdapter, AMapJsonDecoderAdapter
 from thrall.amap.request import AMapRequest
 
@@ -140,6 +140,20 @@ class TestAMapSession(object):
             rsps.add(mock_riding_result)
             result = AMapSession(default_key='x').riding(origin='1,2',
                                                          destination='1,2')
+            result.raise_for_status()
+
+    def test_walking(self, mock_walking_result):
+        with responses.RequestsMock() as rsps:
+            rsps.add(mock_walking_result)
+            result = AMapSession(default_key='x').walking(origin='1,2',
+                                                          destination='1,2')
+            result.raise_for_status()
+
+    def test_driving(self, mock_driving_result):
+        with responses.RequestsMock() as rsps:
+            rsps.add(mock_driving_result)
+            result = AMapSession(default_key='x').driving(origin='1,2',
+                                                          destination='1,2')
             result.raise_for_status()
 
     def test_batch(self, mock_batch_result):
