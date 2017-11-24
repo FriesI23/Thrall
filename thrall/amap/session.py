@@ -21,8 +21,6 @@ BATCH_URL_DEFAULT_PAIRS = {
     RouteKey.SUGGEST: urls.POI_SUGGEST_URL,
     RouteKey.DISTANCE: urls.DISRANCE_URL,
     RouteKey.NAVI_RIDING: urls.NAVI_RIDING_URL,
-    RouteKey.NAVI_DRIVING: urls.NAVI_DRIVING_URL,
-    RouteKey.NAVI_WAKLING: urls.NAVI_WALKING_URL,
 }
 
 BATCH_DECODE_DEFAULT_PAIRS = {
@@ -34,8 +32,6 @@ BATCH_DECODE_DEFAULT_PAIRS = {
     RouteKey.SUGGEST: models.SuggestResponseData,
     RouteKey.DISTANCE: models.DistanceResponseData,
     RouteKey.NAVI_RIDING: models.NaviRidingResponseData,
-    RouteKey.NAVI_WAKLING: models.NaviWalkingResponseData,
-    RouteKey.NAVI_DRIVING: models.NaviDrivingResponseData,
 }
 
 
@@ -312,44 +308,6 @@ class AMapSession(SessionHookMixin):
         self._run_response_hook(route_key, r, response_hook)
 
         d = self.decoder.decode_riding(raw_data=r.content, auto_version=True)
-
-        return d
-
-    def walking(self, *args, **kwargs):
-        return self._defaults(self._walking)(*args, **kwargs)
-
-    def _walking(self, origin=None, destination=None, prepared_hook=None,
-                 response_hook=None, **kwargs):
-        route_key = RouteKey.NAVI_WAKLING.value
-
-        p = self.encoder.encode_walking(origin=origin,
-                                        destination=destination,
-                                        **kwargs)
-        self._run_prepared_hook(route_key, p, prepared_hook)
-
-        r = self.request.get_walking(p)
-        self._run_response_hook(route_key, p, response_hook)
-
-        d = self.decoder.decode_walking(raw_data=r.content)
-
-        return d
-
-    def driving(self, *args, **kwargs):
-        return self._defaults(self._driving)(*args, **kwargs)
-
-    def _driving(self, origin=None, destination=None, prepared_hook=None,
-                 response_hook=None, **kwargs):
-        route_key = RouteKey.NAVI_DRIVING.value
-
-        p = self.encoder.encode_driving(origin=origin,
-                                        destination=destination,
-                                        **kwargs)
-        self._run_prepared_hook(route_key, p, prepared_hook)
-
-        r = self.request.get_driving(p)
-        self._run_response_hook(route_key, p, response_hook)
-
-        d = self.decoder.decode_driving(raw_data=r.content)
 
         return d
 
