@@ -9,6 +9,8 @@ from ._base_model import (
     BaseResponseData,
 )
 
+from thrall.utils import MapStatusMessage
+
 
 class BatchRequestParams(BaseRequestParams):
     def __init__(self, batch_list=None, key=None, url_pairs=None):
@@ -110,6 +112,16 @@ class BatchResponseData(BaseResponseData, BatchExcMixin):
             return len(self._raw_data)
         else:
             return super(BatchResponseData, self).count
+
+    @property
+    def status_msg(self):
+        if isinstance(self._raw_data, list):
+            return MapStatusMessage.from_args(
+                code=10000,
+                msg='OK',
+                detail='')
+        else:
+            return super(BatchResponseData, self).status_msg
 
     @property
     def batch_status(self):
