@@ -24,6 +24,11 @@ def request_amap_result_dir():
 
 
 @pytest.fixture
+def data_dir():
+    return request_amap_result_dir()
+
+
+@pytest.fixture
 def mock_geo_code_result():
     return responses.Response(
         method='GET',
