@@ -24,6 +24,10 @@ class NavRequestParams(BaseRequestParams):
         self.destination = destination
         super(NavRequestParams, self).__init__(**kwargs)
 
+
+class NaviRidingRequestParams(NavRequestParams):
+    ROUTE_KEY = RouteKey.NAVI_RIDING
+
     def prepare_data(self):
         with self.prepare_basic(PreparedNaviRidingRequestParams()) as p:
             p.prepare(
@@ -34,17 +38,31 @@ class NavRequestParams(BaseRequestParams):
         return p
 
 
-class NaviRidingRequestParams(NavRequestParams):
-    ROUTE_KEY = RouteKey.NAVI_RIDING
-
-
 class NaviWalkingRequestParams(NavRequestParams):
     ROUTE_KEY = RouteKey.NAVI_WAKLING
+
+    def prepare_data(self):
+        with self.prepare_basic(PreparedNaviWalkingRequestParams()) as p:
+            p.prepare(
+                origin=self.origin,
+                destination=self.destination,
+            )
+
+        return p
 
 
 class NaviDrivingRequestParams(NavRequestParams):
     # TODO: add more params support
     ROUTE_KEY = RouteKey.NAVI_DRIVING
+
+    def prepare_data(self):
+        with self.prepare_basic(PreparedNaviDrivingRequestParams()) as p:
+            p.prepare(
+                origin=self.origin,
+                destination=self.destination,
+            )
+
+        return p
 
 
 class PreparedNaviRAndWRequestParams(BasePreparedRequestParams):
