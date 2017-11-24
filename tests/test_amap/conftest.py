@@ -16,6 +16,8 @@ from thrall.amap.urls import (
     POI_SUGGEST_URL,
     DISRANCE_URL,
     NAVI_RIDING_URL,
+    NAVI_WALKING_URL,
+    NAVI_DRIVING_URL,
 )
 
 
@@ -102,6 +104,28 @@ def mock_riding_result():
         url=re.compile('{}.*'.format(NAVI_RIDING_URL.url)),
         body=open(str(
             request_amap_result_dir().join('riding_result.json'))).read(),
+        status=200,
+    )
+
+
+@pytest.fixture
+def mock_walking_result():
+    return responses.Response(
+        method='GET',
+        url=re.compile('{}.*'.format(NAVI_WALKING_URL.url)),
+        body=open(str(
+            request_amap_result_dir().join('walking_result.json'))).read(),
+        status=200,
+    )
+
+
+@pytest.fixture
+def mock_driving_result():
+    return responses.Response(
+        method='GET',
+        url=re.compile('{}.*'.format(NAVI_DRIVING_URL.url)),
+        body=open(str(
+            request_amap_result_dir().join('driving_result.json'))).read(),
         status=200,
     )
 
