@@ -16,14 +16,13 @@ from ._base_model import (
 )
 
 
-class NaviRidingRequestParams(BaseRequestParams):
-    ROUTE_KEY = RouteKey.NAVI_RIDING
+class NavRequestParams(BaseRequestParams):
 
     @required_params('origin', 'destination')
     def __init__(self, origin=None, destination=None, **kwargs):
         self.origin = origin
         self.destination = destination
-        super(NaviRidingRequestParams, self).__init__(**kwargs)
+        super(NavRequestParams, self).__init__(**kwargs)
 
     def prepare_data(self):
         with self.prepare_basic(PreparedNaviRidingRequestParams()) as p:
@@ -35,13 +34,24 @@ class NaviRidingRequestParams(BaseRequestParams):
         return p
 
 
-class PreparedNaviRidingRequestParams(BasePreparedRequestParams):
+class NaviRidingRequestParams(NavRequestParams):
     ROUTE_KEY = RouteKey.NAVI_RIDING
 
+
+class NaviWalkingRequestParams(NavRequestParams):
+    ROUTE_KEY = RouteKey.NAVI_WAKLING
+
+
+class NaviDrivingRequestParams(NavRequestParams):
+    # TODO: add more params support
+    ROUTE_KEY = RouteKey.NAVI_DRIVING
+
+
+class PreparedNaviRAndWRequestParams(BasePreparedRequestParams):
     def __init__(self):
         self.origin = None
         self.destination = None
-        super(PreparedNaviRidingRequestParams, self).__init__()
+        super(PreparedNaviRAndWRequestParams, self).__init__()
 
     def prepare(self, origin=None, destination=None, **kwargs):
         self.prepare_origin(origin)
@@ -77,16 +87,20 @@ class PreparedNaviRidingRequestParams(BasePreparedRequestParams):
             return params
 
 
-class NaviRidingResponseData(BaseResponseData):
+class PreparedNaviRidingRequestParams(PreparedNaviRAndWRequestParams):
     ROUTE_KEY = RouteKey.NAVI_RIDING
-    _ROUTE = 'data'
-
-    def get_data(self, raw_data, static=False):
-        data = raw_data.get(self._ROUTE)
-        return NaviRidingData(data, static=static)
 
 
-class NaviRidingData(BaseData):
+class PreparedNaviWalkingRequestParams(PreparedNaviRAndWRequestParams):
+    ROUTE_KEY = RouteKey.NAVI_WAKLING
+
+
+class PreparedNaviDrivingRequestParams(PreparedNaviRidingRequestParams):
+    # TODO: add more params support
+    ROUTE_KEY = RouteKey.NAVI_DRIVING
+
+
+class NaviDataBasic(BaseData):
     _properties = ('destination', 'origin', 'paths')
 
     def decode_param(self, p, data):
@@ -94,11 +108,10 @@ class NaviRidingData(BaseData):
             return self.decode_paths(data)
 
     def decode_paths(self, data):
-        ds = data.get('paths')
-        return [RidingPath(d, self._static) for d in ds] if ds else []
+        raise NotImplementedError
 
 
-class RidingPath(BaseData):
+class NaviPathBasic(BaseData):
     _properties = ('distance', 'duration', 'steps')
 
     def decode_param(self, p, data):
@@ -106,10 +119,10 @@ class RidingPath(BaseData):
             return self.decode_steps(data.get('steps'))
 
     def decode_steps(self, data):
-        return [RidingSteps(d, self._static) for d in data] if data else []
+        raise NotImplementedError
 
 
-class RidingSteps(BaseData):
+class NaviStepsBasic(BaseData):
     _properties = ('instruction',
                    'road',
                    'distance',
@@ -127,3 +140,113 @@ class RidingSteps(BaseData):
         if polyline:
             return [tuple(map(float, i.split(u',')))
                     for i in polyline.split(u';')]
+
+
+class NaviRidingResponseData(BaseResponseData):
+    ROUTE_KEY = RouteKey.NAVI_RIDING
+    _ROUTE = 'data'
+
+    def get_data(self, raw_data, static=False):
+        data = raw_data.get(self._ROUTE)
+        return NaviRidingData(data, static=static)
+
+
+class NaviRidingData(NaviDataBasic):
+
+    def decode_paths(self, data):
+        ds = data.get('paths')
+        return [RidingPath(d, self._static) for d in ds] if ds else []
+
+
+class RidingPath(NaviPathBasic):
+
+    def decode_steps(self, data):
+        return [RidingSteps(d, self._static) for d in data] if data else []
+
+
+class RidingSteps(NaviStepsBasic):
+    _properties = ('instruction',
+                   'road',
+                   'distance',
+                   'orientation',
+                   'duration',
+                   'polyline',
+                   'action',
+                   'assistant_action')
+
+
+class NaviWalkingResponseData(BaseResponseData):
+    ROUTE_KEY = RouteKey.NAVI_WAKLING
+    _ROUTE = 'route'
+
+    def get_data(self, raw_data, static=False):
+        data = raw_data.get(self._ROUTE)
+        return NaviWalkingData(data, static=static)
+
+
+class NaviWalkingData(NaviDataBasic):
+
+    def decode_paths(self, data):
+        ds = data.get('paths')
+        return [WalkingPath(d, self._static) for d in ds] if ds else []
+
+
+class WalkingPath(NaviPathBasic):
+
+    def decode_steps(self, data):
+        return [WalkingSteps(d, self._static) for d in data] if data else []
+
+
+class WalkingSteps(NaviStepsBasic):
+    _properties = ('instruction',
+                   'orientation',
+                   'road',
+                   'distance',
+                   'duration',
+                   'polyline',
+                   'action',
+                   'assistant_action',
+                   'walk_type')
+
+
+class NaviDrivingResponseData(BaseResponseData):
+    ROUTE_KEY = RouteKey.NAVI_DRIVING
+    _ROUTE = 'route'
+
+    def get_data(self, raw_data, static=False):
+        data = raw_data.get(self._ROUTE)
+        return NaviDrivingData(data, static=static)
+
+
+class NaviDrivingData(NaviDataBasic):
+
+    def decode_paths(self, data):
+        ds = data.get('paths')
+        return [DrivingPath(d, self._static) for d in ds] if ds else []
+
+
+class DrivingPath(NaviPathBasic):
+    _properties = ('distance',
+                   'duration',
+                   'strategy',
+                   'tolls',
+                   'toll_distance',
+                   'restriction',
+                   'traffic_lights',
+                   'steps')
+
+    def decode_steps(self, data):
+        return [DrivingSteps(d, self._static) for d in data] if data else []
+
+
+class DrivingSteps(NaviStepsBasic):
+    _properties = ('instruction',
+                   'orientation',
+                   'distance',
+                   'tolls',
+                   'toll_distance',
+                   'toll_road',
+                   'duration',
+                   'polyline',
+                   'action',
+                   'assistant_action')
