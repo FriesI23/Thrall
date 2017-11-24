@@ -229,4 +229,5 @@ class SuggestData(BaseData, LocationMixin):
                    'district',
                    'adcode',
                    'location',
-                   'address')
+                   'address',
+                   'typecode')
