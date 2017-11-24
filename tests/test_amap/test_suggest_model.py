@@ -190,3 +190,5 @@ class TestSuggestResponseData(object):
 
         for i, j in zip(model.data, model.data):
             assert i is j
+
+        assert model.data[1].typecode is not None
