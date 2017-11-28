@@ -76,6 +76,8 @@ class BaseRequest(object):
         except(ConnectionError, Timeout) as err:
             raise VendorConnectionError(str(err), data=err)
         except HTTPError as err:
+            err.request.response = err.response
+            del err.response
             raise VendorHTTPError(str(err), data=err)
         except RequestException as err:
             raise VendorRequestError(str(err), data=err)
