@@ -3,7 +3,6 @@
 from __future__ import absolute_import
 
 from contextlib import contextmanager
-from future.utils import as_native_str
 
 from requests.adapters import HTTPAdapter
 from requests.sessions import Session

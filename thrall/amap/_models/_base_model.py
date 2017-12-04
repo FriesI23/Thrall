@@ -1,7 +1,6 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-from future.utils import as_native_str
 import contextlib
 import functools
 from hashlib import md5
