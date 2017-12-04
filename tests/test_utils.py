@@ -6,6 +6,7 @@ from thrall.utils import (
     required_params,
     check_params_type,
     partialmethod,
+    repr_params,
 )
 
 
@@ -86,3 +87,28 @@ def test_partialmethod():
         b = partialmethod(a, x=2)
 
     assert Mock().b() == 2
+
+
+class TestReprParams(object):
+    class Mock(object):
+        def __init__(self):
+            self.a = 1
+            self.b = '2'
+            self.c = u'杰克'
+
+    def test_repr_params_ok_py2(self):
+        m = self.Mock()
+
+        r = repr_params(m.__dict__, m.__class__.__name__, m)
+
+        assert isinstance(r, str)
+        for i in ['Mock(', 'a=1', 'b=2', "c=杰克"]:
+            assert i in r
+
+    def test_repr_params_with_default_param(self):
+        m = self.Mock()
+
+        r = repr_params(m.__dict__, m.__class__.__name__, m, {'a': 'xxx'})
+
+        for i in ['Mock(', 'a=xxx', 'b=2', "c=杰克"]:
+            assert i in r

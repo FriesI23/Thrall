@@ -17,6 +17,13 @@ class TestSig(object):
         assert sig.unhash_sig == 'a=2&b=1&c=3&d=4key'
         assert sig.hashed_sig is not None
 
+    def test_repr(self):
+        sig = _base_model.Sig('key', kwargs=dict(b=1, a=2, d=4, c=3))
+
+        for i in ['AMapSig(', 'method=OPENSSL_MD5',
+                  "sig='a=2&b=1&c=3&d=4key'"]:
+            assert i in repr(sig)
+
 
 class TestExtensions(object):
     def test_init_ok(self):
@@ -98,6 +105,15 @@ class TestBasePrepareModel(object):
 
     def test_basic(self):
         _base_model.BasePreparedRequestParams()
+
+    def test_repr(self):
+        model = self._MockModel()
+        model.key = 'xxx'
+        model.output = 'json'
+        model._pkey = 'aaa'
+
+        for i in ['_MockModel(', 'key=xxx', 'output=json', 'sig=AMa']:
+            assert i in repr(model)
 
     def test_prepare_key(self):
         model = _base_model.BasePreparedRequestParams()
@@ -224,6 +240,14 @@ class TestBaseResponseData(object):
         assert model.version == 3
 
         model.raise_for_status()
+
+    def test_repr(self):
+        raw_data = """{"status": "1", "info": "OK", "infocode": "10000",
+         "count": "1", "geocodes":[]}"""
+        model = _base_model.BaseResponseData(raw_data)
+
+        for i in ['status=', 'status_msg=', 'count=', 'version=']:
+            assert i in repr(model)
 
     def test_init_no_count(self):
         raw_data = """{"status": "1", "info": "OK", "infocode": "10000",
