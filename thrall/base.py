@@ -3,6 +3,7 @@
 from __future__ import absolute_import
 
 from contextlib import contextmanager
+from future.utils import as_native_str
 
 from requests.adapters import HTTPAdapter
 from requests.sessions import Session
@@ -21,7 +22,7 @@ from thrall.exceptions import (
 )
 
 from .hooks import SetDefault
-from .utils import builtin_names, is_func_bound
+from .utils import builtin_names, is_func_bound, repr_params
 
 set_default = SetDefault
 
@@ -90,6 +91,12 @@ class BaseData(object):
 
         if self._static:
             self._static_decode()
+
+    def __unicode__(self):
+        return repr_params(self._properties, self.__class__.__name__, self)
+
+    def __repr__(self):
+        return self.__unicode__()
 
     def __getattr__(self, name):
         try:

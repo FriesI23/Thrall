@@ -3,7 +3,7 @@ import functools
 import re
 from operator import itemgetter
 
-from future.utils import python_2_unicode_compatible
+from future.utils import python_2_unicode_compatible, as_native_str
 from six import iteritems
 
 from thrall.compat import __builtin__, unicode, urlparse
@@ -75,7 +75,7 @@ def check_params_type(enforce=False, **types):
 
         def __check_type(key, type_list, arg2value, kw):
             if (key not in arg2value and kw.get(key) is None) or (
-                        arg2value.get(key) is None):
+                    arg2value.get(key) is None):
                 return
 
             __enforce_check_type(key, type_list, arg2value, kw)
@@ -210,3 +210,28 @@ class _PartialMethod(functools.partial):
 
 
 partialmethod = _PartialMethod
+
+
+def _iter_repr_params(params, attr, defaults=None):
+    for key in params:
+        if key in defaults:
+            value = defaults[key]
+        else:
+            value = getattr(attr, key)
+
+        try:
+            yield u"{}={}".format(key, value)
+        except UnicodeDecodeError:
+            yield '{}={}'.format(key, value).decode('utf-8')
+
+
+@as_native_str(encoding='utf-8')
+def repr_params(params, class_name, attr, default_value=None):
+    """merge params:  `__repr__` template"""
+    if not default_value:
+        default_value = {}
+
+    return u"{class_name}({params})".format(
+        class_name=class_name,
+        params=u', '.join(_iter_repr_params(params, attr, default_value))
+    )
