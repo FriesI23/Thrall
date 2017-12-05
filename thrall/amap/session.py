@@ -190,7 +190,7 @@ class AMapSession(SessionHookMixin):
 
         self._run_prepared_hook(route_key, p, prepared_hook)
         r = self.request.get_regeo_code(p)
-        self._run_response_hook(route_key, p, response_hook)
+        self._run_response_hook(route_key, r, response_hook)
 
         d = self.decoder.decode_regeo_code(raw_data=r.content)
 
@@ -221,7 +221,7 @@ class AMapSession(SessionHookMixin):
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_search_text(p)
-        self._run_response_hook(route_key, p, response_hook)
+        self._run_response_hook(route_key, r, response_hook)
 
         d = self.decoder.decode_search_text(raw_data=r.content)
         return d
@@ -271,7 +271,7 @@ class AMapSession(SessionHookMixin):
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_suggest(p)
-        self._run_response_hook(route_key, p, response_hook)
+        self._run_response_hook(route_key, r, response_hook)
 
         d = self.decoder.decode_suggest(raw_data=r.content)
         return d
@@ -328,7 +328,7 @@ class AMapSession(SessionHookMixin):
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_walking(p)
-        self._run_response_hook(route_key, p, response_hook)
+        self._run_response_hook(route_key, r, response_hook)
 
         d = self.decoder.decode_walking(raw_data=r.content)
 
@@ -347,7 +347,7 @@ class AMapSession(SessionHookMixin):
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_driving(p)
-        self._run_response_hook(route_key, p, response_hook)
+        self._run_response_hook(route_key, r, response_hook)
 
         d = self.decoder.decode_driving(raw_data=r.content)
 
