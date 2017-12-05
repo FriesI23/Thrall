@@ -137,7 +137,8 @@ class BasePreparedRequestParams(object):
         self.callback = None
 
     def __unicode__(self):
-        params = list(self.__dict__)
+        params = [k for k, v in iteritems(self.__dict__) if
+                  not hasattr(v, '__call__')]
         params.append('sig')
         return repr_params(params, self.__class__.__name__, self)
 
