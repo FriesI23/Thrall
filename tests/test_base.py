@@ -79,6 +79,17 @@ class TestBaseData(object):
 
         assert model._data == raw_data
 
+    def test_repr(self):
+        class MockRepr(BaseData):
+            _properties = ('a', 'b', 'c', 'd', 'f')
+
+        model = MockRepr({'a': 1, 'b': '2', 'c': [1], 'd': u'杰克',
+                          'f': MockRepr(
+                              {'a': 1, 'b': '2', 'c': [1], 'd': u'杰克'})})
+
+        for i in ['MockRepr(', 'a=1', 'b=2', 'c=[1]', 'd=杰克', 'f=MockRepr(']:
+            assert i in repr(model)
+
     def test_get_attr(self, mocker):
         raw_data = {'a': 1, 'b': '2', 'c': [], 'd': [1, 2]}
 

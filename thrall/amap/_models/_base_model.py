@@ -10,7 +10,7 @@ from six import iteritems
 from thrall.compat import unicode, urlparse
 from thrall.consts import FORMAT_JSON, FORMAT_XML, RouteKey
 from thrall.exceptions import VendorError, amap_status_exception
-from thrall.utils import MapStatusMessage, required_params
+from thrall.utils import MapStatusMessage, required_params, repr_params
 
 from ..common import json_load_and_fix_amap_empty, parse_location
 from ..consts import AMapVersion, ExtensionFlag, OutputFmt, StatusFlag
@@ -57,11 +57,11 @@ class Sig(object):
         self.kw = kwargs if kwargs is not None else {}
 
     def __repr__(self):
-        return "AMap{name}({method}, '{sig}')".format(
-            name=self.__class__.__name__,
-            method=self.hash_func.__name__.upper(),
-            sig=repr(self.unhash_sig),
-        )
+        return repr_params(['method', 'sig'],
+                           "AMap{}".format(self.__class__.__name__),
+                           self, default_value={
+                "method": self.hash_func.__name__.upper(),
+                "sig": u"'{}'".format(self.unhash_sig)})
 
     @property
     def hashed_sig(self):
@@ -135,6 +135,14 @@ class BasePreparedRequestParams(object):
         self._pkey = None
         self.output = None
         self.callback = None
+
+    def __unicode__(self):
+        params = list(self.__dict__)
+        params.append('sig')
+        return repr_params(params, self.__class__.__name__, self)
+
+    def __repr__(self):
+        return self.__unicode__()
 
     def generate_params(self):
         """ generate prepared params without sig
@@ -278,6 +286,13 @@ class BaseResponseData(object):
 
         if static_mode:
             self._data = self._get_static_data()
+
+    def __unicode__(self):
+        return repr_params(('status', 'status_msg', 'count', 'version'),
+                           self.__class__.__name__, self)
+
+    def __repr__(self):
+        return self.__unicode__()
 
     @property
     def status(self):
