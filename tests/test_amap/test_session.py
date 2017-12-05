@@ -98,62 +98,105 @@ class TestAMapSession(object):
         with pytest.raises(TypeError):
             model.mount('code', AMapEncodeAdapter)
 
+    def prepare_hook(self, p):
+        from thrall.amap.models import BasePreparedRequestParams
+        assert isinstance(p, BasePreparedRequestParams)
+
+    def repsonse_hook(self, r):
+        from requests.models import Response
+        assert isinstance(r, Response)
+
     def test_geo_code(self, mock_geo_code_result):
         with responses.RequestsMock() as rsps:
             rsps.add(mock_geo_code_result)
-            result = AMapSession(default_key='xxx').geo_code(address='xxxx')
+            result = AMapSession(default_key='xxx').geo_code(
+                address='xxxx',
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
+            )
             result.raise_for_status()
 
     def test_regeo_code(self, mock_regeo_code_result):
         with responses.RequestsMock() as rsps:
             rsps.add(mock_regeo_code_result)
-            result = AMapSession(default_key='xxx').regeo_code(location='1,2')
+            result = AMapSession(default_key='xxx').regeo_code(
+                location='1,2',
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
+            )
             result.raise_for_status()
 
     def test_search_text(self, mock_search_text_result):
         with responses.RequestsMock() as rsps:
             rsps.add(mock_search_text_result)
-            result = AMapSession(default_key='xxx').search_text()
+            result = AMapSession(default_key='xxx').search_text(
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
+            )
             result.raise_for_status()
 
     def test_search_around(self, mock_search_around_result):
         with responses.RequestsMock() as rsps:
             rsps.add(mock_search_around_result)
-            result = AMapSession(default_key='x').search_around(location='1,2')
+            result = AMapSession(default_key='x').search_around(
+                location='1,2',
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
+            )
             result.raise_for_status()
 
     def test_suggest(self, mock_suggest_result):
         with responses.RequestsMock() as rsps:
             rsps.add(mock_suggest_result)
-            result = AMapSession(default_key='x').suggest(keyword='x')
+            result = AMapSession(default_key='x').suggest(
+                keyword='x',
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
+            )
             result.raise_for_status()
 
     def test_distance(self, mock_distance_result):
         with responses.RequestsMock() as rsps:
             rsps.add(mock_distance_result)
-            result = AMapSession(default_key='x').distance(origins='1,2',
-                                                           destination='1,2')
+            result = AMapSession(default_key='x').distance(
+                origins='1,2',
+                destination='1,2',
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
+            )
             result.raise_for_status()
 
     def test_riding(self, mock_riding_result):
         with responses.RequestsMock() as rsps:
             rsps.add(mock_riding_result)
-            result = AMapSession(default_key='x').riding(origin='1,2',
-                                                         destination='1,2')
+            result = AMapSession(default_key='x').riding(
+                origin='1,2',
+                destination='1,2',
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
+            )
             result.raise_for_status()
 
     def test_walking(self, mock_walking_result):
         with responses.RequestsMock() as rsps:
             rsps.add(mock_walking_result)
-            result = AMapSession(default_key='x').walking(origin='1,2',
-                                                          destination='1,2')
+            result = AMapSession(default_key='x').walking(
+                origin='1,2',
+                destination='1,2',
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
+            )
             result.raise_for_status()
 
     def test_driving(self, mock_driving_result):
         with responses.RequestsMock() as rsps:
             rsps.add(mock_driving_result)
-            result = AMapSession(default_key='x').driving(origin='1,2',
-                                                          destination='1,2')
+            result = AMapSession(default_key='x').driving(
+                origin='1,2',
+                destination='1,2',
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
+            )
             result.raise_for_status()
 
     def test_batch(self, mock_batch_result):
@@ -170,6 +213,8 @@ class TestAMapSession(object):
                 ],
                 url_pairs=BATCH_URL_DEFAULT_PAIRS,
                 decode_pairs=BATCH_DECODE_DEFAULT_PAIRS,
-                key='x'
+                key='x',
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
             )
             result.raise_for_status()
