@@ -84,13 +84,11 @@ class BaseRequestParams(object):
     ROUTE_KEY = RouteKey.UNKNOWN
 
     @required_params('key')
-    def __init__(self, key=None, output=None, private_key=None, callback=None,
-                 raw_params=None):
+    def __init__(self, key=None, output=None, private_key=None, callback=None):
         self.key = key
         self.output = output
         self.callback = callback
         self.private_key = private_key
-        self._raw_params = raw_params
 
     def prepare(self):
         try:
@@ -122,8 +120,7 @@ class BaseRequestParams(object):
         new_fun = functools.partial(p.prepare, key=self.key,
                                     pkey=self.private_key,
                                     output=self.output,
-                                    callback=self.callback,
-                                    raw_params=self._raw_params)
+                                    callback=self.callback, )
         p.prepare = new_fun
         yield p
         p.prepare = org_fun
@@ -138,7 +135,6 @@ class BasePreparedRequestParams(object):
         self._pkey = None
         self.output = None
         self.callback = None
-        self._raw_params = None
 
     def __unicode__(self):
         params = [k for k, v in iteritems(self.__dict__) if
@@ -190,10 +186,8 @@ class BasePreparedRequestParams(object):
         """
         raise NotImplementedError
 
-    def prepare_base(self, key=None, pkey=None, output=None, callback=None,
-                     raw_params=None):
+    def prepare_base(self, key=None, pkey=None, output=None, callback=None):
         self._pkey = pkey
-        self._raw_params = raw_params
         self.prepare_key(key)
         self.prepare_output(output)
         self.prepare_callback(callback)
@@ -248,11 +242,9 @@ class BasePreparedRequestParams(object):
     @contextlib.contextmanager
     def init_basic_params(self, params, optionals=None):
         new_params = self._init_basic_params(params)
-        self._init_optional_params(params, optionals)
-        # init raw_params
-        self._init_optional_params(params, self._raw_params)
-
         yield new_params
+
+        self._init_optional_params(params, optionals)
 
     def _init_basic_params(self, params):
         params['key'] = self.prepared_key
