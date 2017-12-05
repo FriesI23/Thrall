@@ -58,7 +58,7 @@ class TestBaseModel(object):
         model = _base_model.BaseRequestParams(key='xxx')
 
         assert model.key == 'xxx'
-        assert model.output == model.callback == model.private_key is None
+        assert model.output == model.callback == model.private_key == model._raw_params is None
 
     def test_base_request_params_no_key(self):
         with pytest.raises(RuntimeError):
@@ -108,11 +108,11 @@ class TestBasePrepareModel(object):
 
     def test_repr(self):
         model = self._MockModel()
-        model.key = 'xxx'
-        model.output = 'json'
-        model._pkey = 'aaa'
+        model.prepare(key='xxx', output='json', pkey='aaa',
+                      raw_params={'a': 1})
 
-        for i in ['_MockModel(', 'key=xxx', 'output=json', 'sig=AMa']:
+        for i in ['_MockModel(', 'key=xxx', 'output=json', 'sig=AMa',
+                  "_raw_params={'a': 1}"]:
             assert i in repr(model)
 
     def test_prepare_key(self):
@@ -169,7 +169,11 @@ class TestBasePrepareModel(object):
         (dict(key='x', output='json', pkey='xxx', callback='http://localhost'),
          {'callback': 'http://localhost', 'key': 'x', 'output': 'json'}),
         (dict(key='x', output='json', callback=None),
-         {'key': 'x', 'output': 'json'})
+         {'key': 'x', 'output': 'json'}),
+        (dict(key='x', output='json', callback=None, raw_params={'a': 1}),
+         {'key': 'x', 'output': 'json', 'a': 1}),
+        (dict(key='x', output='json', callback=None, raw_params={'key': '1'}),
+         {'key': '1', 'output': 'json'}),
     ])
     def test_init_basic_params(self, kwargs, params):
         model = self._MockModel()
@@ -177,7 +181,8 @@ class TestBasePrepareModel(object):
         model.prepare_base(key=kwargs.get('key'),
                            pkey=kwargs.get('pkey'),
                            output=kwargs.get('output'),
-                           callback=kwargs.get('callback'))
+                           callback=kwargs.get('callback'),
+                           raw_params=kwargs.get('raw_params'))
 
         with model.init_basic_params({}) as result:
             for k, v in iteritems(params):
@@ -194,7 +199,8 @@ class TestBasePrepareModel(object):
         model.prepare_base(key='key',
                            pkey='pkey',
                            output='json',
-                           callback='http://localhost')
+                           callback='http://localhost',
+                           raw_params={'xxx': 'yyy', 'hh': None})
 
         optional_params = {
             'have_it': 1,
@@ -204,8 +210,7 @@ class TestBasePrepareModel(object):
         }
 
         with model.init_basic_params({}, optional_params) as result:
-            # prepare optional params after context
-            assert 'have_it' not in result
+            pass
 
         assert result['key'] == 'key'
         assert result['output'] == 'json'
@@ -213,7 +218,9 @@ class TestBasePrepareModel(object):
         assert result['have_it'] == 1
         assert result['have_zero'] == 0
         assert result['ept_list'] == []
+        assert result['xxx'] == 'yyy'
         assert 'oh_no' not in result
+        assert 'hh' not in result
 
 
 class TestBaseResponseDataNoImplement(object):
