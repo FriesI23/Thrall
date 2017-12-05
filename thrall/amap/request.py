@@ -21,6 +21,9 @@ from ..base import BaseRequest
 
 
 class AMapRequest(BaseRequest):
+    def __init__(self, session=None, enable_https=False):
+        super(AMapRequest, self).__init__(session=session)
+        self._is_https = enable_https
 
     def _url_swith(self, oru, dfu, url):
         if oru:
@@ -31,7 +34,8 @@ class AMapRequest(BaseRequest):
     def get_data(self, p, default_url, url=None, **kwargs):
         params = p.params
         url = self._url_swith(url, default_url, p.DEFAULT_URL)
-        return self.get(url.url, params=params, **kwargs)
+        return self.get(url.https_url if self._is_https else url.url,
+                        params=params, **kwargs)
 
     def get_geo_code(self, p, **kwargs):
         return self.get_data(p, default_url=GEO_CODING_URL, **kwargs)
@@ -63,6 +67,11 @@ class AMapRequest(BaseRequest):
 
 class AMapBatchRequest(BaseRequest):
     _POST_URL = 'http://restapi.amap.com/v3/batch'
+    _HTTPS_POST_URL = 'https://restapi.amap.com/v3/batch'
+
+    def __init__(self, session=None, enable_https=False):
+        super(AMapBatchRequest, self).__init__(session=session)
+        self._is_https = enable_https
 
     def get_batch_data(self, request_list, key=None, **kwargs):
         """ AMap batch request
@@ -75,10 +84,13 @@ class AMapBatchRequest(BaseRequest):
             'ops': [{'url': self._construct_ops(r['url'], r['params'])}
                     for r in request_list]}
 
-        return self.post(url="{}?key={}".format(self._POST_URL, key),
-                         data=json.dumps(ops_params),
-                         headers={'Content-Type': 'application/json'},
-                         **kwargs)
+        return self.post(
+            url="{}?key={}".format(
+                self._HTTPS_POST_URL if self._is_https else self._POST_URL,
+                key),
+            data=json.dumps(ops_params),
+            headers={'Content-Type': 'application/json'},
+            **kwargs)
 
     def _construct_ops(self, url, params):
         return '{}?{}'.format(url, urlencode(

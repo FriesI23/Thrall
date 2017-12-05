@@ -110,6 +110,8 @@ class NamedURL(tuple):
     ('name', 'url', 'v1', 'xxx')
     >>> NamedURL.from_args('name', 'http://x.x/1/2', 'v1', 'xxx').path
     '/1/2'
+    >>> NamedURL.from_args('name', 'http://x.x/1/2', 'v1', 'xxx').https_url
+    'https://x.x/1/2'
     """
     name = property(itemgetter(0))
     url = property(itemgetter(1))
@@ -126,6 +128,11 @@ class NamedURL(tuple):
     @property
     def path(self):
         return urlparse(getattr(self, 'url')).path
+
+    @property
+    def https_url(self):
+        return 'https://{url}'.format(
+            url=getattr(self, 'url').split('//')[1])
 
 
 def is_func_bound(method, instance=None):
