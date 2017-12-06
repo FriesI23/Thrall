@@ -22,6 +22,11 @@ class BusinessArea(BaseData, LocationMixin):
     _properties = ('id', 'name', 'location')
 
 
+class Children(BaseData, LocationMixin):
+    _properties = ('id', 'name', 'sname', 'location', 'address',
+                   'distance', 'subtype')
+
+
 class IndoorData(BaseData):
     _properties = ('cpid', 'floor', 'truefloor')
 

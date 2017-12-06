@@ -539,6 +539,9 @@ class TestSearchData(object):
             elif m == 'biz_ext':
                 assert o is not getattr(model, m)
                 assert isinstance(o, _search_model.BizExt)
+            elif m == 'children':
+                assert o is not getattr(model, m)
+                assert isinstance(o, list)
             else:
                 assert o is None
 
