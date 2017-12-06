@@ -73,7 +73,7 @@ class HomeOrCorpControl(IntEnum):
 
     @property
     def param(self):
-        return self
+        return self.value
 
 
 class SortRule(IntEnum):
@@ -121,7 +121,7 @@ class ChildrenFlag(IntEnum):
 
     @property
     def param(self):
-        return self
+        return self.value
 
 
 class DataType(IntEnum):
