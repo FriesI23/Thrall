@@ -30,8 +30,10 @@ class SearchTextRequestParams(BaseRequestParams):
 
     def __init__(self, keywords=None, types=None, city=None, city_limit=None,
                  children=None, offset=None, page=None, building=None,
-                 floor=None, sort_rule=None, extensions=None, **kwargs):
+                 floor=None, sort_rule=None, extensions=None,
+                 location=None, **kwargs):
         self.keywords = keywords
+        self.location = location
         self.types = types
         self.city = city
         self.city_limit = city_limit
@@ -61,6 +63,7 @@ class SearchTextRequestParams(BaseRequestParams):
         with self.prepare_basic(_p) as p:
             p.prepare(
                 keywords=self.keywords,
+                location=self.location,
                 types=self.types,
                 city=self.city,
                 city_limit=self.city_limit,
@@ -118,6 +121,7 @@ class SearchAroundRequestParams(BaseRequestParams):
 class PreparedSearchMixin(object):
     def __init__(self):
         self.keywords = None
+        self.location = None
         self.types = None
         self.offset = None
         self.page = None
@@ -127,6 +131,13 @@ class PreparedSearchMixin(object):
     def prepare_keywords(self, keywords):
         if keywords is not None:
             self.keywords = prepare_multi_address(keywords)
+
+    def prepare_location(self, location):
+        if location is not None:
+            r = prepare_multi_locations(location)
+
+            if r:
+                self.location = r[0]
 
     def prepare_types(self, types):
         if types is not None:
@@ -165,6 +176,11 @@ class PreparedSearchMixin(object):
             return merge_multi_address(self.keywords)
 
     @property
+    def prepared_location(self):
+        if self.location is not None:
+            return merge_location(*self.location)
+
+    @property
     def prepared_types(self):
         if self.types is not None:
             return merge_multi_poi(self.types)
@@ -195,6 +211,7 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
     def __init__(self):
         super(PreparedSearchTextRequestParams, self).__init__()
         self.keywords = None
+        self.location = None
         self.types = None
         self.city = None
         self.city_limit = None
@@ -208,8 +225,10 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
 
     def prepare(self, keywords=None, types=None, city=None, city_limit=None,
                 children=None, offset=None, page=None, building=None,
-                floor=None, sort_rule=None, extensions=None, **kwargs):
+                floor=None, sort_rule=None, extensions=None,
+                location=None, **kwargs):
         self.prepare_keywords(keywords)
+        self.prepare_location(location)
         self.prepare_types(types)
         self.prepare_city(city)
         self.prepare_city_limit(city_limit)
@@ -277,6 +296,7 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
         _p = {}
         optional_params = {
             'keywords': self.prepared_keywords,
+            'location': self.prepared_location,
             'types': self.prepared_types,
             'city': self.prepared_city,
             'citylimit': self.prepared_city_limit,
@@ -322,13 +342,6 @@ class PreparedSearchAroundRequestParams(BasePreparedRequestParams,
         self.prepare_extension(extensions)
         self.prepare_base(**kwargs)
 
-    def prepare_location(self, location):
-        if location is not None:
-            r = prepare_multi_locations(location)
-
-            if r:
-                self.location = r[0]
-
     def prepare_city(self, city):
         if city is not None:
             self.city = unicode(city)
@@ -340,11 +353,6 @@ class PreparedSearchAroundRequestParams(BasePreparedRequestParams,
         #         msg='re_geo radius range must in 0~50000m')
 
         self.radius = radius
-
-    @property
-    def prepared_location(self):
-        if self.location is not None:
-            return merge_location(*self.location)
 
     @property
     def prepared_city(self):
