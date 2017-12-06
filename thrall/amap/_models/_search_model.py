@@ -22,7 +22,7 @@ from ._base_model import (
     Extensions,
     LocationMixin,
 )
-from ._common_model import BizExt, IndoorData, Photos
+from ._common_model import BizExt, IndoorData, Photos, Children
 
 
 class SearchTextRequestParams(BaseRequestParams):
@@ -423,7 +423,8 @@ class SearchData(BaseData, LocationMixin):
                    'cityname', 'adcode', 'adname', 'entr_location',
                    'exit_location', 'navi_poiid', 'gridcode', 'alias',
                    'business_area', 'parking_type', 'indoor_map',
-                   'indoor_data', 'business_area', 'biz_ext', 'photos')
+                   'indoor_data', 'business_area', 'biz_ext', 'photos',
+                   'children')
 
     def decode_param(self, p, data):
         if p == 'indoor_data':
@@ -432,9 +433,15 @@ class SearchData(BaseData, LocationMixin):
             return self.decode_biz_ext(data)
         elif p == 'photos':
             return self.decode_photos(data)
+        elif p == 'children':
+            return self.decode_children(data)
 
     def decode_indoor_data(self, data):
         return IndoorData(data.get('indoor_data'), static=self._static)
+
+    def decode_children(self, data):
+        datas = data.get('children')
+        return [Children(d, self._static) for d in datas] if datas else []
 
     def decode_biz_ext(self, data):
         return BizExt(data.get('biz_ext'), static=self._static)
