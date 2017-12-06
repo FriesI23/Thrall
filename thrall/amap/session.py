@@ -101,10 +101,14 @@ class AMapSession(SessionHookMixin):
         self.mount(self._B_REQUEST, AMapBatchRequest())
 
         self._defaults.set_default(key=default_key,
-                                   private_key=default_private_key)
+                                   private_key=default_private_key,
+                                   response_hook=None,
+                                   prepared_hook=None)
         self._batch_default.set_default(key=default_key,
                                         url_pairs=default_batch_urls,
-                                        decode_pairs=default_batch_decoders)
+                                        decode_pairs=default_batch_decoders,
+                                        prepared_hook=None,
+                                        response_hook=None)
 
     def mount(self, schema, adapter):
         if schema == self._ENCODE:
@@ -138,14 +142,11 @@ class AMapSession(SessionHookMixin):
     def batch(self, *args, **kwargs):
         return self._batch_default(self._batch)(*args, **kwargs)
 
-    def _batch(self, batch_list, key=None, url_pairs=None, decode_pairs=None,
-               prepared_hook=None, response_hook=None, **kwargs):
+    def _batch(self, decode_pairs, prepared_hook, response_hook,
+               *args, **kwargs):
         route_key = RouteKey.BATCH.value
 
-        p = self.encoder.encode_batch(batch_list=batch_list,
-                                      url_pairs=url_pairs,
-                                      key=key,
-                                      **kwargs)
+        p = self.encoder.encode_batch(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.brequest.get_batch(p)
@@ -159,13 +160,10 @@ class AMapSession(SessionHookMixin):
     def geo_code(self, *args, **kwargs):
         return self._defaults(self._geo_code)(*args, **kwargs)
 
-    def _geo_code(self, address, city=None, prepared_hook=None,
-                  response_hook=None, **kwargs):
+    def _geo_code(self, prepared_hook, response_hook, *args, **kwargs):
         route_key = 'geo_code'
 
-        p = self.encoder.encode_geo_code(address=address,
-                                         city=city,
-                                         **kwargs)
+        p = self.encoder.encode_geo_code(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_geo_code(p)
@@ -178,15 +176,10 @@ class AMapSession(SessionHookMixin):
     def regeo_code(self, *args, **kwargs):
         return self._defaults(self._regeo_code)(*args, **kwargs)
 
-    def _regeo_code(self, location, radius=None, batch=None, extensions=None,
-                    prepared_hook=None, response_hook=None, **kwargs):
+    def _regeo_code(self, prepared_hook, response_hook, *args, **kwargs):
         route_key = RouteKey.REGEO_CODE.value
 
-        p = self.encoder.encode_regeo_code(location=location,
-                                           radius=radius,
-                                           extensions=extensions,
-                                           batch=batch,
-                                           **kwargs)
+        p = self.encoder.encode_regeo_code(*args, **kwargs)
 
         self._run_prepared_hook(route_key, p, prepared_hook)
         r = self.request.get_regeo_code(p)
@@ -199,26 +192,11 @@ class AMapSession(SessionHookMixin):
     def search_text(self, *args, **kwargs):
         return self._defaults(self._search_text)(*args, **kwargs)
 
-    def _search_text(self, keywords=None, location=None, types=None, city=None,
-                     city_limit=None, children=None, offset=None, page=None,
-                     building=None, floor=None, sort_rule=None,
-                     extensions=None, prepared_hook=None, response_hook=None,
-                     **kwargs):
+    def _search_text(self, prepared_hook, response_hook, *args, **kwargs):
         route_key = RouteKey.SEARCH_TEXT.value
 
-        p = self.encoder.encode_search_text(keywords=keywords,
-                                            location=location,
-                                            types=types,
-                                            city=city,
-                                            city_limit=city_limit,
-                                            children=children,
-                                            offset=offset,
-                                            page=page,
-                                            building=building,
-                                            floor=floor,
-                                            sort_rule=sort_rule,
-                                            extensions=extensions,
-                                            **kwargs)
+        p = self.encoder.encode_search_text(*args, **kwargs)
+
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_search_text(p)
@@ -230,22 +208,10 @@ class AMapSession(SessionHookMixin):
     def search_around(self, *args, **kwargs):
         return self._defaults(self._search_around)(*args, **kwargs)
 
-    def _search_around(self, location=None, keywords=None, types=None,
-                       city=None, radius=None, sort_rule=None, offset=None,
-                       page=None, extensions=None, prepared_hook=None,
-                       response_hook=None, **kwargs):
+    def _search_around(self, prepared_hook, response_hook, *args, **kwargs):
         route_key = RouteKey.SEARCH_AROUND.value
 
-        p = self.encoder.encode_search_around(location=location,
-                                              keywords=keywords,
-                                              types=types,
-                                              city=city,
-                                              radius=radius,
-                                              sort_rule=sort_rule,
-                                              offset=offset,
-                                              page=page,
-                                              extensions=extensions,
-                                              **kwargs)
+        p = self.encoder.encode_search_around(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_search_around(p)
@@ -257,18 +223,10 @@ class AMapSession(SessionHookMixin):
     def suggest(self, *args, **kwargs):
         return self._defaults(self._suggest)(*args, **kwargs)
 
-    def _suggest(self, keyword=None, types=None, location=None, city=None,
-                 city_limit=None, data_type=None, prepared_hook=None,
-                 response_hook=None, **kwargs):
+    def _suggest(self, prepared_hook, response_hook, *args, **kwargs):
         route_key = RouteKey.SUGGEST.value
 
-        p = self.encoder.encode_suggest(keyword=keyword,
-                                        types=types,
-                                        location=location,
-                                        city=city,
-                                        city_limit=city_limit,
-                                        data_type=data_type,
-                                        **kwargs)
+        p = self.encoder.encode_suggest(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_suggest(p)
@@ -280,14 +238,10 @@ class AMapSession(SessionHookMixin):
     def distance(self, *args, **kwargs):
         return self._defaults(self._distance)(*args, **kwargs)
 
-    def _distance(self, origins=None, destination=None, type=None,
-                  prepared_hook=None, response_hook=None, **kwargs):
+    def _distance(self, prepared_hook, response_hook, *args, **kwargs):
         route_key = RouteKey.DISTANCE.value
 
-        p = self.encoder.encode_distance(origins=origins,
-                                         destination=destination,
-                                         type=type,
-                                         **kwargs)
+        p = self.encoder.encode_distance(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_distance(p)
@@ -300,13 +254,10 @@ class AMapSession(SessionHookMixin):
     def riding(self, *args, **kwargs):
         return self._defaults(self._riding)(*args, **kwargs)
 
-    def _riding(self, origin=None, destination=None, prepared_hook=None,
-                response_hook=None, **kwargs):
+    def _riding(self, prepared_hook, response_hook, *args, **kwargs):
         route_key = RouteKey.NAVI_RIDING.value
 
-        p = self.encoder.encode_riding(origin=origin,
-                                       destination=destination,
-                                       **kwargs)
+        p = self.encoder.encode_riding(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_riding(p)
@@ -319,13 +270,10 @@ class AMapSession(SessionHookMixin):
     def walking(self, *args, **kwargs):
         return self._defaults(self._walking)(*args, **kwargs)
 
-    def _walking(self, origin=None, destination=None, prepared_hook=None,
-                 response_hook=None, **kwargs):
+    def _walking(self, prepared_hook, response_hook, *args, **kwargs):
         route_key = RouteKey.NAVI_WAKLING.value
 
-        p = self.encoder.encode_walking(origin=origin,
-                                        destination=destination,
-                                        **kwargs)
+        p = self.encoder.encode_walking(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_walking(p)
@@ -338,13 +286,10 @@ class AMapSession(SessionHookMixin):
     def driving(self, *args, **kwargs):
         return self._defaults(self._driving)(*args, **kwargs)
 
-    def _driving(self, origin=None, destination=None, prepared_hook=None,
-                 response_hook=None, **kwargs):
+    def _driving(self, prepared_hook, response_hook, *args, **kwargs):
         route_key = RouteKey.NAVI_DRIVING.value
 
-        p = self.encoder.encode_driving(origin=origin,
-                                        destination=destination,
-                                        **kwargs)
+        p = self.encoder.encode_driving(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
 
         r = self.request.get_driving(p)
