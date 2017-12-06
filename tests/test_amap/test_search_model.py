@@ -124,6 +124,23 @@ class TestPreparedSearchMixin(object):
         assert model.prepared_keywords is None
         assert _search_model.merge_multi_address.call_count == 0
 
+    @pytest.mark.parametrize('data, result, p_result', [
+        ('123,45', (123, 45), '123.000000,45.000000'),
+        ('123,45|223,34', (123, 45), '123.000000,45.000000'),
+        (['123,45'], (123, 45), '123.000000,45.000000'),
+        ([(123, 45)], (123, 45), '123.000000,45.000000'),
+    ])
+    def test_prepare_location(self, mocker, data, result, p_result):
+        model = _search_model.PreparedSearchMixin()
+
+        mocker.spy(_search_model, 'prepare_multi_locations')
+        model.prepare_location(data)
+
+        assert model.location == result
+        assert model.prepared_location == p_result
+
+        _search_model.prepare_multi_locations.assert_called_once_with(data)
+
     def test_prepare_types(self, mocker):
         model = _search_model.PreparedSearchMixin()
 
@@ -235,6 +252,7 @@ class TestPreparedSearchTextRequestParams(object):
         model = _search_model.PreparedSearchTextRequestParams()
 
         model.prepare_keywords = lambda x: 'keywords'
+        model.prepare_location = lambda x: 'location'
         model.prepare_types = lambda x: 'types'
         model.prepare_city = lambda x: 'city'
         model.prepare_city_limit = lambda x: 'city_limit'
@@ -249,11 +267,12 @@ class TestPreparedSearchTextRequestParams(object):
         for i in ['prepare_keywords', 'prepare_types', 'prepare_city',
                   'prepare_city_limit', 'prepare_children', 'prepare_offset',
                   'prepare_page', 'prepare_building', 'prepare_floor',
-                  'prepare_sort_rule', 'prepare_extension']:
+                  'prepare_sort_rule', 'prepare_extension',
+                  'prepare_location']:
             mocker.spy(model, i)
 
         model.prepare('keywords', 'types', 'city', True, True,
-                      1, 1, 'building', 'floor', 'all', True)
+                      1, 1, 'building', 'floor', 'all', True, '12,34')
 
         model.prepare_keywords.assert_called_once_with('keywords')
         model.prepare_types.assert_called_once_with('types')
@@ -266,6 +285,7 @@ class TestPreparedSearchTextRequestParams(object):
         model.prepare_floor.assert_called_once_with('floor')
         model.prepare_sort_rule.assert_called_once_with('all')
         model.prepare_extension.assert_called_once_with(True)
+        model.prepare_location.assert_called_once_with('12,34')
 
     @pytest.mark.parametrize('input, output', [
         ('xxx', u'xxx'), (123, u'123'), (u'上海', u'上海'), (None, None),
@@ -336,10 +356,11 @@ class TestPreparedSearchTextRequestParams(object):
           'key': None}),
         (dict(keywords=u'瓷器', types=[u'饮食', 'www'], city='',
               city_limit=False, children=True, offset=10, page=1,
-              building='xxxx', extensions=None),
+              building='xxxx', extensions=None, location=(123, 45)),
          {'keywords': u'瓷器', 'types': u'饮食|www', 'city': '',
           'citylimit': 'false', 'children': 1, 'offset': 10, 'page': 1,
-          'building': 'xxxx', 'key': None}),
+          'building': 'xxxx', 'key': None,
+          'location': '123.000000,45.000000'}),
         (dict(keywords=None, types=None, city=None,
               city_limit=None, children=None, offset=None, page=None,
               building=None, floor=None, extensions=None, key='xxx'),
@@ -389,23 +410,6 @@ class TestPreparedSearchAroundRequestParams(object):
         model.prepare_offset.assert_called_once_with(1)
         model.prepare_page.assert_called_once_with(1)
         model.prepare_extension.assert_called_once_with(True)
-
-    @pytest.mark.parametrize('data, result, p_result', [
-        ('123,45', (123, 45), '123.000000,45.000000'),
-        ('123,45|223,34', (123, 45), '123.000000,45.000000'),
-        (['123,45'], (123, 45), '123.000000,45.000000'),
-        ([(123, 45)], (123, 45), '123.000000,45.000000'),
-    ])
-    def test_prepare_location(self, mocker, data, result, p_result):
-        model = _search_model.PreparedSearchAroundRequestParams()
-
-        mocker.spy(_search_model, 'prepare_multi_locations')
-        model.prepare_location(data)
-
-        assert model.location == result
-        assert model.prepared_location == p_result
-
-        _search_model.prepare_multi_locations.assert_called_once_with(data)
 
     @pytest.mark.parametrize('data', [0, 500, 1000, 5000, 10000, 50000])
     def test_prepare_radius(self, data):
