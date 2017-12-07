@@ -54,7 +54,7 @@ class RoadLevel(IntEnum):
 
     @property
     def param(self):
-        return self
+        return self.value
 
 
 class HomeOrCorpControl(IntEnum):
