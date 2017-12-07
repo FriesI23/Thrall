@@ -78,8 +78,8 @@ class AMapSession(SessionHookMixin):
                              override_func=override_func)
         return hook(p)
 
-    def _run_response_hook(self, route_Key, r, override_func=None):
-        hook = self.get_hook(route_Key, self._RESPONSE_HOOK_PREFIX,
+    def _run_response_hook(self, route_key, r, override_func=None):
+        hook = self.get_hook(route_key, self._RESPONSE_HOOK_PREFIX,
                              override_func=override_func)
         return hook(r)
 
@@ -142,9 +142,11 @@ class AMapSession(SessionHookMixin):
     def batch(self, *args, **kwargs):
         return self._batch_default(self._batch)(*args, **kwargs)
 
-    def _batch(self, decode_pairs, prepared_hook, response_hook,
-               *args, **kwargs):
+    def _batch(self, *args, **kwargs):
         route_key = RouteKey.BATCH.value
+        decode_pairs = kwargs.pop('decode_pairs')
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
 
         p = self.encoder.encode_batch(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
@@ -160,8 +162,10 @@ class AMapSession(SessionHookMixin):
     def geo_code(self, *args, **kwargs):
         return self._defaults(self._geo_code)(*args, **kwargs)
 
-    def _geo_code(self, prepared_hook, response_hook, *args, **kwargs):
+    def _geo_code(self, *args, **kwargs):
         route_key = 'geo_code'
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
 
         p = self.encoder.encode_geo_code(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
@@ -176,8 +180,10 @@ class AMapSession(SessionHookMixin):
     def regeo_code(self, *args, **kwargs):
         return self._defaults(self._regeo_code)(*args, **kwargs)
 
-    def _regeo_code(self, prepared_hook, response_hook, *args, **kwargs):
+    def _regeo_code(self, *args, **kwargs):
         route_key = RouteKey.REGEO_CODE.value
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
 
         p = self.encoder.encode_regeo_code(*args, **kwargs)
 
@@ -192,8 +198,10 @@ class AMapSession(SessionHookMixin):
     def search_text(self, *args, **kwargs):
         return self._defaults(self._search_text)(*args, **kwargs)
 
-    def _search_text(self, prepared_hook, response_hook, *args, **kwargs):
+    def _search_text(self, *args, **kwargs):
         route_key = RouteKey.SEARCH_TEXT.value
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
 
         p = self.encoder.encode_search_text(*args, **kwargs)
 
@@ -208,8 +216,10 @@ class AMapSession(SessionHookMixin):
     def search_around(self, *args, **kwargs):
         return self._defaults(self._search_around)(*args, **kwargs)
 
-    def _search_around(self, prepared_hook, response_hook, *args, **kwargs):
+    def _search_around(self, *args, **kwargs):
         route_key = RouteKey.SEARCH_AROUND.value
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
 
         p = self.encoder.encode_search_around(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
@@ -223,8 +233,10 @@ class AMapSession(SessionHookMixin):
     def suggest(self, *args, **kwargs):
         return self._defaults(self._suggest)(*args, **kwargs)
 
-    def _suggest(self, prepared_hook, response_hook, *args, **kwargs):
+    def _suggest(self, *args, **kwargs):
         route_key = RouteKey.SUGGEST.value
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
 
         p = self.encoder.encode_suggest(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
@@ -238,8 +250,10 @@ class AMapSession(SessionHookMixin):
     def distance(self, *args, **kwargs):
         return self._defaults(self._distance)(*args, **kwargs)
 
-    def _distance(self, prepared_hook, response_hook, *args, **kwargs):
+    def _distance(self, *args, **kwargs):
         route_key = RouteKey.DISTANCE.value
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
 
         p = self.encoder.encode_distance(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
@@ -254,8 +268,10 @@ class AMapSession(SessionHookMixin):
     def riding(self, *args, **kwargs):
         return self._defaults(self._riding)(*args, **kwargs)
 
-    def _riding(self, prepared_hook, response_hook, *args, **kwargs):
+    def _riding(self, *args, **kwargs):
         route_key = RouteKey.NAVI_RIDING.value
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
 
         p = self.encoder.encode_riding(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
@@ -270,8 +286,10 @@ class AMapSession(SessionHookMixin):
     def walking(self, *args, **kwargs):
         return self._defaults(self._walking)(*args, **kwargs)
 
-    def _walking(self, prepared_hook, response_hook, *args, **kwargs):
+    def _walking(self, *args, **kwargs):
         route_key = RouteKey.NAVI_WAKLING.value
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
 
         p = self.encoder.encode_walking(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
@@ -286,8 +304,10 @@ class AMapSession(SessionHookMixin):
     def driving(self, *args, **kwargs):
         return self._defaults(self._driving)(*args, **kwargs)
 
-    def _driving(self, prepared_hook, response_hook, *args, **kwargs):
+    def _driving(self, *args, **kwargs):
         route_key = RouteKey.NAVI_DRIVING.value
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
 
         p = self.encoder.encode_driving(*args, **kwargs)
         self._run_prepared_hook(route_key, p, prepared_hook)
