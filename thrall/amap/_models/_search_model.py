@@ -18,7 +18,7 @@ from ..consts import ChildrenFlag, CityLimitFlag, ExtensionFlag, SortRule
 from ._base_model import (
     AMapBasePreparedRequestParams,
     AMapBaseRequestParams,
-    BaseResponseData,
+    AmapBaseResponseData,
     Extensions,
     LocationMixin,
 )
@@ -380,7 +380,7 @@ class PreparedSearchAroundRequestParams(AMapBasePreparedRequestParams,
             return params
 
 
-class SearchResponseData(BaseResponseData):
+class SearchResponseData(AmapBaseResponseData):
     ROUTE_KEY = RouteKey.SEARCH
 
     _SUGGESTION_ROUTE = 'suggestion'

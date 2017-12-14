@@ -15,6 +15,7 @@ from thrall.base import (
     BaseData,
     BaseRequestParams,
     BasePreparedRequestParams,
+    BaseResponseData,
 )
 from thrall.consts import OutputFmt, FORMAT_XML, FORMAT_JSON
 
@@ -244,6 +245,34 @@ class TestBaseRequest(object):
 
         with pytest.raises(VendorHTTPError):
             model.get('http://example.com', None)
+
+
+class TestBaseResponseDataNoImplement(object):
+    @pytest.mark.parametrize('param', ['status', 'status_msg',
+                                       'count', 'data'])
+    def test_params(self, param):
+        with pytest.raises(NotImplementedError):
+            raw_data = """{"status": "1", "info": "OK", "infocode": "10000",
+             "count": "1", "geocodes":[]}"""
+            model = BaseResponseData(raw_data, 0)
+            getattr(model, param)
+
+    def test_raise_for_status(self):
+        with pytest.raises(NotImplementedError):
+            raw_data = """{"status": "1", "info": "OK", "infocode": "10000",
+             "count": "1", "geocodes":[]}"""
+            model = BaseResponseData(raw_data, 0)
+            model.raise_for_status()
+
+
+class TestBaseResponseData(object):
+    def test_init_ok(self):
+        raw_data = """{"status": "1", "info": "OK", "infocode": "10000",
+         "count": "1", "geocodes":[]}"""
+        model = BaseResponseData(raw_data, 0)
+
+        assert model.version == 0
+        assert model._raw_data == raw_data
 
 
 class TestBaseData(object):

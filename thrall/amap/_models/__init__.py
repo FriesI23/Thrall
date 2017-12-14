@@ -1,14 +1,14 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-import logging as _log
+import logging as _logging
 
 from ._base_model import (
     Sig,
     Extensions,
     AMapBaseRequestParams,
     AMapBasePreparedRequestParams,
-    BaseResponseData,
+    AmapBaseResponseData,
 )
 from ._common_model import (
     Neighborhood,
@@ -83,7 +83,7 @@ from ._batch_model import (
 __all__ = [
     # base
     "Sig", "AMapBaseRequestParams", "AMapBasePreparedRequestParams",
-    "BaseResponseData", "Extensions",
+    "AmapBaseResponseData", "Extensions",
     # batch
     "BatchRequestParams", "PreparedBatchParams", "BatchResponseData",
     # common
@@ -121,12 +121,26 @@ __all__ = [
     "BaseRequestParams", "BasePreparedRequestParams",
 ]
 
+_TEMPATE = ("'{origin_module}' rename to '{this}' and origin name "
+            "will be deprecate and reuse in more basic module, "
+            "please import new module: {this}")
+
+_log = _logging.getLogger(__name__)
+
 
 class BaseRequestParams(AMapBaseRequestParams):
-    _log.warning('"BaseRequestParams" move to base module, please '
-                 'import "AMapBaseRequestParams"')
+    def __new__(cls, *args, **kwargs):
+        _log.warning(_TEMPATE.format(origin_module='BasePreparedRequestParams',
+                                     this='AMapBaseRequestParams'))
 
 
 class BasePreparedRequestParams(AMapBasePreparedRequestParams):
-    _log.warning('"AMapBasePreparedRequestParams" move to base module, please '
-                 'import "AMapBasePreparedRequestParams"')
+    def __new__(cls, *args, **kwargs):
+        _log.warning(_TEMPATE.format(origin_module='BasePreparedRequestParams',
+                                     this='AMapBasePreparedRequestParams'))
+
+
+class BaseResponseData(AmapBaseResponseData):
+    def __new__(cls, *args, **kwargs):
+        _log.warning(_TEMPATE.format(origin_module='BaseResponseData',
+                                     this='AmapBaseResponseData'))

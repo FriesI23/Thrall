@@ -6,7 +6,7 @@ from thrall.exceptions import amap_batch_status_exception
 from ._base_model import (
     AMapBasePreparedRequestParams,
     AMapBaseRequestParams,
-    BaseResponseData,
+    AmapBaseResponseData,
 )
 
 from thrall.utils import MapStatusMessage
@@ -92,7 +92,7 @@ class PreparedBatchParams(AMapBasePreparedRequestParams, BatchExcMixin):
         return {'url': url.path, 'params': params}
 
 
-class BatchResponseData(BaseResponseData, BatchExcMixin):
+class BatchResponseData(AmapBaseResponseData, BatchExcMixin):
     def __init__(self, raw_data, p, decode_pairs, static_mode=False):
         self.prepared_data = p
         self.decode_pairs = decode_pairs or {}

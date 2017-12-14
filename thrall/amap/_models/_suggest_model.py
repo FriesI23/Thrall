@@ -18,7 +18,7 @@ from ..consts import CityLimitFlag, DataType
 from ._base_model import (
     AMapBasePreparedRequestParams,
     AMapBaseRequestParams,
-    BaseResponseData,
+    AmapBaseResponseData,
     LocationMixin
 )
 
@@ -213,7 +213,7 @@ class PreparedSuggestRequestParams(AMapBasePreparedRequestParams):
             return params
 
 
-class SuggestResponseData(BaseResponseData):
+class SuggestResponseData(AmapBaseResponseData):
     ROUTE_KEY = RouteKey.SUGGEST
 
     _ROUTE = 'tips'

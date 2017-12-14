@@ -103,7 +103,7 @@ class TestBaseResponseDataNoImplement(object):
         with pytest.raises(NotImplementedError):
             raw_data = """{"status": "1", "info": "OK", "infocode": "10000",
              "count": "1", "geocodes":[]}"""
-            model = _base_model.BaseResponseData(raw_data)
+            model = _base_model.AmapBaseResponseData(raw_data)
             model._get_data()
 
 
@@ -111,7 +111,7 @@ class TestBaseResponseData(object):
     def test_init_ok(self):
         raw_data = """{"status": "1", "info": "OK", "infocode": "10000",
          "count": "1", "geocodes":[]}"""
-        model = _base_model.BaseResponseData(raw_data)
+        model = _base_model.AmapBaseResponseData(raw_data)
         assert model.status == 1
         assert isinstance(model.status, StatusFlag)
         assert model.status_msg.code == 10000
@@ -126,7 +126,7 @@ class TestBaseResponseData(object):
     def test_repr(self):
         raw_data = """{"status": "1", "info": "OK", "infocode": "10000",
          "count": "1", "geocodes":[]}"""
-        model = _base_model.BaseResponseData(raw_data)
+        model = _base_model.AmapBaseResponseData(raw_data)
 
         for i in ['status=', 'status_msg=', 'count=', 'version=']:
             assert i in repr(model)
@@ -134,7 +134,7 @@ class TestBaseResponseData(object):
     def test_init_no_count(self):
         raw_data = """{"status": "1", "info": "OK", "infocode": "10000",
          "geocodes":[]}"""
-        model = _base_model.BaseResponseData(raw_data)
+        model = _base_model.AmapBaseResponseData(raw_data)
         assert model.status == 1
         assert model.status_msg.code == 10000
         assert model.status_msg.msg == 'OK'
@@ -147,7 +147,7 @@ class TestBaseResponseData(object):
     def test_init_err(self):
         raw_data = """{"status": "0", "info": "INVALID_USER_KEY",
          "infocode": "10001"}"""
-        model = _base_model.BaseResponseData(raw_data)
+        model = _base_model.AmapBaseResponseData(raw_data)
         assert model.status == 0
         assert model.status_msg.code == 10001
         assert model.status_msg.msg == 'INVALID_USER_KEY'
@@ -160,7 +160,7 @@ class TestBaseResponseData(object):
 
     def test_init_v4_ok(self):
         raw_data = '{"errcode": 0, "errdetail": null, "errmsg": "OK"}'
-        model = _base_model.BaseResponseData(raw_data, AMapVersion.V4)
+        model = _base_model.AmapBaseResponseData(raw_data, AMapVersion.V4)
         assert model.status == 1
         assert model.status_msg.code == 0
         assert model.status_msg.msg == 'OK'
@@ -172,7 +172,7 @@ class TestBaseResponseData(object):
         raw_data = """{"errcode": 30006,
         "errdetail": "您输入的起点信息有误,请检验是否符合接口使用规范",
         "errmsg": "INVALID_PARAMETER_VALUE"}"""
-        model = _base_model.BaseResponseData(raw_data, AMapVersion.V4)
+        model = _base_model.AmapBaseResponseData(raw_data, AMapVersion.V4)
         assert model.status == 0
         assert model.status_msg.code == 30006
         assert model.status_msg.msg == 'INVALID_PARAMETER_VALUE'
@@ -182,7 +182,7 @@ class TestBaseResponseData(object):
 
     def test_auto_check_version(self):
         raw_data = '{"errcode": 0, "errdetail": null, "errmsg": "OK"}'
-        meta_model = _base_model.BaseResponseData
+        meta_model = _base_model.AmapBaseResponseData
 
         version = meta_model.auto_check_version(raw_data, AMapVersion.V3)
 
@@ -191,7 +191,7 @@ class TestBaseResponseData(object):
     def test_auto_check_version_init(self):
         raw_data = """{"status": "1", "info": "OK", "infocode": "10000",
          "count": "1", "geocodes":[]}"""
-        model = _base_model.BaseResponseData(raw_data, auto_version=True)
+        model = _base_model.AmapBaseResponseData(raw_data, auto_version=True)
         assert model.status == 1
         assert model.status_msg.code == 10000
         assert model.status_msg.msg == 'OK'
@@ -201,7 +201,7 @@ class TestBaseResponseData(object):
 
     def test_auto_check_version_v4_init(self):
         raw_data = '{"errcode": 0, "errdetail": null, "errmsg": "OK"}'
-        model = _base_model.BaseResponseData(raw_data, auto_version=True)
+        model = _base_model.AmapBaseResponseData(raw_data, auto_version=True)
         assert model.status == 1
         assert model.status_msg.code == 0
         assert model.status_msg.msg == 'OK'
@@ -210,7 +210,7 @@ class TestBaseResponseData(object):
         assert model.count == 0
 
     def test_init_with_static_mode(self, mocker):
-        class Mock(_base_model.BaseResponseData):
+        class Mock(_base_model.AmapBaseResponseData):
             def get_data(self, raw_data, static=False): return 123
 
         data = """{"status": "1", "info": "OK", "infocode": "10000",

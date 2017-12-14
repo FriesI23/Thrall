@@ -295,6 +295,40 @@ class BaseRequest(object):
             raise VendorRequestError(str(err), data=err)
 
 
+class BaseResponseData(object):
+    ROUTE_KEY = RouteKey.UNKNOWN
+    REPR_PARAMS = ['status', 'status_msg', 'count', 'version']
+
+    def __init__(self, raw_data, version):
+        self._raw_data = raw_data
+        self.version = version
+
+    def __unicode__(self):
+        return repr_params(self.REPR_PARAMS, self.__class__.__name__, self)
+
+    def __repr__(self):
+        return self.__unicode__()
+
+    @property
+    def status(self):
+        raise NotImplementedError
+
+    @property
+    def status_msg(self):
+        raise NotImplementedError
+
+    @property
+    def count(self):
+        raise NotImplementedError
+
+    @property
+    def data(self):
+        raise NotImplementedError
+
+    def raise_for_status(self):
+        raise NotImplementedError
+
+
 class BaseData(object):
     _properties = ()
 

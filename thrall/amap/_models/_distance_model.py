@@ -18,7 +18,7 @@ from ..consts import DistanceType
 from ._base_model import (
     AMapBasePreparedRequestParams,
     AMapBaseRequestParams,
-    BaseResponseData
+    AmapBaseResponseData
 )
 
 
@@ -101,7 +101,7 @@ class PreparedDistanceRequestParams(AMapBasePreparedRequestParams):
             return params
 
 
-class DistanceResponseData(BaseResponseData):
+class DistanceResponseData(AmapBaseResponseData):
     ROUTE_KEY = RouteKey.DISTANCE
     _ROUTE = 'results'
 

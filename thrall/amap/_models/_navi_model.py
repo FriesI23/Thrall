@@ -12,7 +12,7 @@ from ..common import (
 from ._base_model import (
     AMapBasePreparedRequestParams,
     AMapBaseRequestParams,
-    BaseResponseData,
+    AmapBaseResponseData,
 )
 
 
@@ -160,7 +160,7 @@ class NaviStepsBasic(BaseData):
                     for i in polyline.split(u';')]
 
 
-class NaviRidingResponseData(BaseResponseData):
+class NaviRidingResponseData(AmapBaseResponseData):
     ROUTE_KEY = RouteKey.NAVI_RIDING
     _ROUTE = 'data'
 
@@ -193,7 +193,7 @@ class RidingSteps(NaviStepsBasic):
                    'assistant_action')
 
 
-class NaviWalkingResponseData(BaseResponseData):
+class NaviWalkingResponseData(AmapBaseResponseData):
     ROUTE_KEY = RouteKey.NAVI_WAKLING
     _ROUTE = 'route'
 
@@ -227,7 +227,7 @@ class WalkingSteps(NaviStepsBasic):
                    'walk_type')
 
 
-class NaviDrivingResponseData(BaseResponseData):
+class NaviDrivingResponseData(AmapBaseResponseData):
     ROUTE_KEY = RouteKey.NAVI_DRIVING
     _ROUTE = 'route'
 

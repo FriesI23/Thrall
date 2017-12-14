@@ -8,9 +8,9 @@ from six import iteritems
 from thrall.base import (
     BaseRequestParams as B_RP,
     BasePreparedRequestParams as BP_RP,
+    BaseResponseData as B_RD,
 )
 from thrall.compat import unicode
-from thrall.consts import RouteKey
 from thrall.exceptions import amap_status_exception
 from thrall.utils import MapStatusMessage, repr_params
 
@@ -108,17 +108,15 @@ class AMapBasePreparedRequestParams(BP_RP):
             return self.sig.hashed_sig
 
 
-class BaseResponseData(object):
-    ROUTE_KEY = RouteKey.UNKNOWN
-
+class AmapBaseResponseData(B_RD):
     def __init__(self, raw_data, version=AMapVersion.V3,
                  auto_version=False, static_mode=False, raw_mode=False):
+        super(AmapBaseResponseData, self).__init__(raw_data=raw_data,
+                                                   version=version)
 
-        if raw_mode:
-            self._raw_data = raw_data
-        else:
+        if not raw_mode:
             self._raw_data = json_load_and_fix_amap_empty(raw_data)
-        self.version = version
+
         self._data = None
 
         if auto_version:
@@ -127,13 +125,6 @@ class BaseResponseData(object):
 
         if static_mode:
             self._data = self._get_static_data()
-
-    def __unicode__(self):
-        return repr_params(('status', 'status_msg', 'count', 'version'),
-                           self.__class__.__name__, self)
-
-    def __repr__(self):
-        return self.__unicode__()
 
     @property
     def status(self):

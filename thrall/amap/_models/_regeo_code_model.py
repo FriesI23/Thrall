@@ -16,7 +16,7 @@ from ..consts import BatchFlag, ExtensionFlag, HomeOrCorpControl, RoadLevel
 from ._base_model import (
     AMapBasePreparedRequestParams,
     AMapBaseRequestParams,
-    BaseResponseData,
+    AmapBaseResponseData,
     Extensions,
     LocationMixin
 )
@@ -203,7 +203,7 @@ class PreparedReGeoCodeRequestParams(AMapBasePreparedRequestParams):
             return params
 
 
-class ReGeoCodeResponseData(BaseResponseData):
+class ReGeoCodeResponseData(AmapBaseResponseData):
     ROUTE_KEY = RouteKey.REGEO_CODE
 
     _ROUTE_SINGLE = 'regeocode'

@@ -11,7 +11,7 @@ from ..common import merge_multi_address, prepare_multi_address
 from ._base_model import (
     AMapBasePreparedRequestParams,
     AMapBaseRequestParams,
-    BaseResponseData,
+    AmapBaseResponseData,
     LocationMixin
 )
 from ._common_model import Building, Neighborhood
@@ -115,7 +115,7 @@ class PreparedGeoCodeRequestParams(AMapBasePreparedRequestParams):
             return params
 
 
-class GeoCodeResponseData(BaseResponseData):
+class GeoCodeResponseData(AmapBaseResponseData):
     ROUTE_KEY = RouteKey.GEO_CODE
     _ROUTE = 'geocodes'
 
