@@ -2,6 +2,7 @@
 # coding: utf-8
 from __future__ import absolute_import
 
+import functools
 from contextlib import contextmanager
 
 from requests.adapters import HTTPAdapter
@@ -13,17 +14,69 @@ from requests.exceptions import (
     HTTPError
 )
 
+from thrall.utils import required_params
+from thrall.consts import RouteKey
 from thrall.compat import basestring
 from thrall.exceptions import (
     VendorRequestError,
     VendorConnectionError,
     VendorHTTPError,
+    VendorError,
 )
 
 from .hooks import SetDefault
 from .utils import builtin_names, is_func_bound, repr_params
 
 set_default = SetDefault
+
+
+class BaseRequestParams(object):
+    ROUTE_KEY = RouteKey.UNKNOWN
+
+    @required_params('key')
+    def __init__(self, key=None, output=None, private_key=None, callback=None,
+                 raw_params=None):
+        self.key = key
+        self.output = output
+        self.callback = callback
+        self.private_key = private_key
+        self._raw_params = raw_params
+
+    def prepare(self):
+        try:
+            return self.prepare_data()
+        except VendorError as err:
+            err.data = self
+            raise err
+
+    def prepare_data(self):
+        """ package request params
+
+            input  --> Nothing
+            output --> prepared object, type_extend: BasePreparedRequestParams
+
+            override example:
+
+                def prepare(self):
+                    p = BasePreparedRequestParams()
+                    p.prepare(**some_kwargs)
+                    return p
+
+            :raise NotImplementedError: this function need to be implement.
+        """
+        raise NotImplementedError
+
+    @contextmanager
+    def prepare_basic(self, p):
+        org_fun = p.prepare
+        new_fun = functools.partial(p.prepare, key=self.key,
+                                    pkey=self.private_key,
+                                    output=self.output,
+                                    callback=self.callback,
+                                    raw_params=self._raw_params)
+        p.prepare = new_fun
+        yield p
+        p.prepare = org_fun
 
 
 class BaseRequest(object):

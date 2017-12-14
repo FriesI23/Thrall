@@ -46,39 +46,11 @@ class TestExtensions(object):
         assert model.d == model._opt_options['d'] == []
 
 
-class TestBaseModelNoEmplement(object):
+class TestAMapBaseModelNoEmplement(object):
     def test_prepare(self):
         with pytest.raises(NotImplementedError):
             model = _base_model.BaseRequestParams(key='xxx')
             model.prepare()
-
-
-class TestBaseModel(object):
-    def test_base_request_params(self):
-        model = _base_model.BaseRequestParams(key='xxx')
-
-        assert model.key == 'xxx'
-        assert model.output == model.callback == model.private_key == model._raw_params is None
-
-    def test_base_request_params_no_key(self):
-        with pytest.raises(RuntimeError):
-            _base_model.BaseRequestParams(key=None)
-
-        with pytest.raises(RuntimeError):
-            _base_model.BaseRequestParams()
-
-    def test_base_request_catch_vendor_err(self):
-        class Mock(_base_model.BaseRequestParams):
-            def prepare_data(self):
-                raise VendorParamError('123')
-
-        model = Mock(key='xxx')
-
-        with pytest.raises(VendorParamError) as err:
-            model.prepare()
-
-        assert isinstance(err.value.data, model.__class__)
-        assert '123' in str(err.value)
 
 
 class TestBasePrepareModelNoEmplement(object):

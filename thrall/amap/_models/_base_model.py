@@ -2,15 +2,15 @@
 from __future__ import absolute_import
 
 import contextlib
-import functools
 from hashlib import md5
 
 from six import iteritems
 
+from thrall.base import BaseRequestParams
 from thrall.compat import unicode, urlparse
 from thrall.consts import FORMAT_JSON, FORMAT_XML, RouteKey
-from thrall.exceptions import VendorError, amap_status_exception
-from thrall.utils import MapStatusMessage, required_params, repr_params
+from thrall.exceptions import amap_status_exception
+from thrall.utils import MapStatusMessage, repr_params
 
 from ..common import json_load_and_fix_amap_empty, parse_location
 from ..consts import AMapVersion, ExtensionFlag, OutputFmt, StatusFlag
@@ -80,53 +80,11 @@ class Sig(object):
         return prepared_sig
 
 
-class BaseRequestParams(object):
-    ROUTE_KEY = RouteKey.UNKNOWN
-
-    @required_params('key')
-    def __init__(self, key=None, output=None, private_key=None, callback=None,
-                 raw_params=None):
-        self.key = key
-        self.output = output
-        self.callback = callback
-        self.private_key = private_key
-        self._raw_params = raw_params
-
-    def prepare(self):
-        try:
-            return self.prepare_data()
-        except VendorError as err:
-            err.data = self
-            raise err
+class AMapBaseRequestParams(BaseRequestParams):
+    """amap base request params --> same as base request params"""
 
     def prepare_data(self):
-        """ package request params
-
-            input  --> Nothing
-            output --> prepared object, type_extend: BasePreparedRequestParams
-
-            override example:
-
-                def prepare(self):
-                    p = BasePreparedRequestParams()
-                    p.prepare(**some_kwargs)
-                    return p
-
-            :raise NotImplementedError: this function need to be implement.
-        """
         raise NotImplementedError
-
-    @contextlib.contextmanager
-    def prepare_basic(self, p):
-        org_fun = p.prepare
-        new_fun = functools.partial(p.prepare, key=self.key,
-                                    pkey=self.private_key,
-                                    output=self.output,
-                                    callback=self.callback,
-                                    raw_params=self._raw_params)
-        p.prepare = new_fun
-        yield p
-        p.prepare = org_fun
 
 
 class BasePreparedRequestParams(object):

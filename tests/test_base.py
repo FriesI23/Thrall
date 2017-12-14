@@ -1,12 +1,53 @@
 # coding: utf-8
+# flake8: noqa
 
 import pytest
 import responses
 
 from requests.sessions import Session
 
-from thrall.exceptions import VendorHTTPError
-from thrall.base import BaseRequest, BaseAdapterMixin, BaseData
+from thrall.exceptions import VendorHTTPError, VendorParamError
+from thrall.base import (
+    BaseRequest,
+    BaseAdapterMixin,
+    BaseData,
+    BaseRequestParams
+)
+
+
+class TestBaseModelNoEmplement(object):
+    def test_prepare(self):
+        with pytest.raises(NotImplementedError):
+            model = BaseRequestParams(key='xxx')
+            model.prepare()
+
+
+class TestBaseModel(object):
+    def test_base_request_params(self):
+        model = BaseRequestParams(key='xxx')
+
+        assert model.key == 'xxx'
+        assert model.output == model.callback == model.private_key == model._raw_params is None
+
+    def test_base_request_params_no_key(self):
+        with pytest.raises(RuntimeError):
+            BaseRequestParams(key=None)
+
+        with pytest.raises(RuntimeError):
+            BaseRequestParams()
+
+    def test_base_request_catch_vendor_err(self):
+        class Mock(BaseRequestParams):
+            def prepare_data(self):
+                raise VendorParamError('123')
+
+        model = Mock(key='xxx')
+
+        with pytest.raises(VendorParamError) as err:
+            model.prepare()
+
+        assert isinstance(err.value.data, model.__class__)
+        assert '123' in str(err.value)
 
 
 class TestBaseRequest(object):
