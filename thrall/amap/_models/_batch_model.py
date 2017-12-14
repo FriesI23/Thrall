@@ -4,15 +4,15 @@ from __future__ import absolute_import
 from thrall.exceptions import amap_batch_status_exception
 
 from ._base_model import (
-    BasePreparedRequestParams,
-    BaseRequestParams,
+    AMapBasePreparedRequestParams,
+    AMapBaseRequestParams,
     BaseResponseData,
 )
 
 from thrall.utils import MapStatusMessage
 
 
-class BatchRequestParams(BaseRequestParams):
+class BatchRequestParams(AMapBaseRequestParams):
     def __init__(self, batch_list=None, key=None, url_pairs=None):
         if batch_list is None:
             batch_list = []
@@ -52,7 +52,7 @@ class BatchExcMixin(object):
         return result_list
 
 
-class PreparedBatchParams(BasePreparedRequestParams, BatchExcMixin):
+class PreparedBatchParams(AMapBasePreparedRequestParams, BatchExcMixin):
     def __init__(self, url_pairs=None):
         self.batch_list = []
         self.url_pairs = url_pairs

@@ -9,15 +9,15 @@ from thrall.utils import required_params
 
 from ..common import merge_multi_address, prepare_multi_address
 from ._base_model import (
-    BasePreparedRequestParams,
-    BaseRequestParams,
+    AMapBasePreparedRequestParams,
+    AMapBaseRequestParams,
     BaseResponseData,
     LocationMixin
 )
 from ._common_model import Building, Neighborhood
 
 
-class GeoCodeRequestParams(BaseRequestParams):
+class GeoCodeRequestParams(AMapBaseRequestParams):
     ROUTE_KEY = RouteKey.GEO_CODE
 
     @required_params('address')
@@ -51,7 +51,7 @@ class GeoCodeRequestParams(BaseRequestParams):
         return _p
 
 
-class PreparedGeoCodeRequestParams(BasePreparedRequestParams):
+class PreparedGeoCodeRequestParams(AMapBasePreparedRequestParams):
     ROUTE_KEY = RouteKey.GEO_CODE
 
     def __init__(self):

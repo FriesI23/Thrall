@@ -16,8 +16,8 @@ from ..common import (
 )
 from ..consts import ChildrenFlag, CityLimitFlag, ExtensionFlag, SortRule
 from ._base_model import (
-    BasePreparedRequestParams,
-    BaseRequestParams,
+    AMapBasePreparedRequestParams,
+    AMapBaseRequestParams,
     BaseResponseData,
     Extensions,
     LocationMixin,
@@ -25,7 +25,7 @@ from ._base_model import (
 from ._common_model import BizExt, IndoorData, Photos, Children
 
 
-class SearchTextRequestParams(BaseRequestParams):
+class SearchTextRequestParams(AMapBaseRequestParams):
     ROUTE_KEY = RouteKey.SEARCH_TEXT
 
     def __init__(self, keywords=None, types=None, city=None, city_limit=None,
@@ -80,7 +80,7 @@ class SearchTextRequestParams(BaseRequestParams):
         return p
 
 
-class SearchAroundRequestParams(BaseRequestParams):
+class SearchAroundRequestParams(AMapBaseRequestParams):
     ROUTE_KEY = RouteKey.SEARCH_AROUND
 
     @required_params('location')
@@ -204,7 +204,7 @@ class PreparedSearchMixin(object):
             return self.extensions.param
 
 
-class PreparedSearchTextRequestParams(BasePreparedRequestParams,
+class PreparedSearchTextRequestParams(AMapBasePreparedRequestParams,
                                       PreparedSearchMixin):
     ROUTE_KEY = RouteKey.SEARCH_TEXT
 
@@ -312,7 +312,7 @@ class PreparedSearchTextRequestParams(BasePreparedRequestParams,
             return params
 
 
-class PreparedSearchAroundRequestParams(BasePreparedRequestParams,
+class PreparedSearchAroundRequestParams(AMapBasePreparedRequestParams,
                                         PreparedSearchMixin):
     ROUTE_KEY = RouteKey.SEARCH_AROUND
 

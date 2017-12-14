@@ -99,8 +99,8 @@ class TestAMapSession(object):
             model.mount('code', AMapEncodeAdapter)
 
     def prepare_hook(self, p):
-        from thrall.amap.models import BasePreparedRequestParams
-        assert isinstance(p, BasePreparedRequestParams)
+        from thrall.amap.models import AMapBasePreparedRequestParams
+        assert isinstance(p, AMapBasePreparedRequestParams)
 
     def repsonse_hook(self, r):
         from requests.models import Response

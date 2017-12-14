@@ -10,6 +10,11 @@ class MapSource(IntEnum):
     BAIDU_MAP = 3
 
 
+class OutputFmt(IntEnum):
+    JSON = 1
+    XML = 2
+
+
 FORMAT_JSON = 'json'
 FORMAT_XML = 'xml'
 

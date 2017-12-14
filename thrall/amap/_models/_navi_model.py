@@ -10,13 +10,13 @@ from ..common import (
     prepare_first_location,
 )
 from ._base_model import (
-    BasePreparedRequestParams,
-    BaseRequestParams,
+    AMapBasePreparedRequestParams,
+    AMapBaseRequestParams,
     BaseResponseData,
 )
 
 
-class NavRequestParams(BaseRequestParams):
+class NavRequestParams(AMapBaseRequestParams):
 
     @required_params('origin', 'destination')
     def __init__(self, origin=None, destination=None, **kwargs):
@@ -65,7 +65,7 @@ class NaviDrivingRequestParams(NavRequestParams):
         return p
 
 
-class PreparedNaviRAndWRequestParams(BasePreparedRequestParams):
+class PreparedNaviRAndWRequestParams(AMapBasePreparedRequestParams):
     def __init__(self):
         self.origin = None
         self.destination = None

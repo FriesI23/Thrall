@@ -14,8 +14,8 @@ from ..common import (
 )
 from ..consts import BatchFlag, ExtensionFlag, HomeOrCorpControl, RoadLevel
 from ._base_model import (
-    BasePreparedRequestParams,
-    BaseRequestParams,
+    AMapBasePreparedRequestParams,
+    AMapBaseRequestParams,
     BaseResponseData,
     Extensions,
     LocationMixin
@@ -23,7 +23,7 @@ from ._base_model import (
 from ._common_model import Building, BusinessArea, Neighborhood, StreetNumber
 
 
-class ReGeoCodeRequestParams(BaseRequestParams):
+class ReGeoCodeRequestParams(AMapBaseRequestParams):
     ROUTE_KEY = RouteKey.REGEO_CODE
 
     @required_params('location')
@@ -83,7 +83,7 @@ class ReGeoCodeRequestParams(BaseRequestParams):
         return _p
 
 
-class PreparedReGeoCodeRequestParams(BasePreparedRequestParams):
+class PreparedReGeoCodeRequestParams(AMapBasePreparedRequestParams):
     ROUTE_KEY = RouteKey.REGEO_CODE
 
     def __init__(self):

@@ -16,13 +16,13 @@ from ..common import (
 )
 from ..consts import DistanceType
 from ._base_model import (
-    BasePreparedRequestParams,
-    BaseRequestParams,
+    AMapBasePreparedRequestParams,
+    AMapBaseRequestParams,
     BaseResponseData
 )
 
 
-class DistanceRequestParams(BaseRequestParams):
+class DistanceRequestParams(AMapBaseRequestParams):
     ROUTE_KEY = RouteKey.DISTANCE
 
     @required_params('origins', 'destination')
@@ -45,7 +45,7 @@ class DistanceRequestParams(BaseRequestParams):
         return p
 
 
-class PreparedDistanceRequestParams(BasePreparedRequestParams):
+class PreparedDistanceRequestParams(AMapBasePreparedRequestParams):
     ROUTE_KEY = RouteKey.DISTANCE
 
     def __init__(self):

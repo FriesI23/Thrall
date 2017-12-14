@@ -1,11 +1,13 @@
 # coding: utf-8
 from __future__ import absolute_import
 
+import logging as _log
+
 from ._base_model import (
     Sig,
     Extensions,
-    BaseRequestParams,
-    BasePreparedRequestParams,
+    AMapBaseRequestParams,
+    AMapBasePreparedRequestParams,
     BaseResponseData,
 )
 from ._common_model import (
@@ -80,7 +82,7 @@ from ._batch_model import (
 
 __all__ = [
     # base
-    "Sig", "BaseRequestParams", "BasePreparedRequestParams",
+    "Sig", "AMapBaseRequestParams", "AMapBasePreparedRequestParams",
     "BaseResponseData", "Extensions",
     # batch
     "BatchRequestParams", "PreparedBatchParams", "BatchResponseData",
@@ -115,4 +117,16 @@ __all__ = [
     "NaviDrivingRequestParams", "PreparedNaviDrivingRequestParams",
     "NaviDrivingResponseData", "NaviDrivingData", "DrivingPath",
     "DrivingSteps",
+    # deprecated module
+    "BaseRequestParams", "BasePreparedRequestParams",
 ]
+
+
+class BaseRequestParams(AMapBaseRequestParams):
+    _log.warning('"BaseRequestParams" move to base module, please '
+                 'import "AMapBaseRequestParams"')
+
+
+class BasePreparedRequestParams(AMapBasePreparedRequestParams):
+    _log.warning('"AMapBasePreparedRequestParams" move to base module, please '
+                 'import "AMapBasePreparedRequestParams"')

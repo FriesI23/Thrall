@@ -2,6 +2,9 @@
 # coding: utf-8
 from __future__ import absolute_import
 
+import logging
+from six import iteritems
+
 import functools
 from contextlib import contextmanager
 
@@ -15,8 +18,8 @@ from requests.exceptions import (
 )
 
 from thrall.utils import required_params
-from thrall.consts import RouteKey
-from thrall.compat import basestring
+from thrall.consts import RouteKey, OutputFmt, FORMAT_JSON, FORMAT_XML
+from thrall.compat import basestring, urlparse
 from thrall.exceptions import (
     VendorRequestError,
     VendorConnectionError,
@@ -77,6 +80,164 @@ class BaseRequestParams(object):
         p.prepare = new_fun
         yield p
         p.prepare = org_fun
+
+
+class BasePreparedRequestParams(object):
+    DEFAULT_URL = None
+    ROUTE_KEY = RouteKey.UNKNOWN
+    PARAMS_MAP = {
+        'key': 'key',
+        'output': 'output',
+        'callback': 'callback',
+        'sig': 'sig'
+    }
+
+    _logger = logging.getLogger(__name__)
+
+    def __init__(self):
+        self.key = None
+        self._pkey = None
+        self.output = None
+        self.callback = None
+        self._raw_params = None
+
+    def __unicode__(self):
+        params = [k for k, v in iteritems(self.__dict__) if
+                  not hasattr(v, '__call__')]
+        params.append('sig')
+        return repr_params(params, self.__class__.__name__, self)
+
+    def __repr__(self):
+        return self.__unicode__()
+
+    def generate_params(self):
+        """ generate prepared params without sig
+
+            input  --> self
+            output --> prepared params dict without `sig`.
+
+            override example:
+
+                def generate_params(self):
+                    optional_params = {..}
+                    with self.init_basic_params({}, optional_params) as p:
+                        # add required params
+                        return p
+
+            :raise NotImplementedError: this function need to be implement.
+        """
+        raise NotImplementedError
+
+    @property
+    def params(self):
+        p = self.generate_params()
+        p.update(
+            {self.PARAMS_MAP['sig']: self.prepared_sig} if self._pkey else {})
+        return p
+
+    def prepare(self, **kwargs):
+        """ called prepare data functions
+
+            input  --> kwargs witch need be package to dict
+            output --> Any
+
+            override example:
+
+                def prepare(self, a=1, b=2, c=3, key='xx'):
+                    # do custom prepare function
+                    # self.prepare_something(a=a, b=b, c=c)
+                    self.prepare_base(key=key)
+
+            :raise NotImplementedError: this function need to be implement.
+        """
+        raise NotImplementedError
+
+    def prepare_base(self, key=None, pkey=None, output=None, callback=None,
+                     raw_params=None):
+        self._pkey = pkey
+        self._raw_params = raw_params
+        self.prepare_key(key)
+        self.prepare_output(output)
+        self.prepare_callback(callback)
+
+    def prepare_key(self, key):
+        self.key = key
+
+    def prepare_output(self, output):
+        # if output is None:
+        #     return
+        #
+        # if isinstance(output, OutputFmt):
+        #     self.output = output
+        # else:
+        #     if output.lower() == FORMAT_JSON:
+        #         self.output = OutputFmt.JSON
+        #     elif output.lower() == FORMAT_XML:
+        #         self.output = OutputFmt.XML
+        self._logger.warning(
+            'output param deprecated, mandatory use json in output param.')
+        if output:
+            self.output = OutputFmt.JSON
+
+    def prepare_callback(self, callback):
+        if callback is None:
+            return
+
+        self.callback = urlparse(callback)
+
+    @property
+    def prepared_key(self):
+        return self.key
+
+    @property
+    def prepared_output(self):
+        if self.output == OutputFmt.JSON:
+            return FORMAT_JSON
+        elif self.output == OutputFmt.XML:
+            return FORMAT_XML
+
+    @property
+    def prepared_callback(self):
+        if self.callback is not None:
+            return self.callback.geturl()
+
+    @property
+    def sig(self):
+        """Achieve calibration function"""
+
+    @property
+    def prepared_sig(self):
+        """Achieve calibration function"""
+
+    @contextmanager
+    def init_basic_params(self, params, optionals=None):
+        new_params = self._init_basic_params(params)
+        self._init_optional_params(params, optionals)
+        # init raw_params
+        self._init_optional_params(params, self._raw_params)
+
+        yield new_params
+
+    def _init_basic_params(self, params):
+        params[self.PARAMS_MAP['key']] = self.prepared_key
+
+        params.update(
+            {self.PARAMS_MAP['output']: self.prepared_output}
+            if self.prepared_output else {})
+        params.update(
+            {self.PARAMS_MAP['callback']: self.prepared_callback}
+            if self.prepared_callback else {})
+
+        return params
+
+    @staticmethod
+    def _init_optional_params(params, optionals):
+
+        if optionals:
+            for opt, opt_v in iteritems(optionals):
+                params.update({opt: opt_v} if opt_v is not None else {})
+
+        return params
 
 
 class BaseRequest(object):

@@ -16,14 +16,14 @@ from ..common import (
 )
 from ..consts import CityLimitFlag, DataType
 from ._base_model import (
-    BasePreparedRequestParams,
-    BaseRequestParams,
+    AMapBasePreparedRequestParams,
+    AMapBaseRequestParams,
     BaseResponseData,
     LocationMixin
 )
 
 
-class SuggestRequestParams(BaseRequestParams):
+class SuggestRequestParams(AMapBaseRequestParams):
     ROUTE_KEY = RouteKey.SUGGEST
 
     @required_params('keyword')
@@ -54,7 +54,7 @@ class SuggestRequestParams(BaseRequestParams):
         return p
 
 
-class PreparedSuggestRequestParams(BasePreparedRequestParams):
+class PreparedSuggestRequestParams(AMapBasePreparedRequestParams):
     ROUTE_KEY = RouteKey.SUGGEST
 
     def __init__(self):

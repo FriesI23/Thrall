@@ -1,13 +1,11 @@
 # coding: utf-8
 # flake8: noqa
 import pytest
-from six import iteritems
 
 from thrall.amap._models import _base_model
-from thrall.amap.consts import (
-    OutputFmt, StatusFlag, AMapVersion, ExtensionFlag)
+from thrall.amap.consts import (StatusFlag, AMapVersion, ExtensionFlag)
 from thrall.utils import MapStatusMessage
-from thrall.exceptions import AMapStatusError, VendorParamError
+from thrall.exceptions import AMapStatusError
 
 
 class TestSig(object):
@@ -49,24 +47,24 @@ class TestExtensions(object):
 class TestAMapBaseModelNoEmplement(object):
     def test_prepare(self):
         with pytest.raises(NotImplementedError):
-            model = _base_model.BaseRequestParams(key='xxx')
+            model = _base_model.AMapBaseRequestParams(key='xxx')
             model.prepare()
 
 
-class TestBasePrepareModelNoEmplement(object):
+class TestAMapBasePrepareModelNoEmplement(object):
     def test_generate_params(self):
         with pytest.raises(NotImplementedError):
-            model = _base_model.BasePreparedRequestParams()
+            model = _base_model.AMapBasePreparedRequestParams()
             model.generate_params()
 
     def test_prepare(self):
         with pytest.raises(NotImplementedError):
-            model = _base_model.BasePreparedRequestParams()
+            model = _base_model.AMapBasePreparedRequestParams()
             model.prepare(a=1, b=2)
 
 
 class TestBasePrepareModel(object):
-    class _MockModel(_base_model.BasePreparedRequestParams):
+    class _MockModel(_base_model.AMapBasePreparedRequestParams):
 
         def generate_params(self):
             with self.init_basic_params({}) as p:
@@ -76,52 +74,16 @@ class TestBasePrepareModel(object):
             self.prepare_base(**kwargs)
 
     def test_basic(self):
-        _base_model.BasePreparedRequestParams()
+        _base_model.AMapBasePreparedRequestParams()
 
     def test_repr(self):
         model = self._MockModel()
         model.prepare(key='xxx', output='json', pkey='aaa',
                       raw_params={'a': 1})
 
-        for i in ['_MockModel(', 'key=xxx', 'output=json', 'sig=AMa',
-                  "_raw_params={'a': 1}"]:
+        for i in ['_MockModel(', 'key=xxx', 'output=1', 'sig=AMa',
+                  "_raw_params={'a': 1}", 'output=json']:
             assert i in repr(model)
-
-    def test_prepare_key(self):
-        model = _base_model.BasePreparedRequestParams()
-
-        model.prepare_key('key')
-        assert model.key == 'key'
-        assert model.prepared_key == 'key'
-
-    @pytest.mark.parametrize(
-        'output', ['json', 'Json', 'jSoN', OutputFmt.JSON])
-    def test_prepare_output_json(self, output):
-        model = _base_model.BasePreparedRequestParams()
-
-        model.prepare_output(output)
-        assert model.output == OutputFmt.JSON
-        assert model.prepared_output == 'json'
-
-    @pytest.mark.parametrize(
-        'output', ['xml', 'Xml', 'xMl', OutputFmt.XML])
-    def test_prepare_output_xml(self, output):
-        model = _base_model.BasePreparedRequestParams()
-
-        model.prepare_output(output)
-        assert model.output == OutputFmt.XML
-        assert model.prepared_output == 'xml'
-
-    def test_prepare_callback(self):
-        try:
-            from urlparse import ParseResult
-        except ImportError:
-            from urllib.parse import ParseResult
-
-        model = _base_model.BasePreparedRequestParams()
-
-        model.prepare_callback('http://www.google.com')
-        assert isinstance(model.callback, ParseResult)
 
     def test_sig(self):
         model = self._MockModel()
@@ -134,65 +96,6 @@ class TestBasePrepareModel(object):
         assert model.sig.private_key == model._pkey
         assert model.sig.unhash_sig == 'key=xxx&output=jsonhahaha'
         assert model.prepared_sig is not None
-
-    @pytest.mark.parametrize('kwargs, params', [
-        (dict(key='xxx'),
-         {'key': 'xxx'}),
-        (dict(key='x', output='json', pkey='xxx', callback='http://localhost'),
-         {'callback': 'http://localhost', 'key': 'x', 'output': 'json'}),
-        (dict(key='x', output='json', callback=None),
-         {'key': 'x', 'output': 'json'}),
-        (dict(key='x', output='json', callback=None, raw_params={'a': 1}),
-         {'key': 'x', 'output': 'json', 'a': 1}),
-        (dict(key='x', output='json', callback=None, raw_params={'key': '1'}),
-         {'key': '1', 'output': 'json'}),
-    ])
-    def test_init_basic_params(self, kwargs, params):
-        model = self._MockModel()
-
-        model.prepare_base(key=kwargs.get('key'),
-                           pkey=kwargs.get('pkey'),
-                           output=kwargs.get('output'),
-                           callback=kwargs.get('callback'),
-                           raw_params=kwargs.get('raw_params'))
-
-        with model.init_basic_params({}) as result:
-            for k, v in iteritems(params):
-                assert result[k] == v
-
-            assert len(result) == len(params)
-
-        if kwargs.get('pkey'):
-            assert model._pkey == kwargs['pkey']
-
-    def test_init_basic_params_with_optionals(self):
-        model = self._MockModel()
-
-        model.prepare_base(key='key',
-                           pkey='pkey',
-                           output='json',
-                           callback='http://localhost',
-                           raw_params={'xxx': 'yyy', 'hh': None})
-
-        optional_params = {
-            'have_it': 1,
-            'have_zero': 0,
-            'oh_no': None,
-            'ept_list': [],
-        }
-
-        with model.init_basic_params({}, optional_params) as result:
-            pass
-
-        assert result['key'] == 'key'
-        assert result['output'] == 'json'
-        assert result['callback'] == 'http://localhost'
-        assert result['have_it'] == 1
-        assert result['have_zero'] == 0
-        assert result['ept_list'] == []
-        assert result['xxx'] == 'yyy'
-        assert 'oh_no' not in result
-        assert 'hh' not in result
 
 
 class TestBaseResponseDataNoImplement(object):

@@ -1,19 +1,21 @@
 # coding: utf-8
 from __future__ import absolute_import
 
-import contextlib
 from hashlib import md5
 
 from six import iteritems
 
-from thrall.base import BaseRequestParams
-from thrall.compat import unicode, urlparse
-from thrall.consts import FORMAT_JSON, FORMAT_XML, RouteKey
+from thrall.base import (
+    BaseRequestParams as B_RP,
+    BasePreparedRequestParams as BP_RP,
+)
+from thrall.compat import unicode
+from thrall.consts import RouteKey
 from thrall.exceptions import amap_status_exception
 from thrall.utils import MapStatusMessage, repr_params
 
 from ..common import json_load_and_fix_amap_empty, parse_location
-from ..consts import AMapVersion, ExtensionFlag, OutputFmt, StatusFlag
+from ..consts import AMapVersion, ExtensionFlag, StatusFlag
 
 
 class Extensions(object):
@@ -80,118 +82,20 @@ class Sig(object):
         return prepared_sig
 
 
-class AMapBaseRequestParams(BaseRequestParams):
+class AMapBaseRequestParams(B_RP):
     """amap base request params --> same as base request params"""
 
     def prepare_data(self):
-        raise NotImplementedError
+        raise super(AMapBaseRequestParams, self).prepare_data()
 
 
-class BasePreparedRequestParams(object):
-    DEFAULT_URL = None
-    ROUTE_KEY = RouteKey.UNKNOWN
-
-    def __init__(self):
-        self.key = None
-        self._pkey = None
-        self.output = None
-        self.callback = None
-        self._raw_params = None
-
-    def __unicode__(self):
-        params = [k for k, v in iteritems(self.__dict__) if
-                  not hasattr(v, '__call__')]
-        params.append('sig')
-        return repr_params(params, self.__class__.__name__, self)
-
-    def __repr__(self):
-        return self.__unicode__()
-
-    def generate_params(self):
-        """ generate prepared params without sig
-
-            input  --> self
-            output --> prepared params dict without `sig`.
-
-            override example:
-
-                def generate_params(self):
-                    optional_params = {..}
-                    with self.init_basic_params({}, optional_params) as p:
-                        # add required params
-                        return p
-
-            :raise NotImplementedError: this function need to be implement.
-        """
-        raise NotImplementedError
-
-    @property
-    def params(self):
-        p = self.generate_params()
-        p.update({'sig': self.prepared_sig} if self._pkey else {})
-        return p
+class AMapBasePreparedRequestParams(BP_RP):
 
     def prepare(self, **kwargs):
-        """ called prepare data functions
+        return super(AMapBasePreparedRequestParams, self).prepare(**kwargs)
 
-            input  --> kwargs witch need be package to dict
-            output --> Any
-
-            override example:
-
-                def prepare(self, a=1, b=2, c=3, key='xx'):
-                    # do custom prepare function
-                    # self.prepare_something(a=a, b=b, c=c)
-                    self.prepare_base(key=key)
-
-            :raise NotImplementedError: this function need to be implement.
-        """
-        raise NotImplementedError
-
-    def prepare_base(self, key=None, pkey=None, output=None, callback=None,
-                     raw_params=None):
-        self._pkey = pkey
-        self._raw_params = raw_params
-        self.prepare_key(key)
-        self.prepare_output(output)
-        self.prepare_callback(callback)
-
-    def prepare_key(self, key):
-        self.key = key
-
-    def prepare_output(self, output):
-        if output is None:
-            return
-
-        if isinstance(output, OutputFmt):
-            self.output = output
-        else:
-            if output.lower() == FORMAT_JSON:
-                self.output = OutputFmt.JSON
-            elif output.lower() == FORMAT_XML:
-                self.output = OutputFmt.XML
-
-    def prepare_callback(self, callback):
-        if callback is None:
-            return
-
-        self.callback = urlparse(callback)
-
-    @property
-    def prepared_key(self):
-        return self.key
-
-    @property
-    def prepared_output(self):
-        if self.output == OutputFmt.JSON:
-            return FORMAT_JSON
-        elif self.output == OutputFmt.XML:
-            return FORMAT_XML
-
-    @property
-    def prepared_callback(self):
-        if self.callback is not None:
-            return self.callback.geturl()
+    def generate_params(self):
+        return super(AMapBasePreparedRequestParams, self).generate_params()
 
     @property
     def sig(self):
@@ -202,36 +106,6 @@ class BasePreparedRequestParams(object):
     def prepared_sig(self):
         if self._pkey:
             return self.sig.hashed_sig
-
-    @contextlib.contextmanager
-    def init_basic_params(self, params, optionals=None):
-        new_params = self._init_basic_params(params)
-        self._init_optional_params(params, optionals)
-        # init raw_params
-        self._init_optional_params(params, self._raw_params)
-
-        yield new_params
-
-    def _init_basic_params(self, params):
-        params['key'] = self.prepared_key
-
-        params.update(
-            {'output': self.prepared_output}
-            if self.prepared_output else {})
-        params.update(
-            {'callback': self.prepared_callback}
-            if self.prepared_callback else {})
-
-        return params
-
-    @staticmethod
-    def _init_optional_params(params, optionals):
-
-        if optionals:
-            for opt, opt_v in iteritems(optionals):
-                params.update({opt: opt_v} if opt_v is not None else {})
-
-        return params
 
 
 class BaseResponseData(object):
