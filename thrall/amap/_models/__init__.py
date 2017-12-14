@@ -4,7 +4,7 @@ from __future__ import absolute_import
 import logging as _logging
 
 from ._base_model import (
-    Sig,
+    AMapSig,
     Extensions,
     AMapBaseRequestParams,
     AMapBasePreparedRequestParams,
@@ -82,7 +82,7 @@ from ._batch_model import (
 
 __all__ = [
     # base
-    "Sig", "AMapBaseRequestParams", "AMapBasePreparedRequestParams",
+    "AMapSig", "AMapBaseRequestParams", "AMapBasePreparedRequestParams",
     "AmapBaseResponseData", "Extensions",
     # batch
     "BatchRequestParams", "PreparedBatchParams", "BatchResponseData",
@@ -144,3 +144,8 @@ class BaseResponseData(AmapBaseResponseData):
     def __new__(cls, *args, **kwargs):
         _log.warning(_TEMPATE.format(origin_module='BaseResponseData',
                                      this='AmapBaseResponseData'))
+
+
+class Sig(AMapSig):
+    def __new__(cls, *args, **kwargs):
+        _log.warning(_TEMPATE.format(origin_module='Sig', this='AmapSig'))

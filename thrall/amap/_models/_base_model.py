@@ -9,6 +9,7 @@ from thrall.base import (
     BaseRequestParams as B_RP,
     BasePreparedRequestParams as BP_RP,
     BaseResponseData as B_RD,
+    Sig as S,
 )
 from thrall.compat import unicode
 from thrall.exceptions import amap_status_exception
@@ -38,7 +39,7 @@ class Extensions(object):
         return ExtensionFlag.ALL if self._flag else ExtensionFlag.BASE
 
 
-class Sig(object):
+class AMapSig(S):
     """ AMap sig generator """
 
     def __init__(self, pkey, hash_fn=md5, kwargs=None):
@@ -54,16 +55,8 @@ class Sig(object):
         must implement digest function.
         :param kwargs: request params, same as request params.
         """
-        self.private_key = pkey
-        self.hash_func = hash_fn
+        super(AMapSig, self).__init__(pkey=pkey, hash_fn=hash_fn)
         self.kw = kwargs if kwargs is not None else {}
-
-    def __repr__(self):
-        return repr_params(['method', 'sig'],
-                           "AMap{}".format(self.__class__.__name__),
-                           self, default_value={
-                "method": self.hash_func.__name__.upper(),
-                "sig": u"'{}'".format(self.unhash_sig)})
 
     @property
     def hashed_sig(self):
@@ -100,7 +93,7 @@ class AMapBasePreparedRequestParams(BP_RP):
     @property
     def sig(self):
         if self._pkey:
-            return Sig(pkey=self._pkey, kwargs=self.generate_params())
+            return AMapSig(pkey=self._pkey, kwargs=self.generate_params())
 
     @property
     def prepared_sig(self):

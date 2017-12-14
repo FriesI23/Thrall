@@ -10,13 +10,13 @@ from thrall.exceptions import AMapStatusError
 
 class TestSig(object):
     def test_sig(self):
-        sig = _base_model.Sig('key', kwargs=dict(b=1, a=2, d=4, c=3))
+        sig = _base_model.AMapSig('key', kwargs=dict(b=1, a=2, d=4, c=3))
 
         assert sig.unhash_sig == 'a=2&b=1&c=3&d=4key'
         assert sig.hashed_sig is not None
 
     def test_repr(self):
-        sig = _base_model.Sig('key', kwargs=dict(b=1, a=2, d=4, c=3))
+        sig = _base_model.AMapSig('key', kwargs=dict(b=1, a=2, d=4, c=3))
 
         for i in ['AMapSig(', 'method=OPENSSL_MD5',
                   "sig='a=2&b=1&c=3&d=4key'"]:
@@ -91,7 +91,7 @@ class TestBasePrepareModel(object):
         model._pkey = 'hahaha'
         model.prepare_output('json')
 
-        assert isinstance(model.sig, _base_model.Sig)
+        assert isinstance(model.sig, _base_model.AMapSig)
 
         assert model.sig.private_key == model._pkey
         assert model.sig.unhash_sig == 'key=xxx&output=jsonhahaha'

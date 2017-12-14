@@ -33,6 +33,27 @@ from .utils import builtin_names, is_func_bound, repr_params
 set_default = SetDefault
 
 
+class Sig(object):
+    def __init__(self, pkey, hash_fn):
+        self.private_key = pkey
+        self.hash_func = hash_fn
+
+    def __repr__(self):
+        return repr_params(['method', 'sig'],
+                           "AMap{}".format(self.__class__.__name__),
+                           self, default_value={
+                "method": self.hash_func.__name__.upper(),
+                "sig": u"'{}'".format(self.unhash_sig)})
+
+    @property
+    def hashed_sig(self):
+        raise NotImplementedError
+
+    @property
+    def unhash_sig(self):
+        raise NotImplementedError
+
+
 class BaseRequestParams(object):
     ROUTE_KEY = RouteKey.UNKNOWN
 
