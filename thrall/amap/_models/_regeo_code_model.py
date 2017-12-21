@@ -362,4 +362,5 @@ class ReGeoAOI(BaseData):
                    'name',
                    'adcode',
                    'location',
-                   'area',)
+                   'area',
+                   'type')
