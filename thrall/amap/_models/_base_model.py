@@ -1,6 +1,8 @@
 # coding: utf-8
 from __future__ import absolute_import
 
+import logging
+
 import contextlib
 import functools
 from hashlib import md5
@@ -14,6 +16,8 @@ from thrall.utils import MapStatusMessage, required_params, repr_params
 
 from ..common import json_load_and_fix_amap_empty, parse_location
 from ..consts import AMapVersion, ExtensionFlag, OutputFmt, StatusFlag
+
+_logger = logging.getLogger(__name__)
 
 
 class Extensions(object):
@@ -205,13 +209,20 @@ class BasePreparedRequestParams(object):
         if output is None:
             return
 
+        def _show_warning():
+            if output == OutputFmt.XML or str(output).lower() == FORMAT_XML:
+                _logger.warning('XML support deprecated, Only support json.')
+
         if isinstance(output, OutputFmt):
-            self.output = output
+            _show_warning()
+            self.output = OutputFmt.JSON
         else:
             if output.lower() == FORMAT_JSON:
                 self.output = OutputFmt.JSON
             elif output.lower() == FORMAT_XML:
-                self.output = OutputFmt.XML
+                _show_warning()
+                # self.output = OutputFmt.XML
+                self.output = OutputFmt.JSON
 
     def prepare_callback(self, callback):
         if callback is None:
@@ -227,8 +238,9 @@ class BasePreparedRequestParams(object):
     def prepared_output(self):
         if self.output == OutputFmt.JSON:
             return FORMAT_JSON
-        elif self.output == OutputFmt.XML:
-            return FORMAT_XML
+        # elif self.output == OutputFmt.XML:
+        #     return FORMAT_XML        # elif self.output == OutputFmt.XML:
+        #     return FORMAT_XML
 
     @property
     def prepared_callback(self):
