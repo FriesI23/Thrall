@@ -90,7 +90,7 @@ class PreparedDistanceRequestParams(BasePreparedRequestParams):
     @property
     def prepared_type(self):
         if self.type is not None:
-            return self.type
+            return self.type.param
 
     def generate_params(self):
         _p = {}
