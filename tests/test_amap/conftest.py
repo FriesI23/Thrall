@@ -14,6 +14,7 @@ from thrall.amap.urls import (
     POI_SEARCH_AROUND_URL,
     POI_SEARCH_TEXT_URL,
     POI_SUGGEST_URL,
+    DISTRICT_URL,
     DISRANCE_URL,
     NAVI_RIDING_URL,
     NAVI_WALKING_URL,
@@ -82,6 +83,17 @@ def mock_suggest_result():
         url=re.compile('{}.*'.format(POI_SUGGEST_URL.url)),
         body=open(str(
             request_amap_result_dir().join('suggest_result.json'))).read(),
+        status=200,
+    )
+
+
+@pytest.fixture
+def mock_district_result():
+    return responses.Response(
+        method='GET',
+        url=re.compile('{}.*'.format(DISTRICT_URL.url)),
+        body=open(str(
+            request_amap_result_dir().join('district_result.json'))).read(),
         status=200,
     )
 

@@ -1,0 +1,158 @@
+{
+  "status": "1",
+  "info": "OK",
+  "infocode": "10000",
+  "count": "1",
+  "suggestion": {
+    "keywords": [],
+    "cities": []
+  },
+  "districts": [
+    {
+      "citycode": "021",
+      "adcode": "310000",
+      "name": "上海市",
+      "center": "121.473662,31.230372",
+      "level": "province",
+      "districts": [
+        {
+          "citycode": "021",
+          "adcode": "310100",
+          "name": "上海城区",
+          "center": "121.473662,31.230372",
+          "level": "city",
+          "districts": [
+            {
+              "citycode": "021",
+              "adcode": "310113",
+              "name": "宝山区",
+              "center": "121.489612,31.405457",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310151",
+              "name": "崇明区",
+              "center": "121.397421,31.623728",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310120",
+              "name": "奉贤区",
+              "center": "121.474055,30.917766",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310109",
+              "name": "虹口区",
+              "center": "121.505133,31.2646",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310101",
+              "name": "黄浦区",
+              "center": "121.484428,31.231739",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310114",
+              "name": "嘉定区",
+              "center": "121.265374,31.375869",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310116",
+              "name": "金山区",
+              "center": "121.342455,30.741798",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310106",
+              "name": "静安区",
+              "center": "121.447453,31.227906",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310112",
+              "name": "闵行区",
+              "center": "121.380831,31.1129",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310118",
+              "name": "青浦区",
+              "center": "121.124178,31.150681",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310115",
+              "name": "浦东新区",
+              "center": "121.544379,31.221517",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310107",
+              "name": "普陀区",
+              "center": "121.395514,31.249603",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310117",
+              "name": "松江区",
+              "center": "121.227747,31.032243",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310104",
+              "name": "徐汇区",
+              "center": "121.436128,31.188464",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310110",
+              "name": "杨浦区",
+              "center": "121.525727,31.259822",
+              "level": "district",
+              "districts": []
+            },
+            {
+              "citycode": "021",
+              "adcode": "310105",
+              "name": "长宁区",
+              "center": "121.424622,31.220372",
+              "level": "district",
+              "districts": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

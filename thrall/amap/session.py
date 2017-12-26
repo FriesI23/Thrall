@@ -23,6 +23,7 @@ BATCH_URL_DEFAULT_PAIRS = {
     RouteKey.NAVI_RIDING: urls.NAVI_RIDING_URL,
     RouteKey.NAVI_DRIVING: urls.NAVI_DRIVING_URL,
     RouteKey.NAVI_WAKLING: urls.NAVI_WALKING_URL,
+    RouteKey.DISTRICT: urls.DISTRICT_URL,
 }
 
 BATCH_DECODE_DEFAULT_PAIRS = {
@@ -36,6 +37,7 @@ BATCH_DECODE_DEFAULT_PAIRS = {
     RouteKey.NAVI_RIDING: models.NaviRidingResponseData,
     RouteKey.NAVI_WAKLING: models.NaviWalkingResponseData,
     RouteKey.NAVI_DRIVING: models.NaviDrivingResponseData,
+    RouteKey.DISTRICT: models.DistrictResponseData,
 }
 
 
@@ -245,6 +247,23 @@ class AMapSession(SessionHookMixin):
         self._run_response_hook(route_key, r, response_hook)
 
         d = self.decoder.decode_suggest(raw_data=r.content)
+        return d
+
+    def district(self, *args, **kwargs):
+        return self._defaults(self._district)(*args, **kwargs)
+
+    def _district(self, *args, **kwargs):
+        route_key = RouteKey.DISTRICT.value
+        prepared_hook = kwargs.pop('prepared_hook', None)
+        response_hook = kwargs.pop('response_hook', None)
+
+        p = self.encoder.encode_district(*args, **kwargs)
+        self._run_prepared_hook(route_key, p, prepared_hook)
+
+        r = self.request.get_district(p)
+        self._run_response_hook(route_key, r, response_hook)
+
+        d = self.decoder.decode_district(raw_data=r.content)
         return d
 
     def distance(self, *args, **kwargs):
