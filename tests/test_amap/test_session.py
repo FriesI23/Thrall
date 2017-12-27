@@ -155,6 +155,16 @@ class TestAMapSession(object):
             )
             result.raise_for_status()
 
+    def test_district(self, mock_district_result):
+        with responses.RequestsMock() as rsps:
+            rsps.add(mock_district_result)
+            result = AMapSession(default_key='x').district(
+                keyword='x',
+                prepared_hook=self.prepare_hook,
+                response_hook=self.repsonse_hook,
+            )
+            result.raise_for_status()
+
     def test_distance(self, mock_distance_result):
         with responses.RequestsMock() as rsps:
             rsps.add(mock_distance_result)

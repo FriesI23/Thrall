@@ -389,16 +389,18 @@ class BaseResponseData(object):
 
 
 class LocationMixin(object):
+    LOCATION_KEY = 'location'
+
     @property
     def latitude(self):
         try:
-            return parse_location(getattr(self, 'location'))[1]
+            return parse_location(getattr(self, self.LOCATION_KEY))[1]
         except Exception:
             return None
 
     @property
     def longitude(self):
         try:
-            return parse_location(getattr(self, 'location'))[0]
+            return parse_location(getattr(self, self.LOCATION_KEY))[0]
         except Exception:
             return None

@@ -46,6 +46,12 @@ from ._suggest_model import (
     SuggestResponseData,
     SuggestData,
 )
+from ._district_model import (
+    DistrictRequestParams,
+    PreparedDistrictRequestParams,
+    DistrictResponseData,
+    DistrictData,
+)
 from ._distance_model import (
     DistanceRequestParams,
     PreparedDistanceRequestParams,
@@ -101,6 +107,9 @@ __all__ = [
     # suggest
     "SuggestRequestParams", "PreparedSuggestRequestParams",
     "SuggestResponseData", "SuggestData",
+    # district
+    "DistrictRequestParams", "PreparedDistrictRequestParams",
+    "DistrictResponseData", "DistrictData",
     # distance
     "DistanceRequestParams", "PreparedDistanceRequestParams",
     "DistanceResponseData", "DistanceData",
