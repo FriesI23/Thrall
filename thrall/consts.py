@@ -30,4 +30,5 @@ class RouteKey(Enum):
     NAVI_RIDING = 'navi_riding'
     NAVI_WAKLING = 'navi_walking'
     NAVI_DRIVING = 'navi_driving'
+    DISTRICT = 'district'
     BATCH = 'batch'

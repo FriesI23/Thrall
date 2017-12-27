@@ -16,6 +16,8 @@ http://restapi.amap.com/v3/direction/walking
 http://restapi.amap.com/v3/direction/driving
 >>> print(NAVI_RIDING_URL)
 http://restapi.amap.com/v4/direction/bicycling
+>>> print(DISTRICT_URL)
+http://restapi.amap.com/v3/config/district
 """
 from __future__ import absolute_import
 
@@ -74,4 +76,10 @@ DISRANCE_URL = NamedURL.from_args(
     name='distance',
     url='http://restapi.amap.com/v3/distance',
     version=AMapVersion.V3,
+)
+
+DISTRICT_URL = NamedURL.from_args(
+    name='district',
+    url='http://restapi.amap.com/v3/config/district',
+    version=AMapVersion.V3
 )

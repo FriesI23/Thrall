@@ -131,6 +131,7 @@ class TestBasePrepareModel(object):
         assert model.output == OutputFmt.JSON
         assert model.prepared_output == 'json'
 
+    @pytest.mark.skip('deprecated after v0.1, only support json return')
     @pytest.mark.parametrize(
         'output', ['xml', 'Xml', 'xMl', OutputFmt.XML])
     def test_prepare_output_xml(self, output):
@@ -139,6 +140,15 @@ class TestBasePrepareModel(object):
         model.prepare_output(output)
         assert model.output == OutputFmt.XML
         assert model.prepared_output == 'xml'
+
+    @pytest.mark.parametrize(
+        'output', ['xml', 'Xml', 'xMl', OutputFmt.XML])
+    def test_prepare_output_xml_to_json(self, output):
+        model = _base_model.BasePreparedRequestParams()
+
+        model.prepare_output(output)
+        assert model.output == OutputFmt.JSON
+        assert model.prepared_output == 'json'
 
     def test_prepare_callback(self):
         try:

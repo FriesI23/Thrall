@@ -171,6 +171,10 @@ class DistanceType(IntEnum):
         elif data == 3:
             return cls.WALKING
 
+    @property
+    def param(self):
+        return self.value
+
 
 EXTENSION_BASE = 'base'
 EXTENSION_ALL = 'all'

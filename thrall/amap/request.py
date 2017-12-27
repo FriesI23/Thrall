@@ -16,6 +16,7 @@ from .urls import (
     NAVI_RIDING_URL,
     NAVI_DRIVING_URL,
     NAVI_WALKING_URL,
+    DISTRICT_URL,
 )
 from ..base import BaseRequest
 
@@ -51,6 +52,9 @@ class AMapRequest(BaseRequest):
 
     def get_suggest(self, p, **kwargs):
         return self.get_data(p, default_url=POI_SUGGEST_URL, **kwargs)
+
+    def get_district(self, p, **kwargs):
+        return self.get_data(p, default_url=DISTRICT_URL, **kwargs)
 
     def get_distance(self, p, **kwargs):
         return self.get_data(p, default_url=DISRANCE_URL, **kwargs)

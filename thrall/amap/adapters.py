@@ -14,6 +14,8 @@ from .models import (
     SearchTextRequestParams,
     SuggestRequestParams,
     SuggestResponseData,
+    DistrictRequestParams,
+    DistrictResponseData,
     NaviRidingRequestParams,
     NaviRidingResponseData,
     NaviWalkingRequestParams,
@@ -38,6 +40,7 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
         self.registry(self.encode_search_text, SearchTextRequestParams)
         self.registry(self.encode_search_around, SearchAroundRequestParams)
         self.registry(self.encode_suggest, SuggestRequestParams)
+        self.registry(self.encode_district, DistrictRequestParams)
         self.registry(self.encode_distance, DistanceRequestParams)
         self.registry(self.encode_riding, NaviRidingRequestParams)
         self.registry(self.encode_walking, NaviWalkingRequestParams)
@@ -61,6 +64,9 @@ class AMapEncodeAdapter(BaseEncoderAdapter):
 
     def encode_suggest(self, *args, **kwargs):
         return self.get_encoder('encode_suggest', *args, **kwargs)
+
+    def encode_district(self, *args, **kwargs):
+        return self.get_encoder('encode_district', *args, **kwargs)
 
     def encode_distance(self, *args, **kwargs):
         return self.get_encoder('encode_distance', *args, **kwargs)
@@ -98,6 +104,7 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
         self.registry(self.decode_search_text, SearchResponseData)
         self.registry(self.decode_search_around, SearchResponseData)
         self.registry(self.decode_suggest, SuggestResponseData)
+        self.registry(self.decode_district, DistrictResponseData)
         self.registry(self.decode_distance, DistanceResponseData)
         self.registry(self.decode_riding, NaviRidingResponseData)
         self.registry(self.decode_walking, NaviWalkingResponseData)
@@ -121,6 +128,9 @@ class AMapJsonDecoderAdapter(BaseDecoderAdapter):
 
     def decode_suggest(self, *args, **kwargs):
         return self.get_decoder('decode_suggest', *args, **kwargs)
+
+    def decode_district(self, *args, **kwargs):
+        return self.get_decoder('decode_district', *args, **kwargs)
 
     def decode_distance(self, *args, **kwargs):
         return self.get_decoder('decode_distance', *args, **kwargs)
