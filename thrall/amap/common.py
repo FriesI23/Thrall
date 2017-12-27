@@ -208,16 +208,27 @@ def json_load_and_fix_amap_empty(raw_data):
     >>> x['a'] == 'b' and x['cd_e'] is None
     True
     """
-
     def _json_load_hook(obj):
         if obj == _EMPTY_DICT:
             return
+
+        new_obj = {}
+        poped_items = []
 
         for k, w in iteritems(obj):
             if is_list_empty(w):
                 obj[k] = None
 
-            obj[camelcase_to_snakecase(k)] = obj.pop(k)
+            renamed_k = camelcase_to_snakecase(k)
+
+            if renamed_k != k:
+                new_obj[camelcase_to_snakecase(k)] = obj.get(k)
+                poped_items.append(k)
+
+        obj.update(new_obj)
+
+        for i in poped_items:
+            obj.pop(i)
 
         return obj
 
