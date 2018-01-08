@@ -104,6 +104,14 @@ class BaseData(object):
             msg = "'{0}' object has no attribute '{1}'"
             raise AttributeError(msg.format(type(self).__name__, name))
 
+    def __setattr__(self, name, value):
+        super(BaseData, self).__setattr__(name, value)
+
+        if name in ('_static', '_data'):
+            return
+
+        self._data[name] = value
+
     def __delattr__(self, name):
         _get_attr = False
 

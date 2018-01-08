@@ -110,6 +110,18 @@ class TestBaseData(object):
         assert model.c == []
         assert model.d == [1, 2]
 
+    @pytest.mark.parametrize('static', [True, False])
+    def test_set_attr(self, static):
+        raw_data = {'a': 1, 'b': '2', 'c': [], 'd': [1, 2]}
+
+        model = BaseData(raw_data, static=static)
+        model._properties = raw_data
+
+        model.a = 'xxx'
+
+        assert model.a == model.__dict__['a'] == 'xxx'
+        assert model._data['a'] == 'xxx'
+
     def test_del_attr(self):
         raw_data = {'a': 1, 'b': '2', 'c': [], 'd': [1, 2]}
 
