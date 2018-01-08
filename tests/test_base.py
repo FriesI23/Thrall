@@ -110,6 +110,26 @@ class TestBaseData(object):
         assert model.c == []
         assert model.d == [1, 2]
 
+    def test_del_attr(self):
+        raw_data = {'a': 1, 'b': '2', 'c': [], 'd': [1, 2]}
+
+        model = BaseData(raw_data)
+        model._properties = raw_data
+
+        del model.a
+
+        assert not hasattr(model, 'a')
+
+    def test_del_attr_static(self):
+        raw_data = {'a': 1, 'b': '2', 'c': [], 'd': [1, 2]}
+
+        model = BaseData(raw_data, static=True)
+        model._properties = raw_data
+
+        del model.a
+
+        assert not hasattr(model, 'a')
+
     def test_static_data(self, mocker):
         class Mock(BaseData):
             _properties = ('a', 'b', 'c', 'd')
