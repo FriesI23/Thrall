@@ -357,7 +357,7 @@ class ReGeoRoadInter(BaseData, LocationMixin):
                    'second_name',)
 
 
-class ReGeoAOI(BaseData):
+class ReGeoAOI(BaseData, LocationMixin):
     _properties = ('id',
                    'name',
                    'adcode',
