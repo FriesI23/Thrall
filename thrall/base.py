@@ -110,6 +110,9 @@ class BaseData(object):
         if name in ('_static', '_data'):
             return
 
+        if name in builtin_names:
+            name += u'_'
+
         self._data[name] = value
 
     def __delattr__(self, name):

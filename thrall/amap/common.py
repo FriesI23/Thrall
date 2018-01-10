@@ -222,7 +222,7 @@ def json_load_and_fix_amap_empty(raw_data):
             renamed_k = camelcase_to_snakecase(k)
 
             if renamed_k != k:
-                new_obj[camelcase_to_snakecase(k)] = obj.get(k)
+                new_obj[renamed_k] = obj.get(k)
                 poped_items.append(k)
 
         obj.update(new_obj)
