@@ -104,6 +104,32 @@ class BaseData(object):
             msg = "'{0}' object has no attribute '{1}'"
             raise AttributeError(msg.format(type(self).__name__, name))
 
+    def __setattr__(self, name, value):
+        super(BaseData, self).__setattr__(name, value)
+
+        if name in ('_static', '_data'):
+            return
+
+        if name in builtin_names:
+            name += u'_'
+
+        self._data[name] = value
+
+    def __delattr__(self, name):
+        _get_attr = False
+
+        if name in self.__dict__:
+            _get_attr = True
+            del self.__dict__[name]
+
+        if name in self._data:
+            _get_attr = True
+            del self._data[name]
+
+        if not _get_attr:
+            msg = "'{0}' object has no attribute '{1}'"
+            raise AttributeError(msg.format(type(self).__name__, name))
+
     def _decode(self, p):
         if p not in self._properties:
             raise KeyError(p)
