@@ -120,7 +120,10 @@ class TestBaseData(object):
         model.a = 'xxx'
 
         assert model.a == model.__dict__['a'] == 'xxx'
-        assert model._data['a'] == 'xxx'
+        if not static:
+            assert model._data['a'] == 'xxx'
+        else:
+            assert model._data['a'] == 1
 
     def test_del_attr(self):
         raw_data = {'a': 1, 'b': '2', 'c': [], 'd': [1, 2]}

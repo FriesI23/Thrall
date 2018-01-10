@@ -113,7 +113,8 @@ class BaseData(object):
         if name in builtin_names:
             name += u'_'
 
-        self._data[name] = value
+        if not self._static:
+            self._data[name] = value
 
     def __delattr__(self, name):
         _get_attr = False
