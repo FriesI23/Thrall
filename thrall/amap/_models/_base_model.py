@@ -6,6 +6,7 @@ import logging
 import contextlib
 import functools
 from hashlib import md5
+from shapely.geometry import Polygon, MultiPolygon
 
 from six import iteritems
 
@@ -404,3 +405,21 @@ class LocationMixin(object):
             return parse_location(getattr(self, self.LOCATION_KEY))[0]
         except Exception:
             return None
+
+
+class PolylineMixin(object):
+    POLYLINE_KEY = 'polyline'
+
+    @property
+    def geo_data(self):
+        def _decode_raw_polyline(raw_polygon):
+            return [parse_location(loc) for loc in raw_polygon.split(';')]
+
+        raw_data = getattr(self, 'polyline', None)
+
+        if raw_data:
+            raw_polygons = raw_data.split('|')
+
+            return MultiPolygon(
+                [Polygon(_decode_raw_polyline(i)) for i in
+                 raw_polygons])

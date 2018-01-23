@@ -3,6 +3,8 @@
 import pytest
 from six import iteritems
 
+from shapely.geometry import Polygon, MultiPolygon, Point
+
 from thrall.amap._models import _base_model
 from thrall.amap.consts import (
     OutputFmt, StatusFlag, AMapVersion, ExtensionFlag)
@@ -373,3 +375,20 @@ class TestLocationMixin(object):
 
         assert model.latitude is None
         assert model.longitude is None
+
+
+class TestGeoMixin(object):
+    def test_geo_data(self):
+        model = _base_model.PolylineMixin()
+        model.polyline = "0,0;0,1;1,1;1,0|1,1;1,2;2,2;2,1"
+
+        assert isinstance(model.geo_data, MultiPolygon)
+        assert isinstance(model.geo_data[0], Polygon)
+
+        assert model.geo_data.intersects(Point(0.5, 0.5))
+        assert not model.geo_data.intersects(Point(3, 3))
+
+    def test_geo_data_error(self):
+        model = _base_model.PolylineMixin()
+
+        assert model.geo_data is None
