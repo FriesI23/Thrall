@@ -23,6 +23,7 @@ requests = "*"
 "functools32" = "*"
 "enum34" = "*"
 future = "*"
+shapely = "*"
 
 
 [requires]
