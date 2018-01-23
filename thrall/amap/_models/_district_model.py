@@ -13,6 +13,7 @@ from ._base_model import (
     BasePreparedRequestParams,
     BaseResponseData,
     LocationMixin,
+    PolylineMixin,
 )
 
 
@@ -138,7 +139,7 @@ class DistrictResponseData(BaseResponseData):
         return [DistrictData(d, static) for d in data] if data else []
 
 
-class DistrictData(BaseData, LocationMixin):
+class DistrictData(BaseData, LocationMixin, PolylineMixin):
     _properties = ('citycode',
                    'adcode',
                    'name',
