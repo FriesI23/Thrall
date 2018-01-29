@@ -38,7 +38,7 @@ class BaseRequest(object):
             self.session = session
 
     @set_default
-    def get(self, url, params, timeout=1, callback=None, **kwargs):
+    def get(self, url, params, timeout=None, callback=None, **kwargs):
         with self.catch_exception():
             r = self._get_result(url, params, timeout, **kwargs)
 
@@ -48,7 +48,7 @@ class BaseRequest(object):
         return r
 
     @set_default
-    def post(self, url, data, timeout=1, callback=None, **kwargs):
+    def post(self, url, data, timeout=None, callback=None, **kwargs):
         with self.catch_exception():
             r = self._post_result(url, data, timeout, **kwargs)
 
