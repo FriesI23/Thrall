@@ -363,4 +363,5 @@ class ReGeoAOI(BaseData, LocationMixin):
                    'adcode',
                    'location',
                    'area',
-                   'type')
+                   'type',
+                   'distance')
